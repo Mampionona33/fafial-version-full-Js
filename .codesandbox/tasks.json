@@ -2,12 +2,12 @@
   // These tasks will run in order when initializing your CodeSandbox project.
   "setupTasks": [
     {
-      "command": "cd backend && pnpm i",
-      "name": "c"
+      "command": "cd backend && pnpm install",
+      "name": "Installing backend Dependencies"
     },
     {
-      "command": "cd frontend && pnpm i",
-      "name": "c"
+      "command": "cd frontend && pnpm install",
+      "name": "Installing frontend Dependencies"
     }
   ],
 
