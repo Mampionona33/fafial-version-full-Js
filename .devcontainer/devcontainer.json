@@ -1,26 +1,24 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/typescript-node
-  {
+{
   "name": "Node.js & TypeScript",
   // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-  "image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
-  "features": {},
-    "customizations": {
-      "vscode": {
-        "extensions": [
-          "mongodb.mongodb-vscode",
-          "dsznajder.es7-react-js-snippets",
-          "ms-azuretools.vscode-docker",
-          "mhutchie.git-graph",
-          "prisma.prisma",
-          "vscode.git",
-          "esbenp.prettier-vscode",
-          "codeium.codeium"
-        ]
-      }
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:20",
+  "workspaceFolder": "/workspace",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "mongodb.mongodb-vscode",
+        "dsznajder.es7-react-js-snippets",
+        "ms-azuretools.vscode-docker",
+        "mhutchie.git-graph",
+        "prisma.prisma",
+        "vscode.git",
+        "esbenp.prettier-vscode",
+        "codeium.codeium"
+      ]
     }
-  
-
+  }
   // Features to add to the dev container. More info: https://containers.dev/features.
   // "features": {},
 
