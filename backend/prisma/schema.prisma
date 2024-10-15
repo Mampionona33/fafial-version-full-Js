@@ -1,0 +1,47 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Role {
+  id          Int          @id @default(autoincrement())
+  name        String       @unique // Déclare 'name' comme unique
+  permissions Permission[] // Relation avec les permissions
+  users       User[]       @relation("RoleUsers") // Relation avec les utilisateurs, nommée explicitement
+  createdAt   DateTime     @default(now()) // Date de création
+  updatedAt   DateTime     @updatedAt // Date de mise à jour automatique
+  status      Boolean      @default(true) // Statut actif ou non
+  User        User[]
+}
+
+model Permission {
+  id       Int    @id @default(autoincrement())
+  action   String // read, write, delete, etc.
+  resource String // Le nom de la ressource (ex: "Post", "User", "Product")
+  roleId   Int
+  role     Role   @relation(fields: [roleId], references: [id])
+
+  createdAt DateTime @default(now()) // Date de création
+  updatedAt DateTime @updatedAt // Date de mise à jour automatique
+  status    Boolean  @default(true) // Statut actif ou non
+}
+
+model User {
+  id       Int    @id @default(autoincrement())
+  email    String @unique
+  password String
+
+  // Relation avec les rôles
+  roles     Role[]   @relation("RoleUsers") // Utilise le même nom que dans Role
+  createdAt DateTime @default(now()) // Date de création
+  updatedAt DateTime @updatedAt // Date de mise à jour automatique
+  status    Boolean  @default(true) // Statut actif ou non
+  Role      Role?    @relation(fields: [roleId], references: [id])
+  roleId    Int?
+}
