@@ -1,16 +1,14 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
-import "./App.css";
+// App.tsx
+import { Outlet } from "react-router-dom";
 
-function App() {
-  const [count, setCount] = useState(0);
-
+const App = () => {
   return (
-    <>
-      <div>My app</div>
-    </>
+    <div>
+      {/* Header, navbar, or other shared components */}
+      <Outlet /> {/* This will render the child routes (like Login) */}
+      {/* Footer or other shared components */}
+    </div>
   );
-}
+};
 
 export default App;
