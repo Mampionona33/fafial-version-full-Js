@@ -12,12 +12,18 @@ const Login = () => {
           <AppInputText
             label="Email"
             id="email"
+            required
             type="email"
             mainClassName="text-slate-800"
             placeholder="Entrez votre email"
             inputClassName="w-full"
           />
-          <AppInputText label="Mot de passe" type="password" id="password" />
+          <AppInputText
+            required
+            label="Mot de passe"
+            type="password"
+            id="password"
+          />
           <button
             className="bg-slate-800 text-slate-50 font-bold py-2 px-4 rounded"
             type="submit"
