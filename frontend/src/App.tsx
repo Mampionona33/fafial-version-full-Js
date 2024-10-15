@@ -1,19 +1,16 @@
-import React from "react";
+import { useState } from "react";
+import reactLogo from "./assets/react.svg";
+import viteLogo from "/vite.svg";
 import "./App.css";
-import AppRoutes from "./routes/AppRoute";
-import { PrimeReactProvider } from "primereact/api";
-import "primereact/resources/themes/lara-light-cyan/theme.css";
 
-export const u = 12;
-console.log("exporting u really screws up HMR :(", u);
-const App = () => {
+function App() {
+  const [count, setCount] = useState(0);
+
   return (
     <>
-      <PrimeReactProvider>
-        <AppRoutes />
-      </PrimeReactProvider>
+      <div>My app</div>
     </>
   );
-};
+}
 
 export default App;

@@ -19,7 +19,7 @@ const Login = () => {
   return (
     <div className="h-screen flex flex-col justify-center items-center bg-gradient-to-t from-gradient-start to-gradient-end">
       <form
-        className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50 sm:h-auto min-h-[400px] w-11/12 md:w-3/4 p-4 shadow-md text-slate-800"
+        className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50 sm:h-auto min-h-[60vh] w-11/12 md:w-2/4 p-4 shadow-md text-slate-800"
         onSubmit={handleSubmit}
       >
         {/* Formulaire */}
@@ -51,7 +51,7 @@ const Login = () => {
         </div>
 
         {/* Image */}
-        <div className="md:col-span-1 w-full h-full flex justify-center items-center">
+        <div className="hidden md:flex md:col-span-1 w-full h-full justify-center items-center">
           <img
             className="w-full h-full object-cover rounded-md"
             src={bgImage}
