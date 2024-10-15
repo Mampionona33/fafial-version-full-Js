@@ -12,8 +12,6 @@ if (!JWT_SECRET) {
 export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
-  console.log(email, password);
-
   try {
     const user = await prisma.user.findUnique({
       where: {
@@ -27,10 +25,13 @@ export const login = async (req: Request, res: Response) => {
       return;
     }
     const isMatch = await bcrypt.compare(password, user.password);
+
+    console.log("authController: ", email, isMatch);
     if (!isMatch) {
       res.status(401).json({
         message: "Invalid email or password",
       });
+      return;
     }
     const token = jwt.sign({ userId: user.id }, JWT_SECRET);
     res.json({ token });
