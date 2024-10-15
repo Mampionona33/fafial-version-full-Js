@@ -1,16 +1,17 @@
 import { PrismaClient } from "@prisma/client";
-import bcrypt from "bcryptjs"; // Ajout pour sécuriser les mots de passe
 
-const prisma = new PrismaClient();
+import bcrypt from "bcryptjs";
+
+const client = new PrismaClient();
 
 async function main() {
   // Créer des rôles
-  const adminRole = await prisma.role.create({ data: { name: "admin" } });
-  const editorRole = await prisma.role.create({ data: { name: "editor" } });
-  const viewerRole = await prisma.role.create({ data: { name: "viewer" } });
+  const adminRole = await client.role.create({ data: { name: "admin" } });
+  const editorRole = await client.role.create({ data: { name: "editor" } });
+  const viewerRole = await client.role.create({ data: { name: "viewer" } });
 
   // Créer des permissions pour différentes ressources
-  await prisma.permission.createMany({
+  await client.permission.createMany({
     data: [
       // Permissions pour User
       { action: "read", resource: "User", roleId: adminRole.id },
@@ -32,7 +33,7 @@ async function main() {
   const hashedViewerPassword = await bcrypt.hash("viewerpassword", 10);
 
   // Créer chaque utilisateur avec un rôle
-  await prisma.user.create({
+  await client.user.create({
     data: {
       email: "admin@example.com",
       password: hashedAdminPassword,
@@ -40,7 +41,7 @@ async function main() {
     },
   });
 
-  await prisma.user.create({
+  await client.user.create({
     data: {
       email: "editor@example.com",
       password: hashedEditorPassword,
@@ -48,7 +49,7 @@ async function main() {
     },
   });
 
-  await prisma.user.create({
+  await client.user.create({
     data: {
       email: "viewer@example.com",
       password: hashedViewerPassword,
@@ -61,11 +62,11 @@ async function main() {
 
 main()
   .then(async () => {
-    await prisma.$disconnect();
+    await client.$disconnect();
   })
   .catch(async (e) => {
     console.error(e);
-    await prisma.$disconnect();
+    await client.$disconnect();
     // @ts-ignore
     process.exit(1);
   });
