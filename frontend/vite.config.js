@@ -16,9 +16,9 @@ export default defineConfig({
       "@": path.resolve(__dirname, "src"),
     },
   },
-  optimizeDeps: {
-    include: ["@tailwindConfig"],
-  },
+  // optimizeDeps: {
+  //   include: ["@tailwindConfig"],
+  // },
   commonjsOptions: {
     types: ["vite/client"],
   },
