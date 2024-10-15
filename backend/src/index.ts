@@ -1,7 +1,7 @@
-import express, { Request, Response, NextFunction } from "express";
 import dotenv from "dotenv";
-
 dotenv.config();
+import express, { Request, Response, NextFunction } from "express";
+import loginRouter from "./routes/authRoutes";
 
 const app = express();
 
@@ -12,6 +12,8 @@ app.use(express.json());
 app.get("/", (req: Request, res: Response) => {
   res.send("Hello World from TypeScript + Express!");
 });
+
+app.use("/api/v1", loginRouter);
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error(err.stack);
