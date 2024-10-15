@@ -27,6 +27,7 @@ export default defineConfig({
       transformMixedEsModules: true,
     },
   },
+
   // server: {
   //   port: 5173,
   //   host: "0.0.0.0",
