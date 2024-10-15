@@ -51,7 +51,7 @@ const Login = () => {
         </div>
 
         {/* Image */}
-        <div className="hidden md:flex md:col-span-1 w-full h-full justify-center items-center">
+        <div className="hidden md:flex md:col-span-1 sm:hidden w-full h-full justify-center items-center">
           <img
             className="w-full h-full object-cover rounded-md"
             src={bgImage}
