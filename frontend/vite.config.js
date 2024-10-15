@@ -16,9 +16,9 @@ export default defineConfig({
       "@": path.resolve(__dirname, "src"),
     },
   },
-  // optimizeDeps: {
-  //   include: ["@tailwindConfig"],
-  // },
+  optimizeDeps: {
+    include: ["@tailwindConfig"],
+  },
   commonjsOptions: {
     types: ["vite/client"],
   },
@@ -28,8 +28,9 @@ export default defineConfig({
     },
   },
 
-  // server: {
-  //   port: 5173,
-  //   host: "0.0.0.0",
-  // },
+  server: {
+    // hmr: false,
+    // port: 5173,
+    // host: "0.0.0.0",
+  },
 });
