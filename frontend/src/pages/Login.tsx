@@ -1,6 +1,6 @@
 import React from "react";
 import AppInputText from "../components/AppInputText";
-//@ts-ignore.
+//@ts-ignore
 import bgImage from "@/assets/fafiala_background_image_02.jpg";
 
 const Login = () => {
@@ -17,14 +17,14 @@ const Login = () => {
   };
 
   return (
-    <div className="h-screen flex flex-col w-screen justify-center items-center bg-gradient-to-t from-gradient-start to-gradient-end">
+    <div className="h-screen flex flex-col justify-center items-center bg-gradient-to-t from-gradient-start to-gradient-end">
       <form
-        className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50 h-2/3 w-3/4 p-2 shadow-md text-slate-800"
+        className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50 sm:h-auto min-h-[400px] w-11/12 md:w-3/4 p-4 shadow-md text-slate-800"
         onSubmit={handleSubmit}
       >
         {/* Formulaire */}
         <div className="flex justify-center flex-col gap-4 px-7">
-          <p className="text-2xl text-left">Login</p>
+          <p className="text-2xl md:text-3xl text-left font-bold">Login</p>
           <AppInputText
             label="Email"
             id="email"
@@ -43,7 +43,7 @@ const Login = () => {
             required
           />
           <button
-            className="bg-slate-800 text-slate-50 font-bold py-2 px-4 rounded"
+            className="bg-slate-800 text-slate-50 font-bold py-2 px-4 rounded mt-4"
             type="submit"
           >
             Se connecter
@@ -51,11 +51,13 @@ const Login = () => {
         </div>
 
         {/* Image */}
-        <img
-          className="w-full h-full object-cover md:col-span-1"
-          src={bgImage}
-          alt="Background"
-        />
+        <div className="md:col-span-1 w-full h-full flex justify-center items-center">
+          <img
+            className="w-full h-full object-cover rounded-md"
+            src={bgImage}
+            alt="Background"
+          />
+        </div>
       </form>
     </div>
   );

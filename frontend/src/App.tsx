@@ -4,7 +4,9 @@ import AppRoutes from "./routes/AppRoute";
 import { PrimeReactProvider } from "primereact/api";
 import "primereact/resources/themes/lara-light-cyan/theme.css";
 
-function App() {
+export const u = 12;
+console.log("exporting u really screws up HMR :(", u);
+const App = () => {
   return (
     <>
       <PrimeReactProvider>
@@ -12,6 +14,6 @@ function App() {
       </PrimeReactProvider>
     </>
   );
-}
+};
 
 export default App;
