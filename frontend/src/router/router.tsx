@@ -6,6 +6,7 @@ import {
 import App from "../App";
 import Login from "../pages/Login";
 import ProtectedRoute from "./PrivateRoute";
+import Dashboard from "../pages/Dashboard";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -14,6 +15,7 @@ const router = createBrowserRouter(
       <Route path="/login" element={<Login />} />
       <Route element={<ProtectedRoute />}>
         {/* All other routes that you want to protect will go inside here */}
+        <Route path="/dashboard" element={<Dashboard />} />
       </Route>
     </Route>
   )

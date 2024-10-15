@@ -1,18 +1,16 @@
 import React from "react";
 import AppInputText from "../components/AppInputText";
 import bgImage from "@/assets/fafiala_background_image_02.jpg";
-import AuthServices from "../services/AuthServices";
+import { useAuth } from "../hooks/useAuth";
 
 const Login = () => {
+  const { login } = useAuth();
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    try {
-      await AuthServices.login(
-        event.currentTarget.email.value,
-        event.currentTarget.password.value
-      );
-    } catch (error) {}
-    // Do something with the form data here
+    const formData = new FormData(event.currentTarget);
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+    await login(email, password);
   };
 
   return (
