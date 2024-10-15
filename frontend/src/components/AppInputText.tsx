@@ -46,7 +46,7 @@ const AppInputText = forwardRef<HTMLInputElement, AppInputTextProps>(
           value={value}
           onChange={onChange}
           ref={ref}
-          className={`p-inputtext !text-slate-500 w-full text-sm py-1 px-2 ${inputClassName}`}
+          className={`p-inputtext !text-slate-500 w-full text-sm py-1 px-2 border ${inputClassName}`}
           {...rest}
         />
         {errorMessage && (
