@@ -1,8 +1,13 @@
 import { createContext } from "react";
+import { LoginData } from "../services/AuthServices";
 
-interface AuthContextType {
+// frontend/src/contexts/AuthContext.tsx
+export interface AuthContextType {
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (
+    email: string,
+    password: string
+  ) => Promise<{ status: number; data: LoginData } | undefined>;
   logout: () => void;
 }
 

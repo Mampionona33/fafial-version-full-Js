@@ -9,14 +9,20 @@ import path from "path";
 const app = express();
 const server = http.createServer(app);
 
-// Updated CORS options with specific origin
+// Updated CORS options with specific origin and credentials
 const corsOptions = {
-  origin: process.env.NODE_ENV === "production" ? process.env.CLIENT_URL : "*",
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  credentials: true,
+  origin: process.env.CLIENT_URL,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Include OPTIONS for preflight
+  allowedHeaders: ["Content-Type", "Authorization"], // Allow headers required by your requests
+  credentials: true, // Allow credentials (cookies, authorization headers)
 };
 
+// Use CORS middleware
 app.use(cors(corsOptions));
+
+// Handle preflight requests for all routes
+app.options("*", cors(corsOptions));
+
 app.use(express.json());
 
 if (process.env.NODE_ENV === "production") {
@@ -27,8 +33,6 @@ if (process.env.NODE_ENV === "production") {
 }
 
 const PORT = process.env.PORT || 5000;
-
-app.use(express.json());
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Hello World from TypeScript + Express!");
