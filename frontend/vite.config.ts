@@ -9,4 +9,16 @@ export default defineConfig({
       "@": "/src",
     },
   },
+  optimizeDeps: {
+    include: ["@tailwindConfig"],
+  },
+  // build: {
+  //   commonjsOptions: {
+  //     transformMixedEsModules: true,
+  //   },
+  // },
+  server: {
+    port: 5173,
+    host: "0.0.0.0",
+  },
 });
