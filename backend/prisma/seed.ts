@@ -1,59 +1,67 @@
 import { PrismaClient } from "@prisma/client";
-
 import bcrypt from "bcryptjs";
 
 const client = new PrismaClient();
 
 async function main() {
   // Créer des rôles
-  const adminRole = await client.role.create({ data: { name: "admin" } });
-  const editorRole = await client.role.create({ data: { name: "editor" } });
-  const viewerRole = await client.role.create({ data: { name: "viewer" } });
+  const superAdmin = await client.role.create({ data: { name: "superadmin" } });
+  const responsable = await client.role.create({
+    data: { name: "responsable" },
+  });
+  const accueil = await client.role.create({ data: { name: "accueil" } });
 
   // Créer des permissions pour différentes ressources
   await client.permission.createMany({
     data: [
-      // Permissions pour User
-      { action: "read", resource: "User", roleId: adminRole.id },
-      { action: "write", resource: "User", roleId: adminRole.id },
-      { action: "delete", resource: "User", roleId: adminRole.id },
+      // Permissions pour Salle
+      { action: "read", resource: "Salle", roleId: superAdmin.id },
+      { action: "write", resource: "Salle", roleId: superAdmin.id },
+      { action: "delete", resource: "Salle", roleId: superAdmin.id },
 
-      // Permissions pour Post
-      { action: "read", resource: "Post", roleId: editorRole.id },
-      { action: "write", resource: "Post", roleId: editorRole.id },
+      { action: "read", resource: "Salle", roleId: responsable.id },
+      { action: "write", resource: "Salle", roleId: responsable.id },
 
-      // Permissions pour viewer (lecture seulement)
-      { action: "read", resource: "Post", roleId: viewerRole.id },
+      { action: "read", resource: "Salle", roleId: accueil.id },
     ],
   });
 
   // Créer des utilisateurs avec des mots de passe sécurisés
-  const hashedAdminPassword = await bcrypt.hash("adminpassword", 10);
-  const hashedEditorPassword = await bcrypt.hash("editorpassword", 10);
-  const hashedViewerPassword = await bcrypt.hash("viewerpassword", 10);
+  const hashedSuperAdminPassword = await bcrypt.hash("superAdminPassword", 10);
+  const hashedResponsablePassword = await bcrypt.hash(
+    "responsablePassword",
+    10
+  );
+  const hashedAccueilPassword = await bcrypt.hash("accueilPassword", 10);
 
   // Créer chaque utilisateur avec un rôle
   await client.user.create({
     data: {
-      email: "admin@example.com",
-      password: hashedAdminPassword,
-      roles: { connect: { id: adminRole.id } }, // Association avec le rôle admin
+      email: "superadmin@example.com",
+      password: hashedSuperAdminPassword,
+      name: "Super",
+      lastName: "Admin",
+      roles: { connect: { id: superAdmin.id } }, // Association avec le rôle superAdmin
     },
   });
 
   await client.user.create({
     data: {
-      email: "editor@example.com",
-      password: hashedEditorPassword,
-      roles: { connect: { id: editorRole.id } }, // Association avec le rôle editor
+      email: "responsable@example.com",
+      password: hashedResponsablePassword,
+      name: "Jean",
+      lastName: "Responsable",
+      roles: { connect: { id: responsable.id } }, // Association avec le rôle responsable
     },
   });
 
   await client.user.create({
     data: {
-      email: "viewer@example.com",
-      password: hashedViewerPassword,
-      roles: { connect: { id: viewerRole.id } }, // Association avec le rôle viewer
+      email: "accueil@example.com",
+      password: hashedAccueilPassword,
+      name: "Marie",
+      lastName: "Accueil",
+      roles: { connect: { id: accueil.id } }, // Association avec le rôle accueil
     },
   });
 

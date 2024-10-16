@@ -4,7 +4,6 @@ import { useAuth } from "../hooks/useAuth";
 const AuthRedirect = () => {
   const { isAuthenticated } = useAuth();
   const location = useLocation();
-  console.log("isAuthenticated", isAuthenticated);
 
   // Si l'utilisateur n'est pas authentifie, on redirige vers la page de login
   if (!isAuthenticated && location.pathname !== "/login") {

@@ -36,6 +36,8 @@ model User {
   id       Int    @id @default(autoincrement())
   email    String @unique
   password String
+  name     String
+  lastName String
 
   // Relation avec les rôles
   roles     Role[]   @relation("RoleUsers") // Utilise le même nom que dans Role
