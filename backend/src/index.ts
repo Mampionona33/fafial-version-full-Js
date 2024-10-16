@@ -2,8 +2,29 @@ import dotenv from "dotenv";
 dotenv.config();
 import express, { Request, Response, NextFunction } from "express";
 import loginRouter from "./routes/authRoutes";
+import http from "http";
+import cors from "cors";
+import path from "path";
 
 const app = express();
+const server = http.createServer(app);
+
+// Updated CORS options with specific origin
+const corsOptions = {
+  origin: process.env.NODE_ENV === "production" ? process.env.CLIENT_URL : "*",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+app.use(express.json());
+
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static("frontend/build"));
+  app.get("*", (req: Request, res: Response) => {
+    res.sendFile(path.resolve(__dirname, "frontend", "build", "index.html"));
+  });
+}
 
 const PORT = process.env.PORT || 5000;
 
@@ -15,11 +36,12 @@ app.get("/", (req: Request, res: Response) => {
 
 app.use("/api/v1", loginRouter);
 
+// Error handling middleware
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error(err.stack);
   res.status(500).send("Something went wrong!");
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+server.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });

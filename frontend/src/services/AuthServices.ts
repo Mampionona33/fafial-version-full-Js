@@ -2,10 +2,13 @@ import axios from "axios";
 import Cookies from "js-cookie";
 
 class AuthServices {
-  private static URL_API = import.meta.env.VITE_API_END_POINT;
+  private static URL_API: string;
   private static COOKIE_NAME = "auth_token";
 
-  constructor() {}
+  // Static block for initializing static properties
+  static {
+    AuthServices.URL_API = `${import.meta.env.VITE_API_END_POINT}/api/v1`;
+  }
 
   // Login function to authenticate and store the token in a cookie
   public static async login(email: string, password: string) {
@@ -19,7 +22,7 @@ class AuthServices {
       // Store the JWT token in a cookie
       Cookies.set(AuthServices.COOKIE_NAME, response.data.token, {
         expires: 7, // Cookie expires in 7 days
-        secure: true, // Only sent over HTTPS
+        // secure: process.env.NODE_ENV === "production", // Only sent over HTTPS in production
         sameSite: "Strict", // Prevent CSRF
       });
 
@@ -35,6 +38,7 @@ class AuthServices {
         }
       }
 
+      // Throw generic error message for non-Axios errors
       throw new Error(
         `Unknown Error: ${
           (error as Error).message || "An unexpected error occurred"
