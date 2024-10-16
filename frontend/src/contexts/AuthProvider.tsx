@@ -22,7 +22,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     try {
       // Appel à AuthServices.login pour obtenir le token et le stocker dans les cookies
       const respons = await AuthServices.login(email, password);
-      setIsAuthenticated(true);
+      if (respons?.status === 200) {
+        setIsAuthenticated(true);
+      }
       return respons;
     } catch (error) {
       console.error("Login failed:", error);

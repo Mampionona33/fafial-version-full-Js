@@ -11,7 +11,7 @@
   box-sizing: border-box;
   font-family: "Inter", sans-serif;
 }
-
+/* 
 #root {
   width: 100%;
   height: 100%;
@@ -69,4 +69,4 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
-}
+} */
