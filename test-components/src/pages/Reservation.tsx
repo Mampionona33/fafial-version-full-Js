@@ -75,6 +75,21 @@ const Reservation = () => {
             />
           </div>
 
+          {/* Nom de l'organisation */}
+          <div>
+            <label
+              htmlFor="organisation"
+              className="block text-sm font-medium text-gray-600"
+            >
+              Organisation
+            </label>
+            <input
+              type="text"
+              id="organisation"
+              className="mt-1 block w-full px-0 py-2 bg-transparent border-b-2 border-gray-300 focus:outline-none focus:border-b-4 focus:border-gray-500 transition-all duration-100"
+            />
+          </div>
+
           {/* Nom complet */}
           <div>
             <label
@@ -269,13 +284,12 @@ const Reservation = () => {
             </div>
           </div>
           <div className="text-center mt-4">
-            <button
+            <input
               type="button"
+              value="Ajouter"
               onClick={handleAddAccompte}
-              className="bg-primary text-white px-4 py-2 mt-2 cursor-pointer"
-            >
-              Ajouter un Acompte
-            </button>
+              className="bg-green-900 hover:cursor-pointer hover:bg-green-800 text-white py-2 px-4 hover:bg-blue-600"
+            />
           </div>
 
           {/* Liste des acomptes */}
@@ -340,7 +354,7 @@ const Reservation = () => {
             <input
               type="submit"
               value="Enregistrer"
-              className="bg-primary text-white px-4 py-2 mt-6 cursor-pointer"
+              className="bg-primary hover:bg-gray-700 text-white px-4 py-2 mt-6 cursor-pointer"
             />
           </div>
         </form>
