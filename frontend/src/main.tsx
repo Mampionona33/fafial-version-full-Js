@@ -8,10 +8,10 @@ import { AuthProvider } from "./contexts/AuthProvider";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <PrimeReactProvider>
-      <AuthProvider>
+    <AuthProvider>
+      <PrimeReactProvider>
         <RouterProvider router={router} />
-      </AuthProvider>
-    </PrimeReactProvider>
+      </PrimeReactProvider>
+    </AuthProvider>
   </StrictMode>
 );

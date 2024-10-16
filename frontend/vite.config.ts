@@ -22,10 +22,10 @@ export default defineConfig({
     host: "0.0.0.0",
     strictPort: true,
   },
-  server: {
-    port: 5173,
-    host: "0.0.0.0",
-    strictPort: true,
-    origin: "http://localhost:5173",
-  },
+  // server: {
+  //   port: 5173,
+  //   host: "0.0.0.0",
+  //   strictPort: true,
+  //   origin: "http://localhost:5173",
+  // },
 });

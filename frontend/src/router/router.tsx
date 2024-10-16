@@ -1,5 +1,4 @@
 import {
-  Navigate,
   Route,
   createBrowserRouter,
   createRoutesFromElements,
@@ -8,22 +7,28 @@ import App from "../App";
 import Login from "../pages/Login";
 import ProtectedRoute from "./PrivateRoute";
 import Dashboard from "../pages/Dashboard";
+import AuthRedirect from "./AuthRedirect";
 
 // Create the routes
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<App />}>
-      <Route index element={<Login />} />
+      {/* Redirection vers login si non authentifié, sinon dashboard */}
+      <Route
+        index
+        element={
+          <AuthRedirect>
+            <Login />
+          </AuthRedirect>
+        }
+      />
       <Route path="/login" element={<Login />} />
       <Route element={<ProtectedRoute />}>
-        {/* All other routes that you want to protect will go inside here */}
-        <Route path="/" element={<Navigate to="/dashboard" />} />
+        {/* Toutes les routes protégées */}
         <Route path="/dashboard" element={<Dashboard />} />
       </Route>
     </Route>
   )
 );
-
-// You can't use `useAuth` directly outside a component, so you should wrap your Router with the Auth context or handle authentication checks inside components like ProtectedRoute.
 
 export default router;

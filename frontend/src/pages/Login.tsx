@@ -5,16 +5,9 @@ import { useAuth } from "../hooks/useAuth";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { AxiosError } from "axios";
-import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const { login } = useAuth();
-  const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
-
-  React.useEffect(() => {
-    navigate("/dashboard");
-  }, [isAuthenticated, navigate]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();

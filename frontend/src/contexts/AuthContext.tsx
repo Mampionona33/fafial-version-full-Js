@@ -1,7 +1,6 @@
 import { createContext } from "react";
 import { LoginData } from "../services/AuthServices";
 
-// frontend/src/contexts/AuthContext.tsx
 export interface AuthContextType {
   isAuthenticated: boolean;
   login: (
