@@ -1,10 +1,11 @@
 import React from "react";
-import AppInputText from "../components/AppInputText";
+import AppInputText from "../components/AppInput";
 import bgImage from "../assets/fafiala_background_image_02.jpg";
 import { useAuth } from "../hooks/useAuth";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { AxiosError } from "axios";
+import AppLabel from "../components/AppLabel";
 
 const Login = () => {
   const { login } = useAuth();
@@ -47,23 +48,30 @@ const Login = () => {
       >
         <div className="flex justify-center flex-col gap-4 px-7">
           <p className="text-2xl md:text-3xl text-left font-bold">Login</p>
-          <AppInputText
-            label="Email"
-            id="email"
-            name="email"
-            required
-            type="email"
-            mainClassName="text-slate-800"
-            placeholder="Entrez votre email"
-            inputClassName="w-full"
-          />
-          <AppInputText
-            label="Mot de passe"
-            type="password"
-            id="password"
-            name="password"
-            required
-          />
+
+          <div className="flex flex-col gap-3">
+            <div>
+              <AppLabel htmlFor="email">Email</AppLabel>
+              <AppInputText
+                id="email"
+                name="email"
+                type="email"
+                placeholder="Entrer votre email"
+                autoComplete="email"
+              />
+            </div>
+            <div>
+              <AppLabel htmlFor="password">Mot de passe</AppLabel>
+              <AppInputText
+                id="password"
+                name="password"
+                type="password"
+                autoComplete="current-password"
+                placeholder="Entrer votre mot de passe"
+              />
+            </div>
+          </div>
+
           <button
             className="bg-slate-800 text-slate-50 font-bold py-2 px-4 rounded mt-4"
             type="submit"
@@ -73,7 +81,7 @@ const Login = () => {
         </div>
         <div className="hidden md:flex md:col-span-1 sm:hidden w-full h-full justify-center items-center">
           <img
-            className="w-full h-full object-cover rounded-md"
+            className="w-full h-full object-cover rounded-tr-md rounded-br-md"
             src={bgImage}
             alt="Background"
           />

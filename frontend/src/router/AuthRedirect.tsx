@@ -1,26 +1,20 @@
-import { Navigate, useLocation } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
-import { ReactNode } from "react";
 
-interface AuthRedirectProps {
-  children: ReactNode;
-}
-
-const AuthRedirect = ({ children }: AuthRedirectProps) => {
+const AuthRedirect = () => {
   const { isAuthenticated } = useAuth();
   const location = useLocation();
+  console.log("isAuthenticated", isAuthenticated);
 
-  console.log("isAuthenticated: ", isAuthenticated);
-
-  // Redirection si authentifié et à la racine ou sur la page de login
-  if (
-    isAuthenticated &&
-    (location.pathname === "/" || location.pathname === "/login")
-  ) {
-    return <Navigate to="/dashboard" replace />;
+  // Si l'utilisateur n'est pas authentifie, on redirige vers la page de login
+  if (!isAuthenticated && location.pathname !== "/login") {
+    return <Navigate to="/login" state={{ from: location }} />;
+  } else if (isAuthenticated && location.pathname === "/login") {
+    return <Navigate to="/dashboard" state={{ from: location }} />;
   }
 
-  return <>{children}</>;
+  // Sinon, on rend les sous-composants
+  return <Outlet />;
 };
 
 export default AuthRedirect;
