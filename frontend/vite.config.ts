@@ -12,13 +12,20 @@ export default defineConfig({
   optimizeDeps: {
     include: ["@tailwindConfig"],
   },
-  // build: {
-  //   commonjsOptions: {
-  //     transformMixedEsModules: true,
-  //   },
-  // },
+  build: {
+    commonjsOptions: {
+      transformMixedEsModules: true,
+    },
+  },
+  preview: {
+    port: 5173,
+    host: "0.0.0.0",
+    strictPort: true,
+  },
   server: {
     port: 5173,
     host: "0.0.0.0",
+    strictPort: true,
+    origin: "http://localhost:5173",
   },
 });
