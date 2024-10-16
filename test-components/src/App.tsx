@@ -8,7 +8,7 @@ import Reservation from "./pages/Reservation";
 function App() {
   return (
     <>
-      <div>
+      <div className="w-screen p-4 h-full bg-gradient-to-t from-gradient-start to-gradient-end">
         {/* <AppCalendar /> */}
         <Reservation />
       </div>
