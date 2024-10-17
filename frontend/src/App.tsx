@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom";
 import NavBar from "./components/NavBar";
-import { ToastContainer } from "react-toastify";
+
 import { PrimeReactProvider } from "primereact/api";
 import "primereact/resources/themes/lara-light-indigo/theme.css";
 import "primereact/resources/primereact.min.css";
@@ -9,6 +9,9 @@ import IndeterminateProgressBar from "./components/IndeterminateProgressBar";
 
 const App = () => {
   const { loading } = useAuth();
+
+  // console.log("user", user);
+
   return (
     <PrimeReactProvider>
       {loading && <IndeterminateProgressBar />}
@@ -17,7 +20,6 @@ const App = () => {
         <NavBar />
         <Outlet /> {/* This will render the child routes (like Login) */}
         {/* Footer or other shared components */}
-        <ToastContainer />
       </div>
     </PrimeReactProvider>
   );

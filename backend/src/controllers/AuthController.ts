@@ -86,6 +86,9 @@ class AuthController {
         where: {
           id: decoded.userId,
         },
+        include: {
+          roles: true,
+        },
       });
 
       if (!user) {
