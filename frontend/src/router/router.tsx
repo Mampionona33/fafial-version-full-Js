@@ -5,19 +5,44 @@ import {
 } from "react-router-dom";
 import Login from "../pages/Login";
 import ProtectedRoute from "./PrivateRoute";
-import Dashboard from "../pages/Dashboard";
 import AuthRedirect from "./AuthRedirect";
+import SuperAdminDashboard from "../pages/SuperAdmin/SuperAdmin.Dashboard";
+import StafDashboard from "../pages/Staf/Staf.Dashboard";
+import FrontDesckDashboard from "../pages/FrontDesck/FrontDesck.Dashboard";
+import Unauthorized from "../pages/Unauthorized";
 
 // Create the routes
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<AuthRedirect />}>
-      {/* Redirection vers login si non authentifié, sinon dashboard */}
+      {/* Page de connexion publique */}
       <Route path="/login" element={<Login />} />
-      <Route element={<ProtectedRoute />}>
-        {/* Toutes les routes protégées */}
-        <Route path="/dashboard" element={<Dashboard />} />
+
+      {/* Pages protégées, nécessitant une authentification et des rôles spécifiques */}
+      <Route element={<ProtectedRoute allowedRoles={["superAdmin", "staf"]} />}>
+        {/* Le tableau de bord est accessible aux rôles admin et manager */}
+        <Route path="/staf-dashboard" element={<StafDashboard />} />
       </Route>
+
+      {/* Page Admin uniquement accessible par les administrateurs */}
+      <Route element={<ProtectedRoute allowedRoles={["superAdmin"]} />}>
+        <Route
+          path="/super-admin-dashboard"
+          element={<SuperAdminDashboard />}
+        />
+      </Route>
+
+      <Route
+        element={<ProtectedRoute allowedRoles={["frontDesk", "superAdmin"]} />}
+      >
+        <Route
+          path="/front-desck-dashboard"
+          element={<FrontDesckDashboard />}
+        />
+      </Route>
+
+      {/* Page pour les utilisateurs non autorisés */}
+      <Route path="/Unauthorized" element={<Unauthorized />} />
     </Route>
   )
 );

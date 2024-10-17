@@ -5,45 +5,29 @@ const client = new PrismaClient();
 
 async function main() {
   // Créer des rôles
-  const superAdmin = await client.role.create({ data: { name: "superadmin" } });
-  const responsable = await client.role.create({
-    data: { name: "responsable" },
-  });
-  const accueil = await client.role.create({ data: { name: "accueil" } });
-  const manager = await client.role.create({ data: { name: "manager" } });
-  const user = await client.role.create({ data: { name: "user" } });
+  const superAdmin = await client.role.create({ data: { name: "superAdmin" } });
+  const staf = await client.role.create({ data: { name: "staf" } });
+  const frontDesk = await client.role.create({ data: { name: "frontDesk" } });
 
   // Créer des permissions pour différentes ressources
   await client.permission.createMany({
     data: [
-      // Permissions pour Salle
-      { action: "read", resource: "Salle", roleId: superAdmin.id },
-      { action: "write", resource: "Salle", roleId: superAdmin.id },
-      { action: "delete", resource: "Salle", roleId: superAdmin.id },
-
-      { action: "read", resource: "Salle", roleId: responsable.id },
-      { action: "write", resource: "Salle", roleId: responsable.id },
-
-      { action: "read", resource: "Salle", roleId: accueil.id },
-
-      { action: "read", resource: "Salle", roleId: manager.id },
-      { action: "write", resource: "Salle", roleId: manager.id },
-
-      { action: "read", resource: "Salle", roleId: user.id },
+      // Permissions pour différentes ressources par rôle
+      { action: "read", resource: "Dashboard", roleId: superAdmin.id },
+      { action: "write", resource: "Dashboard", roleId: superAdmin.id },
+      { action: "read", resource: "Dashboard", roleId: staf.id },
+      { action: "read", resource: "Dashboard", roleId: frontDesk.id },
     ],
   });
 
   // Créer des utilisateurs avec des mots de passe sécurisés
-  const hashedSuperAdminPassword = await bcrypt.hash("superAdminPassword", 10);
-  const hashedResponsablePassword = await bcrypt.hash(
-    "responsablePassword",
-    10
-  );
-  const hashedAccueilPassword = await bcrypt.hash("accueilPassword", 10);
-  const hashedManagerPassword = await bcrypt.hash("managerPassword", 10);
-  const hashedUserPassword = await bcrypt.hash("userPassword", 10);
+  const hashedSuperAdminPassword = await bcrypt.hash("SuperAdmin123!", 10);
+  const hashedStafPassword = await bcrypt.hash("StafPassword456$", 10);
+  const hashedFrontDeskPassword = await bcrypt.hash("FrontDesk789#", 10);
+  const hashedMultiRolePassword = await bcrypt.hash("MultiRole000@", 10);
+  const hashedUserPassword = await bcrypt.hash("StafUser321&", 10);
 
-  // Créer chaque utilisateur avec un rôle
+  // Créer chaque utilisateur avec un rôle et un mot de passe unique
   await client.user.create({
     data: {
       email: "superadmin@example.com",
@@ -56,51 +40,51 @@ async function main() {
 
   await client.user.create({
     data: {
-      email: "responsable@example.com",
-      password: hashedResponsablePassword,
-      name: "Jean",
-      lastName: "Responsable",
-      roles: { connect: { id: responsable.id } }, // Association avec le rôle responsable
+      email: "staf@example.com",
+      password: hashedStafPassword,
+      name: "John",
+      lastName: "Staf",
+      roles: { connect: { id: staf.id } }, // Association avec le rôle staf
     },
   });
 
   await client.user.create({
     data: {
-      email: "accueil@example.com",
-      password: hashedAccueilPassword,
-      name: "Marie",
-      lastName: "Accueil",
-      roles: { connect: { id: accueil.id } }, // Association avec le rôle accueil
+      email: "frontdesk@example.com",
+      password: hashedFrontDeskPassword,
+      name: "Anna",
+      lastName: "FrontDesk",
+      roles: { connect: { id: frontDesk.id } }, // Association avec le rôle frontDesk
     },
   });
 
-  // Utilisateur avec plusieurs rôles (manager et responsable)
+  // Utilisateur avec plusieurs rôles (superAdmin et frontDesk)
   await client.user.create({
     data: {
-      email: "manager@example.com",
-      password: hashedManagerPassword,
-      name: "Paul",
-      lastName: "Manager",
+      email: "adminfrontdesk@example.com",
+      password: hashedMultiRolePassword,
+      name: "Alex",
+      lastName: "AdminFrontDesk",
       roles: {
         connect: [
-          { id: manager.id }, // Rôle Manager
-          { id: responsable.id }, // Rôle Responsable
+          { id: superAdmin.id }, // Rôle SuperAdmin
+          { id: frontDesk.id }, // Rôle FrontDesk
         ],
       },
     },
   });
 
-  // Utilisateur avec plusieurs rôles (user et accueil)
+  // Utilisateur avec plusieurs rôles (staf et frontDesk)
   await client.user.create({
     data: {
-      email: "user@example.com",
+      email: "stafuser@example.com",
       password: hashedUserPassword,
       name: "Sophie",
-      lastName: "User",
+      lastName: "StafUser",
       roles: {
         connect: [
-          { id: user.id }, // Rôle User
-          { id: accueil.id }, // Rôle Accueil
+          { id: staf.id }, // Rôle Staf
+          { id: frontDesk.id }, // Rôle FrontDesk
         ],
       },
     },
