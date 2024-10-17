@@ -6,7 +6,7 @@ class UserServices {
   private static URL_API: string = `${BACKEND_URL}/users`;
 
   // Méthode pour récupérer un utilisateur
-  public static async getUser() {
+  public static async getAuthenticatedUser() {
     try {
       const token = AuthServices.getToken(); // Récupération dynamique du token à chaque appel
 

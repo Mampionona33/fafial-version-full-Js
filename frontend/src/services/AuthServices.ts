@@ -1,6 +1,6 @@
 import axios from "axios";
 import Cookies from "js-cookie";
-import { BACKEND_URL } from "../constants/appContants";
+import { BACKEND_URL, COOKIE_NAME } from "../constants/appContants";
 
 export interface LoginData {
   token: string;
@@ -9,10 +9,11 @@ export interface LoginData {
 
 class AuthServices {
   private static URL_API: string;
-  private static COOKIE_NAME = "auth_token";
+  private static COOKIE_NAME: string;
 
   static {
     AuthServices.URL_API = BACKEND_URL;
+    AuthServices.COOKIE_NAME = COOKIE_NAME;
   }
 
   // Login function to authenticate and store the token in a cookie
