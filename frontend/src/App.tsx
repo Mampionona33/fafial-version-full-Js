@@ -10,15 +10,16 @@ import IndeterminateProgressBar from "./components/IndeterminateProgressBar";
 const App = () => {
   const { loading } = useAuth();
 
-  // console.log("user", user);
-
   return (
     <PrimeReactProvider>
       {loading && <IndeterminateProgressBar />}
       <div className="bg-gradient-to-t from-gradient-start to-gradient-end h-full w-full">
         {/* Header, navbar, or other shared components */}
         <NavBar />
-        <Outlet /> {/* This will render the child routes (like Login) */}
+        <div className="pt-16">
+          {/* Add padding to push the content down */}
+          <Outlet />
+        </div>
         {/* Footer or other shared components */}
       </div>
     </PrimeReactProvider>

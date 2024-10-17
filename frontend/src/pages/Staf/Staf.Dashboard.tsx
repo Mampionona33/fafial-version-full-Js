@@ -1,9 +1,9 @@
 const StafDashboard = () => {
-    return (
-        <div>
-            <h1>Staf Dashboard</h1>
-        </div>
-    );
-}
+  return (
+    <div className="min-h-screen">
+      <h1>Staf Dashboard</h1>
+    </div>
+  );
+};
 
-export default StafDashboard
+export default StafDashboard;
