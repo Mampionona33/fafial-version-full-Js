@@ -10,7 +10,13 @@ import IndeterminateProgressBar from "../components/IndeterminateProgressBar";
 import { PrimeReactProvider } from "primereact/api";
 
 const Login = () => {
-  const { login, loading } = useAuth();
+  const { login, loading, isAuthenticated } = useAuth();
+
+  React.useEffect(() => {
+    if (!isAuthenticated) {
+      toast.info("Déconnexion réussie.");
+    }
+  }, [isAuthenticated]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();

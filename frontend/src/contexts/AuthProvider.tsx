@@ -79,10 +79,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
     Cookies.remove(COOKIE_NAME);
     localStorage.removeItem("user"); // Supprimer l'utilisateur de localStorage
     setIsAuthenticated(false);
+    
     setSuser(null);
   };
 
