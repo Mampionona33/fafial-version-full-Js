@@ -34,7 +34,7 @@ const Login = () => {
   };
 
   return (
-    <div className="h-screen flex flex-col justify-center items-center bg-gradient-to-t from-gradient-start to-gradient-end">
+    <div className="h-screen flex flex-col justify-center px-16 md:px-4 items-center bg-gradient-to-t from-gradient-start to-gradient-end">
       <form
         className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50 sm:h-auto min-h-[60vh] w-11/12 md:w-2/4 p-4 shadow-md text-slate-800"
         onSubmit={handleSubmit}
