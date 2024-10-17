@@ -6,6 +6,9 @@ import "primereact/resources/themes/lara-light-indigo/theme.css";
 import "primereact/resources/primereact.min.css";
 import { useAuth } from "./hooks/useAuth";
 import IndeterminateProgressBar from "./components/IndeterminateProgressBar";
+import "primeicons/primeicons.css";
+import "material-symbols";
+
 const App = () => {
   const { loading } = useAuth();
 
