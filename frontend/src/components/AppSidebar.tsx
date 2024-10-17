@@ -1,7 +1,12 @@
 import { Sidebar, SidebarProps } from "primereact/sidebar";
-import { Link } from "react-router-dom";
+import StafDashboard from "./StafDashboard";
+import { useLocation } from "react-router-dom";
 
 const AppSidebar = ({ visible, onHide }: SidebarProps) => {
+  const pathName = useLocation().pathname;
+
+  console.log("phathName", pathName);
+
   return (
     <Sidebar
       visible={visible}
@@ -19,8 +24,8 @@ const AppSidebar = ({ visible, onHide }: SidebarProps) => {
       className="w-64 shadow-sm rounded-tr-md rounded-br-md bg-slate-100"
     >
       <hr className="mt-2" />
-      <div className="card flex justify-content-center  pl-4 pt-5">
-        <Link to={"/"}>Dashboard</Link>
+      <div className="pt-5 w-full">
+        {pathName === "/staf-dashboard" && <StafDashboard />}
       </div>
     </Sidebar>
   );

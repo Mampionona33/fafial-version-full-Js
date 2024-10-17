@@ -2,11 +2,11 @@ import React, { useState, useEffect, ReactNode } from "react";
 import Cookies from "js-cookie";
 import { AuthContext } from "./AuthContext";
 import { toast } from "react-toastify";
-import { LoginData } from "../../interfaces/LoginDataInterface";
+import { LoginData } from "../interfaces/LoginDataInterface";
 import AuthServices from "../services/AuthServices";
 import { AxiosError } from "axios";
 import UserServices from "../services/UserServices";
-import { UserInterface } from "../../interfaces/userInterface";
+import { UserInterface } from "../interfaces/userInterface";
 import { COOKIE_NAME } from "../constants/appContants";
 import { ToastContainer } from "react-toastify";
 
@@ -83,7 +83,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     Cookies.remove(COOKIE_NAME);
     localStorage.removeItem("user"); // Supprimer l'utilisateur de localStorage
     setIsAuthenticated(false);
-    
+
     setSuser(null);
   };
 

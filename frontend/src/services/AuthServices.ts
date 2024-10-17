@@ -1,7 +1,7 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 import { BACKEND_URL, COOKIE_NAME } from "../constants/appContants";
-import { LoginData } from "../../interfaces/LoginDataInterface";
+import { LoginData } from "../interfaces/LoginDataInterface";
 
 class AuthServices {
   private static URL_API: string;
