@@ -1,8 +1,10 @@
 import React, { useState, useEffect, ReactNode } from "react";
 import Cookies from "js-cookie";
-import { AuthContext } from "./AuthContext"; // Import context and hook
+import { AuthContext } from "./AuthContext";
+import { toast } from "react-toastify";
 
 import AuthServices, { LoginData } from "../services/AuthServices";
+import { AxiosError } from "axios";
 
 // Le provider AuthContext
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({
@@ -20,15 +22,27 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     password: string
   ): Promise<{ status: number; data: LoginData } | undefined> => {
     try {
-      // Appel à AuthServices.login pour obtenir le token et le stocker dans les cookies
-      const respons = await AuthServices.login(email, password);
-      console.log(respons);
-      if (respons?.status === 200) {
+      const response = await AuthServices.login(email, password);
+
+      if (response.status === 200) {
         setIsAuthenticated(true);
+      } else if (response.status === 401) {
+        setIsAuthenticated(false);
+        toast.error(
+          response.data.message || "Unauthorized. Check your credentials."
+        );
       }
-      return respons;
+
+      return response;
     } catch (error) {
-      console.error("Login failed:", error);
+      if (error instanceof AxiosError && error.response?.status === 401) {
+        toast.error(
+          error.response.data.message || "Unauthorized. Check your credentials."
+        );
+      } else {
+        console.error("Login failed:", error);
+        toast.error("An unexpected error occurred. Please try again.");
+      }
       throw error;
     }
   };

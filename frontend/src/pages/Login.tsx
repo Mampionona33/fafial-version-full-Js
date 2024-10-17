@@ -22,13 +22,6 @@ const Login = () => {
       if (!resp) {
         throw new Error("Login failed. Please try again.");
       }
-      if (resp.status === 200) {
-        toast.success("Login successful!");
-      }
-
-      if (resp.status === 401) {
-        toast.error("Invalid email or password. Please try again.");
-      }
     } catch (error: AxiosError | unknown) {
       if (error instanceof AxiosError) {
         toast.error(

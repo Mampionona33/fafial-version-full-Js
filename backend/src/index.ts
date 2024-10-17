@@ -12,15 +12,13 @@ const server = http.createServer(app);
 // Updated CORS options with specific origin and credentials
 const corsOptions = {
   origin: process.env.CLIENT_URL,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Include OPTIONS for preflight
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"], // Allow headers required by your requests
   credentials: true, // Allow credentials (cookies, authorization headers)
 };
 
-// Use CORS middleware
 app.use(cors(corsOptions));
 
-// Handle preflight requests for all routes
 app.options("*", cors(corsOptions));
 
 app.use(express.json());

@@ -4,7 +4,7 @@ import { BACKEND_URL } from "../constants/appContants";
 
 export interface LoginData {
   token: string;
-  // Add other properties as needed
+  message?: string;
 }
 
 class AuthServices {
