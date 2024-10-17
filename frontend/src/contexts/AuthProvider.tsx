@@ -14,26 +14,28 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setSuser] = useState<UserInterface | null>(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const token = Cookies.get("auth_token");
-    setIsAuthenticated(!!token); // Si le token existe, l'utilisateur est authentifié
+    setIsAuthenticated(!!token);
   }, []);
 
   const login = async (
     email: string,
     password: string
   ): Promise<{ status: number; data: LoginData } | undefined> => {
+    setLoading(true);
     try {
       const response = await AuthServices.login(email, password);
 
       if (response.status === 200) {
         const user = await UserServices.getAuthenticatedUser();
-
+        toast.success(response.data.message || "Connexion réussie.");
         if (user) {
+          console.log(user);
           setSuser(user);
         }
-
         setIsAuthenticated(true);
       } else if (response.status === 401) {
         setIsAuthenticated(false);
@@ -53,6 +55,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         toast.error("An unexpected error occurred. Please try again.");
       }
       throw error;
+    } finally {
+      setLoading(false); // Fin du chargement
     }
   };
 
@@ -66,6 +70,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       value={{
         isAuthenticated,
         user,
+        loading,
         login: login as (
           email: string,
           password: string

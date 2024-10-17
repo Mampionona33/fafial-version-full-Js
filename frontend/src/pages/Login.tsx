@@ -6,9 +6,11 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { AxiosError } from "axios";
 import AppLabel from "../components/AppLabel";
+import IndeterminateProgressBar from "../components/IndeterminateProgressBar";
+import { PrimeReactProvider } from "primereact/api";
 
 const Login = () => {
-  const { login } = useAuth();
+  const { login, loading } = useAuth();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -34,54 +36,57 @@ const Login = () => {
   };
 
   return (
-    <div className="h-screen flex flex-col justify-center px-16 md:px-4 items-center bg-gradient-to-t from-gradient-start to-gradient-end">
-      <form
-        className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50 sm:h-auto min-h-[60vh] w-11/12 md:w-2/4 p-4 shadow-md text-slate-800"
-        onSubmit={handleSubmit}
-      >
-        <div className="flex justify-center flex-col gap-4 px-7">
-          <p className="text-2xl md:text-3xl text-left font-bold">Login</p>
+    <PrimeReactProvider>
+      {loading && <IndeterminateProgressBar />}
+      <div className="h-screen flex flex-col justify-center px-16 md:px-4 items-center bg-gradient-to-t from-gradient-start to-gradient-end">
+        <form
+          className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50 sm:h-auto min-h-[60vh] w-11/12 md:w-2/4 p-4 shadow-md text-slate-800"
+          onSubmit={handleSubmit}
+        >
+          <div className="flex justify-center flex-col gap-4 px-7">
+            <p className="text-2xl md:text-3xl text-left font-bold">Login</p>
 
-          <div className="flex flex-col gap-3">
-            <div>
-              <AppLabel htmlFor="email">Email</AppLabel>
-              <AppInputText
-                id="email"
-                name="email"
-                type="email"
-                placeholder="Entrer votre email"
-                autoComplete="email"
-              />
+            <div className="flex flex-col gap-3">
+              <div>
+                <AppLabel htmlFor="email">Email</AppLabel>
+                <AppInputText
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="Entrer votre email"
+                  autoComplete="email"
+                />
+              </div>
+              <div>
+                <AppLabel htmlFor="password">Mot de passe</AppLabel>
+                <AppInputText
+                  id="password"
+                  name="password"
+                  type="password"
+                  autoComplete="current-password"
+                  placeholder="Entrer votre mot de passe"
+                />
+              </div>
             </div>
-            <div>
-              <AppLabel htmlFor="password">Mot de passe</AppLabel>
-              <AppInputText
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                placeholder="Entrer votre mot de passe"
-              />
-            </div>
+
+            <button
+              className="bg-slate-800 text-slate-50 font-bold py-2 px-4 rounded mt-4"
+              type="submit"
+            >
+              Se connecter
+            </button>
           </div>
-
-          <button
-            className="bg-slate-800 text-slate-50 font-bold py-2 px-4 rounded mt-4"
-            type="submit"
-          >
-            Se connecter
-          </button>
-        </div>
-        <div className="hidden md:flex md:col-span-1 sm:hidden w-full h-full justify-center items-center">
-          <img
-            className="w-full h-full object-cover rounded-tr-md rounded-br-md"
-            src={bgImage}
-            alt="Background"
-          />
-        </div>
-      </form>
-      <ToastContainer />
-    </div>
+          <div className="hidden md:flex md:col-span-1 sm:hidden w-full h-full justify-center items-center">
+            <img
+              className="w-full h-full object-cover rounded-tr-md rounded-br-md"
+              src={bgImage}
+              alt="Background"
+            />
+          </div>
+        </form>
+        <ToastContainer />
+      </div>
+    </PrimeReactProvider>
   );
 };
 
