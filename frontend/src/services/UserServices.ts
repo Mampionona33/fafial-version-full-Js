@@ -3,7 +3,7 @@ import { BACKEND_URL } from "../constants/appContants";
 import AuthServices from "./AuthServices";
 
 class UserServices {
-  private static URL_API: string = `${BACKEND_URL}/users`;
+  private static URL_API: string = `${BACKEND_URL}`;
 
   // Méthode pour récupérer un utilisateur
   public static async getAuthenticatedUser() {
@@ -14,11 +14,14 @@ class UserServices {
         throw new Error("Token is missing");
       }
 
-      const response = await axios.get(UserServices.URL_API, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axios.get(
+        `${UserServices.URL_API}/authenticated`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       return response.data;
     } catch (error) {

@@ -55,7 +55,7 @@ class AuthController {
   }
 
   // Méthode pour récupérer l'utilisateur à partir du token JWT
-  public static async getUserByToken(
+  public static async getAuthenticatedUser(
     req: Request,
     res: Response
   ): Promise<void> {
@@ -92,7 +92,7 @@ class AuthController {
         res.status(404).json({ message: "Utilisateur non trouvé" });
         return;
       }
-
+      console.log("AuthController: ", user);
       // Retourner les informations de l'utilisateur
       res.status(200).json(user);
     } catch (error) {

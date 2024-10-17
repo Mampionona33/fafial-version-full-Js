@@ -2,15 +2,18 @@ import React, { useState, useEffect, ReactNode } from "react";
 import Cookies from "js-cookie";
 import { AuthContext } from "./AuthContext";
 import { toast } from "react-toastify";
-
-import AuthServices, { LoginData } from "../services/AuthServices";
+import { LoginData } from "../../interfaces/LoginDataInterface";
+import AuthServices from "../services/AuthServices";
 import { AxiosError } from "axios";
+import UserServices from "../services/UserServices";
+import { UserInterface } from "../../interfaces/userInterface";
 
 // Le provider AuthContext
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setSuser] = useState<UserInterface | null>(null);
 
   useEffect(() => {
     const token = Cookies.get("auth_token");
@@ -25,6 +28,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       const response = await AuthServices.login(email, password);
 
       if (response.status === 200) {
+        const user = await UserServices.getAuthenticatedUser();
+
+        if (user) {
+          setSuser(user);
+        }
+
         setIsAuthenticated(true);
       } else if (response.status === 401) {
         setIsAuthenticated(false);
@@ -56,6 +65,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     <AuthContext.Provider
       value={{
         isAuthenticated,
+        user,
         login: login as (
           email: string,
           password: string
