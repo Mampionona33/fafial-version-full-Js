@@ -46,7 +46,7 @@ class AuthController {
         expiresIn: "1h", // On peut ajuster la durée d'expiration
       });
 
-      // Retourner le token
+      // Retourner le token JWT et un message à la vue
       res.json({ token, message: "Connexion réussie" });
     } catch (error) {
       console.error(error);
