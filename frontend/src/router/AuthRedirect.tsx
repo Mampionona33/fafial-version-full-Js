@@ -33,7 +33,7 @@ const AuthRedirect = () => {
     // Redirection en fonction d'un rôle unique
     if (hasSuperAdminRole) {
       return (
-        <Navigate to="/super-admin-dashboard" state={{ from: location }} />
+        <Navigate to="/super-admin/dashboard" state={{ from: location }} />
       );
     }
     if (hasStafRole) {
@@ -42,7 +42,7 @@ const AuthRedirect = () => {
     if (hasFrontDeskRole) {
       return (
         <Navigate
-          to="/front-desck-dashboard"
+          to="/front-desck/dashboard"
           state={{ from: location }}
           replace
         />
