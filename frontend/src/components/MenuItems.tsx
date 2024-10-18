@@ -51,7 +51,7 @@ const MenuItems = () => {
             >
               {item.icon}
             </span>
-            <span className="text-sm">{item.label}</span>
+            <span className="text-sm capitalize">{item.label}</span>
           </Link>
         </li>
       ))}
