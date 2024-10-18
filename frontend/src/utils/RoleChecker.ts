@@ -4,6 +4,9 @@ class RoleChecker {
   public static hasRole(user: UserInterface, roleName: string): boolean {
     return user.roles.some((role) => role.name === roleName);
   }
+  public static getUserRolesLength(user: UserInterface): number {
+    return user.roles.length;
+  }
 }
 
 export default RoleChecker;

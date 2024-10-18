@@ -1,5 +1,5 @@
 import { Sidebar, SidebarProps } from "primereact/sidebar";
-import StafDashboard from "./StafDashboard";
+import MenuItems from "./MenuItems";
 import { useLocation } from "react-router-dom";
 
 const AppSidebar = ({ visible, onHide }: SidebarProps) => {
@@ -25,7 +25,7 @@ const AppSidebar = ({ visible, onHide }: SidebarProps) => {
     >
       <hr className="mt-2" />
       <div className="pt-5 w-full">
-        {pathName === "/staf-dashboard" && <StafDashboard />}
+        <MenuItems />
       </div>
     </Sidebar>
   );
