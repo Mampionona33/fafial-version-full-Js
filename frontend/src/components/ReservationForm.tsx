@@ -1,8 +1,15 @@
 import AppLabel from "./AppLabel";
 import AppInput from "./AppInput";
 import AppTextarea from "./AppTextarea";
+import AppSelect from "./AppSelect";
 
 const ReservationForm = () => {
+  const options = [
+    { value: "salle_a", label: "Salle A" },
+    { value: "salle_b", label: "Salle B" },
+    { value: "salle_c", label: "Salle C" },
+  ];
+
   return (
     <div className="min-h-screen flex items-center justify-center h-full w-full">
       <div className="bg-white p-8 shadow-md w-full max-w-3xl">
@@ -57,7 +64,12 @@ const ReservationForm = () => {
               <AppInput id="heure_fin" type="time" required />
             </div>
           </div>
-          {/* Ajouter un acompte */}
+
+          <div className="col-span-1">
+            <AppLabel htmlFor="salle">Choisir une salle</AppLabel>
+            <AppSelect id="salle" options={options} />
+          </div>
+
           <div className="col-span-2">
             <AppLabel htmlFor="activite">Activité</AppLabel>
             <AppTextarea id="activite" />
