@@ -11,7 +11,7 @@ const NavBar = () => {
   };
 
   return (
-    <div className="bg-gray-900 text-white p-4 flex justify-end items-center px-2 py-2 fixed top-0 left-0 right-0  h-14">
+    <div className="bg-gray-900 text-white p-4 flex justify-end items-center px-2 py-2 fixed top-0 left-0 right-0  h-14 z-50">
       <div className="flex gap-4 justify-between w-full">
         <button
           onClick={() => setSidebarVisible(true)}

@@ -3,7 +3,7 @@ import AppCalendar from "../../components/AppCalendar";
 
 const StafCalendar = () => {
   return (
-    <div className="min-w-screen min-h-screen bg-transparent flex justify-center items-center px-4">
+    <div className="min-w-screen min-h-[80vh] bg-transparent flex justify-center items-center p-4">
       <div className="w-full max-w-5xl bg-slate-100 p-8 flex flex-col items-center justify-center">
         <div className="w-full flex flex-row items-center justify-between mb-6">
           <h1 className="text-3xl font-semibold text-gray-950">Calendrier</h1>
