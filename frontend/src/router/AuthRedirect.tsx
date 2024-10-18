@@ -5,14 +5,16 @@ const AuthRedirect = () => {
   const { isAuthenticated, user } = useAuth();
   const location = useLocation();
 
-  // Si l'utilisateur n'est pas authentifié et essaie d'accéder à une page protégée
+  console.log("user", user);
+
+  // Si l'utilisateur n'est pas authentifié
   if (!isAuthenticated && location.pathname !== "/login") {
     return <Navigate to="/login" state={{ from: location }} />;
   }
 
-  // Si l'utilisateur est authentifié et essaie d'accéder à la page de login
+  // Si l'utilisateur est authentifié
   if (isAuthenticated && location.pathname === "/login") {
-    // Vérification des rôles de l'utilisateur
+    // Récupérer les rôles de l'utilisateur
     const hasSuperAdminRole = user?.roles.some(
       (role: { name: string }) => role.name === "superAdmin"
     );
@@ -23,14 +25,26 @@ const AuthRedirect = () => {
       (role: { name: string }) => role.name === "frontDesk"
     );
 
-    // Redirection en fonction des rôles
+    // Si l'utilisateur a plusieurs rôles, redirige vers une page de sélection
+    const roles = [];
+    if (hasSuperAdminRole) roles.push("superAdmin");
+    if (hasStafRole) roles.push("staf");
+    if (hasFrontDeskRole) roles.push("frontDesk");
+
+    if (roles.length > 1) {
+      return <Navigate to="/select-dashboard" state={{ from: location }} />;
+    }
+
+    // Redirection en fonction d'un rôle unique
     if (hasSuperAdminRole) {
       return (
         <Navigate to="/super-admin-dashboard" state={{ from: location }} />
       );
-    } else if (hasStafRole) {
+    }
+    if (hasStafRole) {
       return <Navigate to="/staf-dashboard" state={{ from: location }} />;
-    } else if (hasFrontDeskRole) {
+    }
+    if (hasFrontDeskRole) {
       return (
         <Navigate
           to="/front-desck-dashboard"
@@ -38,9 +52,8 @@ const AuthRedirect = () => {
           replace
         />
       );
-    } else {
-      return <Navigate to="/unauthorized" state={{ from: location }} />;
     }
+    return <Navigate to="/unauthorized" state={{ from: location }} />;
   }
 
   // Sinon, on rend les sous-composants (routes protégées)
