@@ -41,7 +41,7 @@ const MenuItems = () => {
         <li key={item.to} className="w-full">
           <Link
             to={item.to}
-            className="hover:bg-gray-200 flex items-center gap-2 w-full py-1 px-4"
+            className="hover:bg-gray-200 flex items-center gap-2 w-full py-2 px-4"
             replace
           >
             <span

@@ -17,8 +17,8 @@ export const menuItemsByRole: { [key: string]: MenuItemPorps[] } = {
       icon: "calendar_month",
     },
     {
-      label: "gestion-tansaction",
-      to: "/staf-dashboard/gestion-tansaction",
+      label: "journal des caisses",
+      to: "/staf-dashboard/journal-des-caisses",
       icon: "receipt_long",
     },
     {
@@ -27,10 +27,15 @@ export const menuItemsByRole: { [key: string]: MenuItemPorps[] } = {
       icon: "meeting_room",
     },
     {
-      label:"paramatres",
+      label: "utilisateurs",
+      to: "/staf-dashboard/utilisateurs",
+      icon: "people",
+    },
+    {
+      label: "paramatres",
       to: "/staf-dashboard/paramatres",
       icon: "settings",
-    }
+    },
   ],
   frontDesk: [
     {
