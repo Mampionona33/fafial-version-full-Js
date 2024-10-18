@@ -2,7 +2,8 @@ import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import prisma from "../../prisma/prisma";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { JWT_SECRET } from "constants/envConstants";
+
+const JWT_SECRET = process.env.JWT_SECRET;
 
 class AuthController {
   // Méthode statique de connexion

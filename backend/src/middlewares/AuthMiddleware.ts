@@ -1,4 +1,3 @@
-import { JWT_SECRET } from "constants/envConstants";
 import { Request, Response, NextFunction } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
@@ -6,6 +5,8 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 interface AuthenticatedRequest extends Request {
   user?: string | JwtPayload;
 }
+
+const JWT_SECRET = process.env.JWT_SECRET;
 
 class AuthMiddleware {
   // Méthode statique pour vérifier le token

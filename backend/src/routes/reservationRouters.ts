@@ -1,4 +1,4 @@
-import AuthMiddleware from "middlewares/AuthMiddleware";
+import AuthMiddleware from "../middlewares/AuthMiddleware";
 import ReservationController from "../controllers/ReservationController";
 import express from "express";
 

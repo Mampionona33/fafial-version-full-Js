@@ -42,8 +42,8 @@ app.get("/", (req: Request, res: Response) => {
   res.send("Hello World from TypeScript + Express!");
 });
 
-app.use(apiVersion, loginRouter);
-app.use(apiVersion, reservationRouter);
+app.use("/api/v1", loginRouter);
+app.use("/api/v1", reservationRouter);
 
 // Error handling middleware
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {

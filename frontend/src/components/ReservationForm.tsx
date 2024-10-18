@@ -3,8 +3,17 @@ import AppInput from "./AppInput";
 import AppTextarea from "./AppTextarea";
 import AppSelect from "./AppSelect";
 import React from "react";
+import { v4 as uuidv4 } from "uuid";
+import ReservationService from "../services/ReservationService";
+import {
+  StatutReservation,
+  UtilisateurType,
+} from "../interfaces/ReservationInterface";
+import { useAuth } from "../hooks/useAuth";
+import RoleChecker from "../utils/RoleChecker";
 
 const ReservationForm = () => {
+  const { user } = useAuth();
   const [acomptes, setAcomptes] = React.useState<
     {
       id: string;
@@ -17,6 +26,18 @@ const ReservationForm = () => {
   const [montant, setMontant] = React.useState<number>(0);
   const [datePrevue, setDatePrevue] = React.useState<string>("");
   const [modePaiement, setModePaiement] = React.useState<string>("carte");
+
+  const [nomOrganisation, setnomOrganisation] = React.useState<string>("");
+  const [nomPrenomContact, setContactName] = React.useState<string>("");
+  const [email, setEmail] = React.useState<string>("");
+  const [telephone, setTelephone] = React.useState<string>("");
+  const [nombrePersonnes, setNombrePersonnes] = React.useState<number>(0);
+  const [dateDebut, setDateDebut] = React.useState<string>("");
+  const [heureDebut, setHeureDebut] = React.useState<string>("");
+  const [dateFin, setDateFin] = React.useState<string>("");
+  const [heureFin, setHeureFin] = React.useState<string>("");
+  const [activite, setActivite] = React.useState<string>("");
+  const [remarques, setRemarques] = React.useState<string>("");
 
   const options = [
     { value: "salle_a", label: "Salle A" },
@@ -31,8 +52,9 @@ const ReservationForm = () => {
   ];
 
   const handleAddAcompt = () => {
+    const id = uuidv4();
     const newAcompte = {
-      id: Date.now().toString(),
+      id: id,
       montant,
       datePrevue,
       modePaiement,
@@ -47,6 +69,50 @@ const ReservationForm = () => {
     setAcomptes(acomptes.filter((acompte) => acompte.id !== id));
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log({
+      nomOrganisation,
+      nomPrenomContact,
+      email,
+      telephone,
+      nombrePersonnes,
+      dateDebut,
+      heureDebut,
+      dateFin,
+      heureFin,
+      acomptes,
+      activite,
+      remarques,
+    });
+
+    try {
+      const res = await ReservationService.create({
+        id: uuidv4(),
+        reference: "",
+        nomOrganisation,
+        nomPrenomContact,
+        email,
+        telephone,
+        nombrePersonnes,
+        dateDebut,
+        heureDebut,
+        dateFin,
+        heureFin,
+        salleId: options[0].value, // Exemple pour salleId, ajustez selon votre logique
+        acomptes,
+        activite,
+        remarques,
+        statut: RoleChecker.hasRole(user!, "staf")
+          ? StatutReservation.VALIDE
+          : StatutReservation.EN_ATTENTE, // Valeur par défaut
+        utilisateurType: UtilisateurType.STAFF, // Valeur par défaut
+      });
+      console.log("Réservation créée :", res);
+    } catch (error) {
+      console.error("Erreur lors de la création de la réservation", error);
+    }
+  };
   return (
     <div className="min-h-screen flex items-center justify-center h-full w-full py-8 px-4">
       <div className="bg-white p-8 shadow-md w-full max-w-3xl">
@@ -54,27 +120,39 @@ const ReservationForm = () => {
           Réservation de Salle
         </h1>
         <hr className="mb-6" />
-        <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <form
+          onSubmit={handleSubmit}
+          className="grid grid-cols-1 md:grid-cols-2 gap-4"
+        >
           <div>
-            <AppLabel htmlFor="ref">Référence</AppLabel>
-            <AppInput id="ref" type="text" disabled placeholder="Référence" />
-          </div>
-          <div>
-            <AppLabel htmlFor="organis_name">Nom de l'organisation</AppLabel>
+            <AppLabel htmlFor="reference">Référence</AppLabel>
             <AppInput
-              id="organis_name"
+              id="reference"
               type="text"
-              placeholder="Nom de l'organisation"
+              disabled
+              placeholder="Référence"
             />
           </div>
           <div>
-            <AppLabel htmlFor="nom_prenom_contact">
+            <AppLabel htmlFor="nomOrganisation">Nom de l'organisation</AppLabel>
+            <AppInput
+              id="nomOrganisation"
+              type="text"
+              placeholder="Nom de l'organisation"
+              value={nomOrganisation}
+              onChange={(e) => setnomOrganisation(e.target.value)}
+            />
+          </div>
+          <div>
+            <AppLabel htmlFor="nomPrenomContact">
               Nom et prénom du contact
             </AppLabel>
             <AppInput
-              id="nom_prenom_contact"
+              id="nomPrenomContact"
               type="text"
               placeholder="Nom et prénom"
+              value={nomPrenomContact}
+              onChange={(e) => setContactName(e.target.value)}
             />
           </div>
           <div>
@@ -83,6 +161,8 @@ const ReservationForm = () => {
               id="email"
               type="email"
               placeholder="exemple@domaine.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
           </div>
           <div>
@@ -91,41 +171,69 @@ const ReservationForm = () => {
               id="telephone"
               type="text"
               placeholder="Numéro de téléphone"
+              value={telephone}
+              onChange={(e) => setTelephone(e.target.value)}
             />
           </div>
           <div>
-            <AppLabel htmlFor="nombre_personnes">Nombre de personnes</AppLabel>
+            <AppLabel htmlFor="nombrePersonnes">Nombre de personnes</AppLabel>
             <AppInput
-              id="nombre_personnes"
+              id="nombrePersonnes"
               type="number"
               required
               placeholder="Nombre de personnes"
+              value={nombrePersonnes}
+              onChange={(e) => setNombrePersonnes(e.target.valueAsNumber)}
             />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <AppLabel htmlFor="date_debut">Date de début</AppLabel>
-              <AppInput id="date_debut" type="date" required />
+              <AppLabel htmlFor="dateDebut">Date de début</AppLabel>
+              <AppInput
+                id="dateDebut"
+                type="date"
+                required
+                value={dateDebut}
+                onChange={(e) => setDateDebut(e.target.value)}
+              />
             </div>
             <div>
-              <AppLabel htmlFor="heure_debut">Heure de début</AppLabel>
-              <AppInput id="heure_debut" type="time" required />
+              <AppLabel htmlFor="heureDebut">Heure de début</AppLabel>
+              <AppInput
+                id="heureDebut"
+                type="time"
+                required
+                value={heureDebut}
+                onChange={(e) => setHeureDebut(e.target.value)}
+              />
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <AppLabel htmlFor="date_fin">Date de fin</AppLabel>
-              <AppInput id="date_fin" type="date" required />
+              <AppLabel htmlFor="dateFin">Date de fin</AppLabel>
+              <AppInput
+                id="dateFin"
+                type="date"
+                required
+                value={dateFin}
+                onChange={(e) => setDateFin(e.target.value)}
+              />
             </div>
             <div>
-              <AppLabel htmlFor="heure_fin">Heure de fin</AppLabel>
-              <AppInput id="heure_fin" type="time" required />
+              <AppLabel htmlFor="heureFin">Heure de fin</AppLabel>
+              <AppInput
+                id="heureFin"
+                type="time"
+                required
+                value={heureFin}
+                onChange={(e) => setHeureFin(e.target.value)}
+              />
             </div>
           </div>
 
           <div className="col-span-1">
-            <AppLabel htmlFor="salle">Choisir une salle</AppLabel>
-            <AppSelect id="salle" options={options} />
+            <AppLabel htmlFor="salleId">Choisir une salle</AppLabel>
+            <AppSelect id="salleId" options={options} />
           </div>
 
           {/* Acompte */}
@@ -199,6 +307,8 @@ const ReservationForm = () => {
             <AppTextarea
               id="activite"
               placeholder="Description de l'activité"
+              value={activite}
+              onChange={(e) => setActivite(e.target.value)}
             />
           </div>
           <div className="col-span-1 md:col-span-2">
@@ -206,6 +316,8 @@ const ReservationForm = () => {
             <AppTextarea
               id="remarques"
               placeholder="Ajoutez vos remarques ici..."
+              value={remarques}
+              onChange={(e) => setRemarques(e.target.value)}
             />
           </div>
 

@@ -1,14 +1,24 @@
 import axios from "axios";
 import { ReservationInterface } from "../interfaces/ReservationInterface";
 import { BACKEND_URL } from "../constants/appContants";
+import AuthServices from "./AuthServices";
 
 class ReservationService {
-  static API_URL = `${BACKEND_URL}/api/v1/reservations`;
+  static API_URL = `${BACKEND_URL}/reservations`;
+
+  // Méthode pour obtenir le token
+  private static getToken() {
+    return AuthServices.getToken();
+  }
 
   // Méthode pour obtenir toutes les réservations
-  static async getReservations(): Promise<ReservationInterface[]> {
+  static async getAll(): Promise<ReservationInterface[]> {
     try {
-      const response = await axios.get(`${this.API_URL}`);
+      const response = await axios.get(this.API_URL, {
+        headers: {
+          Authorization: `Bearer ${this.getToken()}`,
+        },
+      });
       return response.data as ReservationInterface[];
     } catch (error) {
       console.error("Erreur lors de la récupération des réservations", error);
@@ -17,11 +27,15 @@ class ReservationService {
   }
 
   // Méthode pour créer une nouvelle réservation
-  static async createReservation(
+  static async create(
     reservationData: ReservationInterface
   ): Promise<ReservationInterface> {
     try {
-      const response = await axios.post(`${this.API_URL}`, reservationData);
+      const response = await axios.post(this.API_URL, reservationData, {
+        headers: {
+          Authorization: `Bearer ${this.getToken()}`,
+        },
+      });
       return response.data as ReservationInterface;
     } catch (error) {
       console.error("Erreur lors de la création de la réservation", error);
@@ -30,14 +44,19 @@ class ReservationService {
   }
 
   // Méthode pour mettre à jour une réservation
-  static async updateReservation(
+  static async update(
     id: string,
     reservationData: ReservationInterface
   ): Promise<ReservationInterface> {
     try {
       const response = await axios.put(
         `${this.API_URL}/${id}`,
-        reservationData
+        reservationData,
+        {
+          headers: {
+            Authorization: `Bearer ${this.getToken()}`,
+          },
+        }
       );
       return response.data as ReservationInterface;
     } catch (error) {
@@ -47,9 +66,13 @@ class ReservationService {
   }
 
   // Méthode pour supprimer une réservation
-  static async deleteReservation(id: string): Promise<void> {
+  static async delete(id: string): Promise<void> {
     try {
-      await axios.delete(`${this.API_URL}/${id}`);
+      await axios.delete(`${this.API_URL}/${id}`, {
+        headers: {
+          Authorization: `Bearer ${this.getToken()}`,
+        },
+      });
     } catch (error) {
       console.error("Erreur lors de la suppression de la réservation", error);
       throw error;
