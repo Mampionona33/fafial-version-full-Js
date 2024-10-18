@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
-import { menuItemsByRole } from "../constants/appContants";
-import RoleChecker from "../utils/RoleChecker"; // Importer la classe RoleChecker
+import RoleChecker from "../utils/RoleChecker";
+import { menuItemsByRole } from "../constants/menuItemsByRole";
 
 const MenuItems = () => {
   const { user } = useAuth();
@@ -19,7 +19,7 @@ const MenuItems = () => {
       items.push({
         label: "Sélectionner le tableau de bord",
         to: "/select-dashboard",
-        icon: "dashboard_customize", 
+        icon: "dashboard_customize",
       });
     }
 

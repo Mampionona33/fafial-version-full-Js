@@ -1,6 +1,6 @@
 import { useAuth } from "../hooks/useAuth";
 import SelectDashboardLink from "../components/SelectDashboardLink";
-import { selectDashboardLinkItems } from "../constants/appContants";
+import { selectDashboardLinkItems } from "../constants/selectDashboardLinkItems";
 
 const SelectDashboard = () => {
   const { user } = useAuth();
