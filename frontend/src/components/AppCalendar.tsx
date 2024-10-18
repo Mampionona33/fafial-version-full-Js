@@ -50,7 +50,14 @@ const AppCalendar = () => {
         events={myEventsList}
         startAccessor="start"
         endAccessor="end"
-        style={{ height: 500 }}
+        style={{
+          height: "auto",
+          maxHeight: "40rem",
+          minHeight: "40rem",
+          width: "100%",
+          minWidth: "60rem",
+          overflow: "auto",
+        }}
         messages={{
           next: "Suivant",
           previous: "Précédent",
