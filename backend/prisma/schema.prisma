@@ -1,5 +1,7 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,25 +13,24 @@ datasource db {
 
 model Role {
   id          Int          @id @default(autoincrement())
-  name        String       @unique // Déclare 'name' comme unique
-  permissions Permission[] // Relation avec les permissions
-  users       User[]       @relation("RoleUsers") // Relation avec les utilisateurs, nommée explicitement
-  createdAt   DateTime     @default(now()) // Date de création
-  updatedAt   DateTime     @updatedAt // Date de mise à jour automatique
-  status      Boolean      @default(true) // Statut actif ou non
-  User        User[]
+  name        String       @unique
+  permissions Permission[]
+  users       User[]       @relation("RoleUsers")
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  status      Boolean      @default(true)
 }
 
 model Permission {
   id       Int    @id @default(autoincrement())
-  action   String // read, write, delete, etc.
-  resource String // Le nom de la ressource (ex: "Post", "User", "Product")
+  action   String
+  resource String
   roleId   Int
   role     Role   @relation(fields: [roleId], references: [id])
 
-  createdAt DateTime @default(now()) // Date de création
-  updatedAt DateTime @updatedAt // Date de mise à jour automatique
-  status    Boolean  @default(true) // Statut actif ou non
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  status    Boolean  @default(true)
 }
 
 model User {
@@ -39,11 +40,71 @@ model User {
   name     String
   lastName String
 
-  // Relation avec les rôles
-  roles     Role[]   @relation("RoleUsers") // Utilise le même nom que dans Role
-  createdAt DateTime @default(now()) // Date de création
-  updatedAt DateTime @updatedAt // Date de mise à jour automatique
-  status    Boolean  @default(true) // Statut actif ou non
-  Role      Role?    @relation(fields: [roleId], references: [id])
-  roleId    Int?
+  roles     Role[]   @relation("RoleUsers")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  status    Boolean  @default(true)
+}
+
+model Salle {
+  id           String        @id @default(cuid())
+  nom          String
+  capacite     Int
+  montantLoyer Float
+  reservations Reservation[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Reservation {
+  id               String    @id @default(cuid())
+  reference        String    @unique
+  nomOrganisation  String
+  nomPrenomContact String
+  email            String
+  telephone        String
+  nombrePersonnes  Int
+  dateDebut        DateTime
+  heureDebut       DateTime
+  dateFin          DateTime
+  heureFin         DateTime
+  salleId          String
+  salle            Salle     @relation(fields: [salleId], references: [id])
+  acomptes         Acompte[]
+  activite         String?
+  remarques        String?
+  statut           String    @default("EN_ATTENTE")
+  utilisateurType  String
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+}
+
+model Acompte {
+  id            String      @id @default(cuid())
+  montant       Float
+  datePrevue    DateTime
+  modePaiement  String
+  reservationId String
+  reservation   Reservation @relation(fields: [reservationId], references: [id])
+  statut        String      @default("EN_ATTENTE")
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model Recette {
+  id          String   @id @default(cuid())
+  montant     Float
+  description String?
+  date        DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Depense {
+  id          String   @id @default(cuid())
+  montant     Float
+  description String?
+  date        DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

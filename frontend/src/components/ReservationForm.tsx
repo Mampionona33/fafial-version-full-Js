@@ -32,7 +32,7 @@ const ReservationForm = () => {
 
   const handleAddAcompt = () => {
     const newAcompte = {
-      id: Date.now().toString(), // Utiliser un identifiant unique
+      id: Date.now().toString(),
       montant,
       datePrevue,
       modePaiement,
@@ -40,7 +40,7 @@ const ReservationForm = () => {
     setAcomptes([...acomptes, newAcompte]);
     setMontant(0);
     setDatePrevue("");
-    setModePaiement("carte"); // Réinitialiser au mode par défaut
+    setModePaiement("carte");
   };
 
   const handleDeleteAcompt = (id: string) => {
@@ -48,13 +48,13 @@ const ReservationForm = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center h-full w-full">
+    <div className="min-h-screen flex items-center justify-center h-full w-full py-8 px-4">
       <div className="bg-white p-8 shadow-md w-full max-w-3xl">
         <h1 className="text-3xl font-semibold text-gray-700 text-center mb-6">
           Réservation de Salle
         </h1>
         <hr className="mb-6" />
-        <form className="grid grid-cols-2 gap-4">
+        <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <AppLabel htmlFor="ref">Référence</AppLabel>
             <AppInput id="ref" type="text" disabled placeholder="Référence" />
@@ -102,7 +102,7 @@ const ReservationForm = () => {
               placeholder="Nombre de personnes"
             />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <AppLabel htmlFor="date_debut">Date de début</AppLabel>
               <AppInput id="date_debut" type="date" required />
@@ -112,7 +112,7 @@ const ReservationForm = () => {
               <AppInput id="heure_debut" type="time" required />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <AppLabel htmlFor="date_fin">Date de fin</AppLabel>
               <AppInput id="date_fin" type="date" required />
@@ -129,7 +129,7 @@ const ReservationForm = () => {
           </div>
 
           {/* Acompte */}
-          <div className="col-span-2 grid grid-cols-3 gap-4">
+          <div className="col-span-1 md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <AppLabel htmlFor="val_account">Montant acompte</AppLabel>
               <AppInput
@@ -161,7 +161,7 @@ const ReservationForm = () => {
             </div>
           </div>
 
-          <div className="col-span-2 flex justify-center items-center">
+          <div className="col-span-1 md:col-span-2 flex justify-center items-center">
             <input
               type="button"
               onClick={handleAddAcompt}
@@ -170,7 +170,7 @@ const ReservationForm = () => {
             />
           </div>
 
-          <div className="col-span-2">
+          <div className="col-span-1 md:col-span-2">
             <h3>Liste des acomptes</h3>
             <ul>
               {acomptes.map((acompte) => (
@@ -192,16 +192,16 @@ const ReservationForm = () => {
             </ul>
           </div>
 
-          <hr className="col-span-2" />
+          <hr className="col-span-1 md:col-span-2" />
 
-          <div className="col-span-2">
+          <div className="col-span-1 md:col-span-2">
             <AppLabel htmlFor="activite">Activité</AppLabel>
             <AppTextarea
               id="activite"
               placeholder="Description de l'activité"
             />
           </div>
-          <div className="col-span-2">
+          <div className="col-span-1 md:col-span-2">
             <AppLabel htmlFor="remarques">Remarques</AppLabel>
             <AppTextarea
               id="remarques"
@@ -210,11 +210,11 @@ const ReservationForm = () => {
           </div>
 
           {/* Bouton imprimer devis */}
-          <div className="text-center flex justify-center items-center w-full col-span-2">
+          <div className="text-center flex justify-center items-center w-full col-span-1 md:col-span-2">
             <input
               type="submit"
               value="Enregistrer"
-              className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 mt-6 cursor-pointer"
+              className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 mt-6 cursor-pointer rounded-sm"
             />
           </div>
         </form>
