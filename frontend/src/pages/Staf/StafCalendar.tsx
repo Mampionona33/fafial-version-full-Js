@@ -8,7 +8,7 @@ const StafCalendar = () => {
         <div className="w-full flex flex-row items-center justify-between mb-6">
           <h1 className="text-3xl font-semibold text-gray-950">Calendrier</h1>
           <Link
-            to="create-reservation"
+            to="/staf/ajout-reservation" // Mise à jour de la redirection
             className="bg-gray-600 hover:bg-gray-500 text-white font-bold py-1 px-8 rounded"
           >
             Ajouter réservation

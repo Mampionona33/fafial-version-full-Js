@@ -13,6 +13,7 @@ import ProtectedRoute from "./PrivateRoute";
 import SelectDashboard from "../pages/SelectDashboard";
 import FrontDesckDashboard from "../pages/FrontDesck/FrontDesck.Dashboard";
 import StafCalendar from "../pages/Staf/StafCalendar";
+import StafAjoutReservation from "../pages/Staf/StafAjoutReservation";
 
 // Créer les routes
 const router = createBrowserRouter(
@@ -35,6 +36,7 @@ const router = createBrowserRouter(
           <Route path="/staf">
             <Route path="dashboard" element={<StafDashboard />} />
             <Route path="calendar" element={<StafCalendar />} />
+            <Route path="ajout-reservation" element={<StafAjoutReservation />} />
           </Route>
         </Route>
 
