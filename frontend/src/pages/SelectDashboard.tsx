@@ -1,19 +1,12 @@
-import { Link } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import SelectDashboardLink from "../components/SelectDashboardLink";
+import { selectDashboardLinkItems } from "../constants/appContants";
 
 const SelectDashboard = () => {
   const { user } = useAuth();
 
-  // Vérification des rôles
-  const hasSuperAdminRole = user?.roles.some(
-    (role: { name: string }) => role.name === "superAdmin"
-  );
-  const hasStafRole = user?.roles.some(
-    (role: { name: string }) => role.name === "staf"
-  );
-  const hasFrontDeskRole = user?.roles.some(
-    (role: { name: string }) => role.name === "frontDesk"
-  );
+  // Récupérer les rôles de l'utilisateur
+  const roles = user?.roles.map((role) => role.name) || [];
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-transparent">
@@ -22,40 +15,14 @@ const SelectDashboard = () => {
           Choisissez un tableau de bord
         </h1>
         <ul className="w-full max-w-md space-y-4">
-          {/* Super Admin Dashboard */}
-          {hasSuperAdminRole && (
-            <li>
-              <Link
-                to="/super-admin-dashboard"
-                className="block p-4 bg-gray-700 text-white text-center rounded-sm shadow-lg transition-transform transform hover:scale-105 hover:bg-gray-600"
-              >
-                Super Admin Dashboard
-              </Link>
-            </li>
-          )}
-
-          {/* Staf Dashboard */}
-          {hasStafRole && (
-            <li>
-              <Link
-                to="/staf-dashboard"
-                className="block p-4 bg-gray-700 text-white text-center rounded-sm shadow-lg transition-transform transform hover:scale-105 hover:bg-gray-600"
-              >
-                Staf Dashboard
-              </Link>
-            </li>
-          )}
-
-          {/* Front Desk Dashboard */}
-          {hasFrontDeskRole && (
-            <li>
-              <Link
-                to="/front-desck-dashboard"
-                className="block p-4 bg-gray-700 text-white text-center rounded-sm shadow-lg transition-transform transform hover:scale-105 hover:bg-gray-600"
-              >
-                Front Desk Dashboard
-              </Link>
-            </li>
+          {selectDashboardLinkItems.map(
+            ({ role, items }) =>
+              roles.includes(role) &&
+              items.map((item) => (
+                <li key={item.to}>
+                  <SelectDashboardLink to={item.to} label={item.label} />
+                </li>
+              ))
           )}
         </ul>
       </div>

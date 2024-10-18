@@ -26,7 +26,7 @@ const AuthRedirect = () => {
     if (hasStafRole) roles.push("staf");
     if (hasFrontDeskRole) roles.push("frontDesk");
 
-    if (roles.length > 1) {
+    if (roles.length > 1 || hasSuperAdminRole) {
       return <Navigate to="/select-dashboard" state={{ from: location }} />;
     }
 

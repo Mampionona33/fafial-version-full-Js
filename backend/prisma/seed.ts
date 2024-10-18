@@ -2,6 +2,14 @@ import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 const client = new PrismaClient();
+/**
+ * Liste des compte avec les mots de passes :
+ * - superadmin@example.com : SuperAdmin123!
+ * - staf@example.com : StafPassword456$
+ * - frontdesk@example.com : FrontDesk789#
+ * - adminfrontdesk@example.com : MultiRole000@
+ * - stafuser@example.com : StafUser321&
+ */
 
 async function main() {
   // Créer des rôles

@@ -12,11 +12,14 @@ const MenuItems = () => {
     const roles = user?.roles || [];
 
     // Ajout d'un lien vers "/select-dashboard" si l'utilisateur a plusieurs rôles
-    if (RoleChecker.getUserRolesLength(user!) > 1) {
+    if (
+      RoleChecker.getUserRolesLength(user!) > 1 ||
+      RoleChecker.hasRole(user!, "superAdmin")
+    ) {
       items.push({
         label: "Sélectionner le tableau de bord",
         to: "/select-dashboard",
-        icon: "dashboard_customize", // Vous pouvez choisir une icône appropriée
+        icon: "dashboard_customize", 
       });
     }
 
