@@ -214,7 +214,7 @@ const ReservationForm = () => {
             <input
               type="submit"
               value="Enregistrer"
-              className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 mt-6 cursor-pointer rounded-sm"
+              className="bg-gray-800 hover:bg-gray-700 text-white px-8 py-1 mt-6 cursor-pointer rounded-md"
             />
           </div>
         </form>
