@@ -1,5 +1,6 @@
 import AppLabel from "./AppLabel";
 import AppInput from "./AppInput";
+import AppTextarea from "./AppTextarea";
 
 const ReservationForm = () => {
   return (
@@ -55,6 +56,15 @@ const ReservationForm = () => {
               <AppLabel htmlFor="heure_fin">Heure de fin</AppLabel>
               <AppInput id="heure_fin" type="time" required />
             </div>
+          </div>
+          {/* Ajouter un acompte */}
+          <div className="col-span-2">
+            <AppLabel htmlFor="activite">Activité</AppLabel>
+            <AppTextarea id="activite" />
+          </div>
+          <div className="col-span-2">
+            <AppLabel htmlFor="remarques">Remarques</AppLabel>
+            <AppTextarea id="remarques" />
           </div>
         </form>
       </div>
