@@ -8,6 +8,11 @@ import path from "path";
 
 const app = express();
 const server = http.createServer(app);
+const apiVersion = process.env.API_VERSION;
+
+if (!apiVersion) {
+  throw new Error("API_VERSION is not defined");
+}
 
 // Updated CORS options with specific origin and credentials
 const corsOptions = {
@@ -36,7 +41,10 @@ app.get("/", (req: Request, res: Response) => {
   res.send("Hello World from TypeScript + Express!");
 });
 
-app.use("/api/v1", loginRouter);
+app.use(apiVersion, loginRouter);
+app.use(apiVersion, (req: Request, res: Response) => {
+  res.json({ message: "Hello from TypeScript + Express!" });
+});
 
 // Error handling middleware
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
