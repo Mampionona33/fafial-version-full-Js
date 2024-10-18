@@ -1,57 +1,63 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import RoleChecker from "../utils/RoleChecker";
+import Cookies from "js-cookie";
+import { COOKIE_NAME } from "../constants/appContants";
 
 const AuthRedirect = () => {
-  const { isAuthenticated, user } = useAuth();
+  const { user } = useAuth();
   const location = useLocation();
-
-  console.log("user", user);
+  const token = Cookies.get(COOKIE_NAME);
 
   // Si l'utilisateur n'est pas authentifié
-  if (!isAuthenticated && location.pathname !== "/login") {
-    return <Navigate to="/login" state={{ from: location }} />;
+  if (!token) {
+    return location.pathname === "/login" ? (
+      <Outlet />
+    ) : (
+      <Navigate to="/login" state={{ from: location }} />
+    );
   }
 
   // Si l'utilisateur est authentifié
-  if (isAuthenticated && location.pathname === "/login") {
+  if (user) {
     // Récupérer les rôles de l'utilisateur
-    const hasSuperAdminRole = RoleChecker.hasRole(user!, "superAdmin");
-    const hasStafRole = RoleChecker.hasRole(user!, "staf");
-    const hasFrontDeskRole = RoleChecker.hasRole(user!, "frontDesk");
+    const hasSuperAdminRole = RoleChecker.hasRole(user, "superAdmin");
+    const hasStafRole = RoleChecker.hasRole(user, "staf");
+    const hasFrontDeskRole = RoleChecker.hasRole(user, "frontDesk");
 
-    // Si l'utilisateur a plusieurs rôles, redirige vers une page de sélection
+    // Créer une liste de rôles
     const roles = [];
     if (hasSuperAdminRole) roles.push("superAdmin");
     if (hasStafRole) roles.push("staf");
     if (hasFrontDeskRole) roles.push("frontDesk");
 
-    if (roles.length > 1 || hasSuperAdminRole) {
-      return <Navigate to="/select-dashboard" state={{ from: location }} />;
+    // Redirection depuis la page de connexion
+    if (location.pathname === "/login" || location.pathname === "/") {
+      if (roles.length > 1 || hasSuperAdminRole) {
+        return <Navigate to="/select-dashboard" state={{ from: location }} />;
+      }
+
+      // Redirection en fonction d'un rôle unique
+      if (hasSuperAdminRole) {
+        return (
+          <Navigate to="/super-admin/dashboard" state={{ from: location }} />
+        );
+      }
+      if (hasStafRole) {
+        return <Navigate to="/staf/dashboard" state={{ from: location }} />;
+      }
+      if (hasFrontDeskRole) {
+        return (
+          <Navigate to="/front-desck/dashboard" state={{ from: location }} />
+        );
+      }
     }
 
-    // Redirection en fonction d'un rôle unique
-    if (hasSuperAdminRole) {
-      return (
-        <Navigate to="/super-admin/dashboard" state={{ from: location }} />
-      );
-    }
-    if (hasStafRole) {
-      return <Navigate to="/staf/dashboard" state={{ from: location }} />;
-    }
-    if (hasFrontDeskRole) {
-      return (
-        <Navigate
-          to="/front-desck/dashboard"
-          state={{ from: location }}
-          replace
-        />
-      );
-    }
-    return <Navigate to="/unauthorized" state={{ from: location }} />;
+    // Si l'utilisateur est déjà sur une page protégée, afficher le contenu
+    return <Outlet />;
   }
 
-  // Sinon, on rend les sous-composants (routes protégées)
+  // Par défaut, afficher le contenu si le token existe mais l'utilisateur n'est pas encore défini
   return <Outlet />;
 };
 

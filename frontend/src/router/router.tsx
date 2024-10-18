@@ -26,6 +26,8 @@ const router = createBrowserRouter(
       {/* Layout principal avec éléments communs */}
       <Route element={<App />}>
         {/* Pages protégées, nécessitant une authentification et des rôles spécifiques */}
+        <Route path="/select-dashboard" element={<SelectDashboard />} />
+
         <Route
           element={<ProtectedRoute allowedRoles={["superAdmin", "staf"]} />}
         >
@@ -35,8 +37,6 @@ const router = createBrowserRouter(
             <Route path="calendar" element={<StafCalendar />} />
           </Route>
         </Route>
-
-        <Route path="/select-dashboard" element={<SelectDashboard />} />
 
         {/* Page Admin uniquement accessible par les administrateurs */}
         <Route element={<ProtectedRoute allowedRoles={["superAdmin"]} />}>
