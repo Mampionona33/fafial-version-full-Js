@@ -1,12 +1,7 @@
 import { Sidebar, SidebarProps } from "primereact/sidebar";
 import MenuItems from "./MenuItems";
-import { useLocation } from "react-router-dom";
 
 const AppSidebar = ({ visible, onHide }: SidebarProps) => {
-  const pathName = useLocation().pathname;
-
-  console.log("phathName", pathName);
-
   return (
     <Sidebar
       visible={visible}

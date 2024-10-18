@@ -37,7 +37,7 @@ const AuthRedirect = () => {
       );
     }
     if (hasStafRole) {
-      return <Navigate to="/staf-dashboard" state={{ from: location }} />;
+      return <Navigate to="/staf/dashboard" state={{ from: location }} />;
     }
     if (hasFrontDeskRole) {
       return (
