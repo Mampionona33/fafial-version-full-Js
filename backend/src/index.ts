@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import express, { Request, Response, NextFunction } from "express";
 import loginRouter from "./routes/authRoutes";
+import reservationRouter from "./routes/reservationRouters";
 import http from "http";
 import cors from "cors";
 import path from "path";
@@ -42,9 +43,7 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.use(apiVersion, loginRouter);
-app.use(apiVersion, (req: Request, res: Response) => {
-  res.json({ message: "Hello from TypeScript + Express!" });
-});
+app.use(apiVersion, reservationRouter);
 
 // Error handling middleware
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
