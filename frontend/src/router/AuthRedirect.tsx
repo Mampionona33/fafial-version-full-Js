@@ -1,5 +1,6 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import RoleChecker from "../utils/RoleChecker";
 
 const AuthRedirect = () => {
   const { isAuthenticated, user } = useAuth();
@@ -15,15 +16,9 @@ const AuthRedirect = () => {
   // Si l'utilisateur est authentifié
   if (isAuthenticated && location.pathname === "/login") {
     // Récupérer les rôles de l'utilisateur
-    const hasSuperAdminRole = user?.roles.some(
-      (role: { name: string }) => role.name === "superAdmin"
-    );
-    const hasStafRole = user?.roles.some(
-      (role: { name: string }) => role.name === "staf"
-    );
-    const hasFrontDeskRole = user?.roles.some(
-      (role: { name: string }) => role.name === "frontDesk"
-    );
+    const hasSuperAdminRole = RoleChecker.hasRole(user!, "superAdmin");
+    const hasStafRole = RoleChecker.hasRole(user!, "staf");
+    const hasFrontDeskRole = RoleChecker.hasRole(user!, "frontDesk");
 
     // Si l'utilisateur a plusieurs rôles, redirige vers une page de sélection
     const roles = [];
