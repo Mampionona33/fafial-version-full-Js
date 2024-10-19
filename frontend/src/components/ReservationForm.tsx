@@ -13,8 +13,10 @@ import {
   ValidationStatut,
 } from "../interfaces/ReservationInterface";
 import { nanoid } from "nanoid";
+import { useAuth } from "../hooks/useAuth";
 
 const ReservationForm = () => {
+  const { user } = useAuth();
   // State pour les acomptes
   const [acomptes, setAcomptes] = React.useState<
     {
@@ -105,8 +107,13 @@ const ReservationForm = () => {
       statut: PayementStatut.EN_ATTENTE,
     }));
 
+    if (!user || !user.id) {
+      throw new Error("Utilisateur non connecté");
+    }
+
     // Crée l'objet ReservationInterface
     const reservationData: ReservationInterface = {
+      createdById: user?.id,
       reference,
       nomOrganisation,
       nomPrenomContact,
@@ -117,7 +124,7 @@ const ReservationForm = () => {
       heureDebut,
       dateFin: formattedDateFin,
       heureFin,
-      salleId: "cm2g5zory0000q78nh2y2p13g", // A remplacer par un Id de salle valid
+      salleId: "cm2gc064p0000q2pl5td6b6aq", // A remplacer par un Id de salle valid
       acomptes: updatedAcomptes,
       activite,
       remarques,
@@ -125,8 +132,6 @@ const ReservationForm = () => {
       utilisateurType: UtilisateurType.STAFF, // Valeur par défaut
       validationStatus: ValidationStatut.VALIDE, // Ajout de la propriété manquante
     };
-
-    console.log(reservationData);
 
     try {
       // Création de la réservation

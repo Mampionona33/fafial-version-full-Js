@@ -15,10 +15,12 @@ interface ReservationRequestBody {
   dateFin: string;
   heureFin: string;
   salleId: string;
+  creationDate: string;
+  createdById: number;
   acomptes: Array<{
     id: string;
     montant: number;
-    datePrevue: string; // Format de la date prévu
+    datePrevue: string;
     modePaiement: string;
     statut: string;
   }>;
@@ -31,7 +33,7 @@ interface ReservationRequestBody {
 
 class ReservationController {
   public static async create(
-    req: Request<{}, {}, ReservationRequestBody>, // Typage du body de la requête
+    req: Request<{}, {}, ReservationRequestBody>,
     res: Response
   ) {
     try {
@@ -54,7 +56,7 @@ class ReservationController {
       // Convertir les dates dans les acomptes en Date valide ISO
       const acomptes = body.acomptes.map((acompte) => ({
         ...acompte,
-        datePrevue: new Date(acompte.datePrevue).toISOString() // Conversion en ISO
+        datePrevue: new Date(acompte.datePrevue).toISOString(), // Conversion en ISO
       }));
 
       // Créer la réservation avec la date et l'heure combinées
@@ -66,38 +68,40 @@ class ReservationController {
           email: body.email,
           telephone: body.telephone,
           nombrePersonnes: body.nombrePersonnes,
-          dateDebut, // Date complète
-          heureDebut, // DateTime combinée
-          dateFin, // Date complète
-          heureFin, // DateTime combinée
+          dateDebut,
+          heureDebut,
+          dateFin,
+          heureFin,
           salleId: body.salleId,
+          createdById: body.createdById,
           acomptes: {
-            create: acomptes // Créer des acomptes avec la date convertie
+            create: acomptes,
           },
           activite: body.activite,
           remarques: body.remarques,
           statut: body.statut,
           utilisateurType: body.utilisateurType,
-          validationStatus: body.validationStatus
-        }
+          validationStatus: body.validationStatus,
+        },
       });
 
       if (!newReservation) {
         res.status(500).json({
           error:
-            "Une erreur s'est produite lors de la création de la réservation"
+            "Une erreur s'est produite lors de la création de la réservation",
         });
         return;
       }
 
       res.status(201).json({
         message: "Réservation créée avec succès",
-        data: newReservation
+        data: newReservation,
       });
     } catch (error) {
       console.error(error); // Pour plus de détails sur l'erreur
       res.status(500).json({
-        error: "Une erreur s'est produite lors de la création de la réservation"
+        error:
+          "Une erreur s'est produite lors de la création de la réservation",
       });
     }
   }
