@@ -10,7 +10,7 @@ import {
   StatutReservation,
   UtilisateurType,
   ReservationInterface,
-  ValidationStatut,
+  ValidationStatut
 } from "../interfaces/ReservationInterface";
 
 const ReservationForm = () => {
@@ -44,13 +44,13 @@ const ReservationForm = () => {
   const options = [
     { value: "salle_a", label: "Salle A" },
     { value: "salle_b", label: "Salle B" },
-    { value: "salle_c", label: "Salle C" },
+    { value: "salle_c", label: "Salle C" }
   ];
 
   const modesPaiement = [
     { value: "carte", label: "Carte" },
     { value: "espece", label: "Espèce" },
-    { value: "cheque", label: "Chèque" },
+    { value: "cheque", label: "Chèque" }
   ];
 
   const handleAddAcompt = () => {
@@ -59,7 +59,7 @@ const ReservationForm = () => {
       id: id,
       montant,
       datePrevue,
-      modePaiement,
+      modePaiement
     };
     setAcomptes([...acomptes, newAcompte]);
     setMontant(0);
@@ -80,13 +80,14 @@ const ReservationForm = () => {
     // Met à jour les statuts des acomptes en "EN_ATTENTE"
     const updatedAcomptes = acomptes.map((acompte) => ({
       ...acompte,
-      statut: PayementStatut.EN_ATTENTE,
+      // comment supprimer l'id des acomptes ici
+      id: undefined,
+      statut: PayementStatut.EN_ATTENTE
     }));
 
     // Crée l'objet ReservationInterface
     const reservationData: ReservationInterface = {
-      id: uuidv4(),
-      reference: "", // À gérer selon ta logique de référence
+      reference: "",
       nomOrganisation,
       nomPrenomContact,
       email,
@@ -96,13 +97,13 @@ const ReservationForm = () => {
       heureDebut,
       dateFin: formattedDateFin,
       heureFin,
-      salleId: options[0].value, // Exemple pour salleId, ajustez selon votre logique
+      salleId: "cm2g5zory0000q78nh2y2p13g", // A remplacer par un Id de salle valid
       acomptes: updatedAcomptes,
       activite,
       remarques,
       statut: StatutReservation.OUVERT,
       utilisateurType: UtilisateurType.STAFF, // Valeur par défaut
-      validationStatus: ValidationStatut.VALIDE, // Ajout de la propriété manquante
+      validationStatus: ValidationStatut.VALIDE // Ajout de la propriété manquante
     };
 
     console.log(reservationData);

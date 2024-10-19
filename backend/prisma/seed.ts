@@ -61,8 +61,8 @@ async function main() {
       { action: "read", resource: "paiement", roleId: superAdmin.id },
       { action: "write", resource: "paiement", roleId: superAdmin.id },
       { action: "read", resource: "paiement", roleId: staf.id },
-      { action: "write", resource: "paiement", roleId: staf.id },
-    ],
+      { action: "write", resource: "paiement", roleId: staf.id }
+    ]
   });
 
   // Créer des utilisateurs avec des mots de passe sécurisés
@@ -72,6 +72,15 @@ async function main() {
   const hashedMultiRolePassword = await bcrypt.hash("MultiRole000@", 10);
   const hashedUserPassword = await bcrypt.hash("StafUser321&", 10);
 
+  // créer les salles
+  await client.salle.create({
+    data: {
+      nom: "Salle 01",
+      capacite: 100,
+      montantLoyer: 50000
+    }
+  });
+
   // Créer chaque utilisateur avec un rôle et un mot de passe unique
   await client.user.create({
     data: {
@@ -79,8 +88,8 @@ async function main() {
       password: hashedSuperAdminPassword,
       name: "Super",
       lastName: "Admin",
-      roles: { connect: { id: superAdmin.id } }, // Association avec le rôle superAdmin
-    },
+      roles: { connect: { id: superAdmin.id } } // Association avec le rôle superAdmin
+    }
   });
 
   await client.user.create({
@@ -89,8 +98,8 @@ async function main() {
       password: hashedStafPassword,
       name: "John",
       lastName: "Staf",
-      roles: { connect: { id: staf.id } }, // Association avec le rôle staf
-    },
+      roles: { connect: { id: staf.id } } // Association avec le rôle staf
+    }
   });
 
   await client.user.create({
@@ -99,8 +108,8 @@ async function main() {
       password: hashedFrontDeskPassword,
       name: "Anna",
       lastName: "FrontDesk",
-      roles: { connect: { id: frontDesk.id } }, // Association avec le rôle frontDesk
-    },
+      roles: { connect: { id: frontDesk.id } } // Association avec le rôle frontDesk
+    }
   });
 
   // Utilisateur avec plusieurs rôles (superAdmin et frontDesk)
@@ -113,10 +122,10 @@ async function main() {
       roles: {
         connect: [
           { id: superAdmin.id }, // Rôle SuperAdmin
-          { id: frontDesk.id }, // Rôle FrontDesk
-        ],
-      },
-    },
+          { id: frontDesk.id } // Rôle FrontDesk
+        ]
+      }
+    }
   });
 
   // Utilisateur avec plusieurs rôles (staf et frontDesk)
@@ -129,10 +138,10 @@ async function main() {
       roles: {
         connect: [
           { id: staf.id }, // Rôle Staf
-          { id: frontDesk.id }, // Rôle FrontDesk
-        ],
-      },
-    },
+          { id: frontDesk.id } // Rôle FrontDesk
+        ]
+      }
+    }
   });
 
   console.log("Seeding completed.");

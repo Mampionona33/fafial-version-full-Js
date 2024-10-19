@@ -9,11 +9,6 @@ import path from "path";
 
 const app = express();
 const server = http.createServer(app);
-const apiVersion = process.env.API_VERSION;
-
-if (!apiVersion) {
-  throw new Error("API_VERSION is not defined");
-}
 
 // Updated CORS options with specific origin and credentials
 const corsOptions = {

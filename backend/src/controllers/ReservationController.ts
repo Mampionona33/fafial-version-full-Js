@@ -54,7 +54,7 @@ class ReservationController {
       // Convertir les dates dans les acomptes en Date valide ISO
       const acomptes = body.acomptes.map((acompte) => ({
         ...acompte,
-        datePrevue: new Date(acompte.datePrevue).toISOString(), // Conversion en ISO
+        datePrevue: new Date(acompte.datePrevue).toISOString() // Conversion en ISO
       }));
 
       // Créer la réservation avec la date et l'heure combinées
@@ -72,33 +72,32 @@ class ReservationController {
           heureFin, // DateTime combinée
           salleId: body.salleId,
           acomptes: {
-            create: acomptes, // Créer des acomptes avec la date convertie
+            create: acomptes // Créer des acomptes avec la date convertie
           },
           activite: body.activite,
           remarques: body.remarques,
           statut: body.statut,
           utilisateurType: body.utilisateurType,
-          validationStatus: body.validationStatus,
-        },
+          validationStatus: body.validationStatus
+        }
       });
 
       if (!newReservation) {
         res.status(500).json({
           error:
-            "Une erreur s'est produite lors de la création de la réservation",
+            "Une erreur s'est produite lors de la création de la réservation"
         });
         return;
       }
 
       res.status(201).json({
         message: "Réservation créée avec succès",
-        data: newReservation,
+        data: newReservation
       });
     } catch (error) {
       console.error(error); // Pour plus de détails sur l'erreur
       res.status(500).json({
-        error:
-          "Une erreur s'est produite lors de la création de la réservation",
+        error: "Une erreur s'est produite lors de la création de la réservation"
       });
     }
   }

@@ -1,28 +1,28 @@
 // Enums pour les statuts et types d'utilisateurs
 export enum StatutReservation {
   OUVERT = "OUVERT",
-  ANNULE = "ANNULE",
+  ANNULE = "ANNULE"
 }
 
 export enum ValidationStatut {
   EN_ATTENTE = "EN_ATTENTE",
   VALIDE = "VALIDE",
-  REFUSE = "REFUSE",
+  REFUSE = "REFUSE"
 }
 
 export enum UtilisateurType {
   STAFF = "STAFF",
-  FRONT_DESK = "FRONT_DESK",
+  FRONT_DESK = "FRONT_DESK"
 }
 
 export enum PayementStatut {
   EN_ATTENTE = "EN_ATTENTE",
-  PAYE = "PAYE",
+  PAYE = "PAYE"
 }
 
 // Interface pour Acompte
 export interface Acompte {
-  id: string;
+  id?: string;
   montant: number;
   datePrevue: string; // Format ISO
   modePaiement: string;
@@ -79,7 +79,7 @@ export interface Salle {
 
 // Interface pour Reservation
 export interface ReservationInterface {
-  id: string;
+  id?: string;
   reference: string;
   nomOrganisation: string;
   nomPrenomContact: string;
