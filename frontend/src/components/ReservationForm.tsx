@@ -6,14 +6,15 @@ import React from "react";
 import { v4 as uuidv4 } from "uuid";
 import ReservationService from "../services/ReservationService";
 import {
+  PayementStatut,
   StatutReservation,
   UtilisateurType,
+  ReservationInterface,
+  ValidationStatut,
 } from "../interfaces/ReservationInterface";
-import { useAuth } from "../hooks/useAuth";
-import RoleChecker from "../utils/RoleChecker";
 
 const ReservationForm = () => {
-  const { user } = useAuth();
+  // State pour les acomptes
   const [acomptes, setAcomptes] = React.useState<
     {
       id: string;
@@ -23,12 +24,13 @@ const ReservationForm = () => {
     }[]
   >([]);
 
+  // State pour les informations de la réservation
   const [montant, setMontant] = React.useState<number>(0);
   const [datePrevue, setDatePrevue] = React.useState<string>("");
   const [modePaiement, setModePaiement] = React.useState<string>("carte");
 
-  const [nomOrganisation, setnomOrganisation] = React.useState<string>("");
-  const [nomPrenomContact, setContactName] = React.useState<string>("");
+  const [nomOrganisation, setNomOrganisation] = React.useState<string>("");
+  const [nomPrenomContact, setNomPrenomContact] = React.useState<string>("");
   const [email, setEmail] = React.useState<string>("");
   const [telephone, setTelephone] = React.useState<string>("");
   const [nombrePersonnes, setNombrePersonnes] = React.useState<number>(0);
@@ -71,48 +73,49 @@ const ReservationForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log({
+
+    const formattedDateDebut = new Date(dateDebut);
+    const formattedDateFin = new Date(dateFin);
+
+    // Met à jour les statuts des acomptes en "EN_ATTENTE"
+    const updatedAcomptes = acomptes.map((acompte) => ({
+      ...acompte,
+      statut: PayementStatut.EN_ATTENTE,
+    }));
+
+    // Crée l'objet ReservationInterface
+    const reservationData: ReservationInterface = {
+      id: uuidv4(),
+      reference: "", // À gérer selon ta logique de référence
       nomOrganisation,
       nomPrenomContact,
       email,
       telephone,
       nombrePersonnes,
-      dateDebut,
+      dateDebut: formattedDateDebut,
       heureDebut,
-      dateFin,
+      dateFin: formattedDateFin,
       heureFin,
-      acomptes,
+      salleId: options[0].value, // Exemple pour salleId, ajustez selon votre logique
+      acomptes: updatedAcomptes,
       activite,
       remarques,
-    });
+      statut: StatutReservation.OUVERT,
+      utilisateurType: UtilisateurType.STAFF, // Valeur par défaut
+      validationStatus: ValidationStatut.VALIDE, // Ajout de la propriété manquante
+    };
+
+    console.log(reservationData);
 
     try {
-      const res = await ReservationService.create({
-        id: uuidv4(),
-        reference: "",
-        nomOrganisation,
-        nomPrenomContact,
-        email,
-        telephone,
-        nombrePersonnes,
-        dateDebut,
-        heureDebut,
-        dateFin,
-        heureFin,
-        salleId: options[0].value, // Exemple pour salleId, ajustez selon votre logique
-        acomptes,
-        activite,
-        remarques,
-        statut: RoleChecker.hasRole(user!, "staf")
-          ? StatutReservation.VALIDE
-          : StatutReservation.EN_ATTENTE, // Valeur par défaut
-        utilisateurType: UtilisateurType.STAFF, // Valeur par défaut
-      });
+      // Création de la réservation
+      const res = await ReservationService.create(reservationData);
       console.log("Réservation créée :", res);
     } catch (error) {
       console.error("Erreur lors de la création de la réservation", error);
     }
   };
+
   return (
     <div className="min-h-screen flex items-center justify-center h-full w-full py-8 px-4">
       <div className="bg-white p-8 shadow-md w-full max-w-3xl">
@@ -124,6 +127,7 @@ const ReservationForm = () => {
           onSubmit={handleSubmit}
           className="grid grid-cols-1 md:grid-cols-2 gap-4"
         >
+          {/* Référence */}
           <div>
             <AppLabel htmlFor="reference">Référence</AppLabel>
             <AppInput
@@ -133,6 +137,8 @@ const ReservationForm = () => {
               placeholder="Référence"
             />
           </div>
+
+          {/* Nom Organisation */}
           <div>
             <AppLabel htmlFor="nomOrganisation">Nom de l'organisation</AppLabel>
             <AppInput
@@ -140,9 +146,11 @@ const ReservationForm = () => {
               type="text"
               placeholder="Nom de l'organisation"
               value={nomOrganisation}
-              onChange={(e) => setnomOrganisation(e.target.value)}
+              onChange={(e) => setNomOrganisation(e.target.value)}
             />
           </div>
+
+          {/* Nom Prenom Contact */}
           <div>
             <AppLabel htmlFor="nomPrenomContact">
               Nom et prénom du contact
@@ -152,9 +160,11 @@ const ReservationForm = () => {
               type="text"
               placeholder="Nom et prénom"
               value={nomPrenomContact}
-              onChange={(e) => setContactName(e.target.value)}
+              onChange={(e) => setNomPrenomContact(e.target.value)}
             />
           </div>
+
+          {/* Email */}
           <div>
             <AppLabel htmlFor="email">Email</AppLabel>
             <AppInput
@@ -165,6 +175,8 @@ const ReservationForm = () => {
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
+
+          {/* Téléphone */}
           <div>
             <AppLabel htmlFor="telephone">Téléphone</AppLabel>
             <AppInput
@@ -175,6 +187,8 @@ const ReservationForm = () => {
               onChange={(e) => setTelephone(e.target.value)}
             />
           </div>
+
+          {/* Nombre de personnes */}
           <div>
             <AppLabel htmlFor="nombrePersonnes">Nombre de personnes</AppLabel>
             <AppInput
@@ -186,6 +200,8 @@ const ReservationForm = () => {
               onChange={(e) => setNombrePersonnes(e.target.valueAsNumber)}
             />
           </div>
+
+          {/* Date et Heure de début */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <AppLabel htmlFor="dateDebut">Date de début</AppLabel>
@@ -208,6 +224,8 @@ const ReservationForm = () => {
               />
             </div>
           </div>
+
+          {/* Date et Heure de fin */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <AppLabel htmlFor="dateFin">Date de fin</AppLabel>
@@ -231,12 +249,13 @@ const ReservationForm = () => {
             </div>
           </div>
 
+          {/* Salle */}
           <div className="col-span-1">
             <AppLabel htmlFor="salleId">Choisir une salle</AppLabel>
             <AppSelect id="salleId" options={options} />
           </div>
 
-          {/* Acompte */}
+          {/* Acomptes */}
           <div className="col-span-1 md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <AppLabel htmlFor="val_account">Montant acompte</AppLabel>
@@ -269,6 +288,7 @@ const ReservationForm = () => {
             </div>
           </div>
 
+          {/* Ajouter acompte */}
           <div className="col-span-1 md:col-span-2 flex justify-center items-center">
             <input
               type="button"
@@ -278,6 +298,7 @@ const ReservationForm = () => {
             />
           </div>
 
+          {/* Liste des acomptes */}
           <div className="col-span-1 md:col-span-2">
             <h3>Liste des acomptes</h3>
             <ul>
@@ -287,7 +308,7 @@ const ReservationForm = () => {
                   className="flex justify-between items-center space-y-2"
                 >
                   <span>{acompte.datePrevue}</span>
-                  <span>{acompte.montant} €</span>
+                  <span>{acompte.montant} Ar</span>
                   <span>{acompte.modePaiement}</span>
                   <button
                     onClick={() => handleDeleteAcompt(acompte.id)}
@@ -302,6 +323,7 @@ const ReservationForm = () => {
 
           <hr className="col-span-1 md:col-span-2" />
 
+          {/* Activité */}
           <div className="col-span-1 md:col-span-2">
             <AppLabel htmlFor="activite">Activité</AppLabel>
             <AppTextarea
@@ -311,6 +333,8 @@ const ReservationForm = () => {
               onChange={(e) => setActivite(e.target.value)}
             />
           </div>
+
+          {/* Remarques */}
           <div className="col-span-1 md:col-span-2">
             <AppLabel htmlFor="remarques">Remarques</AppLabel>
             <AppTextarea
@@ -321,7 +345,7 @@ const ReservationForm = () => {
             />
           </div>
 
-          {/* Bouton imprimer devis */}
+          {/* Bouton soumettre */}
           <div className="text-center flex justify-center items-center w-full col-span-1 md:col-span-2">
             <input
               type="submit"
