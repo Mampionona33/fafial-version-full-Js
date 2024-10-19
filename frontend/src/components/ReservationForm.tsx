@@ -10,8 +10,9 @@ import {
   StatutReservation,
   UtilisateurType,
   ReservationInterface,
-  ValidationStatut
+  ValidationStatut,
 } from "../interfaces/ReservationInterface";
+import { nanoid } from "nanoid";
 
 const ReservationForm = () => {
   // State pour les acomptes
@@ -40,17 +41,18 @@ const ReservationForm = () => {
   const [heureFin, setHeureFin] = React.useState<string>("");
   const [activite, setActivite] = React.useState<string>("");
   const [remarques, setRemarques] = React.useState<string>("");
+  const [reference, setReference] = React.useState<string>("");
 
   const options = [
     { value: "salle_a", label: "Salle A" },
     { value: "salle_b", label: "Salle B" },
-    { value: "salle_c", label: "Salle C" }
+    { value: "salle_c", label: "Salle C" },
   ];
 
   const modesPaiement = [
     { value: "carte", label: "Carte" },
     { value: "espece", label: "Espèce" },
-    { value: "cheque", label: "Chèque" }
+    { value: "cheque", label: "Chèque" },
   ];
 
   const handleAddAcompt = () => {
@@ -59,7 +61,7 @@ const ReservationForm = () => {
       id: id,
       montant,
       datePrevue,
-      modePaiement
+      modePaiement,
     };
     setAcomptes([...acomptes, newAcompte]);
     setMontant(0);
@@ -70,6 +72,24 @@ const ReservationForm = () => {
   const handleDeleteAcompt = (id: string) => {
     setAcomptes(acomptes.filter((acompte) => acompte.id !== id));
   };
+
+  const generateRef = () => {
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    const formattedDate = `${year}${month}${day}`;
+
+    const randomString = nanoid(7);
+
+    // Retourner la référence dans le format : RESYYYYMMDDrandomString
+    return `RES-${formattedDate}-${randomString}`;
+  };
+
+  React.useEffect(() => {
+    setReference(generateRef());
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,12 +102,12 @@ const ReservationForm = () => {
       ...acompte,
       // comment supprimer l'id des acomptes ici
       id: undefined,
-      statut: PayementStatut.EN_ATTENTE
+      statut: PayementStatut.EN_ATTENTE,
     }));
 
     // Crée l'objet ReservationInterface
     const reservationData: ReservationInterface = {
-      reference: "",
+      reference,
       nomOrganisation,
       nomPrenomContact,
       email,
@@ -103,7 +123,7 @@ const ReservationForm = () => {
       remarques,
       statut: StatutReservation.OUVERT,
       utilisateurType: UtilisateurType.STAFF, // Valeur par défaut
-      validationStatus: ValidationStatut.VALIDE // Ajout de la propriété manquante
+      validationStatus: ValidationStatut.VALIDE, // Ajout de la propriété manquante
     };
 
     console.log(reservationData);
@@ -134,6 +154,7 @@ const ReservationForm = () => {
             <AppInput
               id="reference"
               type="text"
+              value={reference}
               disabled
               placeholder="Référence"
             />
