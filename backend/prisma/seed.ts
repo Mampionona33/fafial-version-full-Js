@@ -21,10 +21,47 @@ async function main() {
   await client.permission.createMany({
     data: [
       // Permissions pour différentes ressources par rôle
-      { action: "read", resource: "Dashboard", roleId: superAdmin.id },
-      { action: "write", resource: "Dashboard", roleId: superAdmin.id },
-      { action: "read", resource: "Dashboard", roleId: staf.id },
-      { action: "read", resource: "Dashboard", roleId: frontDesk.id },
+      { action: "read", resource: "salle", roleId: superAdmin.id },
+      { action: "write", resource: "salle", roleId: superAdmin.id },
+      { action: "read", resource: "salle", roleId: staf.id },
+      { action: "write", resource: "salle", roleId: staf.id },
+      { action: "read", resource: "salle", roleId: frontDesk.id },
+      // Permissions pour users par rôle
+      { action: "read", resource: "user", roleId: superAdmin.id },
+      { action: "write", resource: "user", roleId: superAdmin.id },
+      { action: "read", resource: "user", roleId: staf.id },
+      { action: "write", resource: "user", roleId: staf.id },
+      { action: "read", resource: "user", roleId: frontDesk.id },
+      { action: "write", resource: "user", roleId: frontDesk.id },
+      // permissions pour reservation par rôle
+      { action: "read", resource: "reservation", roleId: superAdmin.id },
+      { action: "write", resource: "reservation", roleId: superAdmin.id },
+      { action: "read", resource: "reservation", roleId: staf.id },
+      { action: "write", resource: "reservation", roleId: staf.id },
+      { action: "read", resource: "reservation", roleId: frontDesk.id },
+      { action: "write", resource: "reservation", roleId: frontDesk.id },
+      // permissions pour role par rôle
+      { action: "read", resource: "role", roleId: superAdmin.id },
+      { action: "write", resource: "role", roleId: superAdmin.id },
+      { action: "read", resource: "role", roleId: staf.id },
+      { action: "write", resource: "role", roleId: staf.id },
+      { action: "read", resource: "role", roleId: frontDesk.id },
+      //  permissions pour permission par rôle
+      { action: "read", resource: "permission", roleId: superAdmin.id },
+      { action: "write", resource: "permission", roleId: superAdmin.id },
+      { action: "read", resource: "permission", roleId: staf.id },
+      { action: "write", resource: "permission", roleId: staf.id },
+      { action: "read", resource: "permission", roleId: frontDesk.id },
+      // permissions pour depense par rôle
+      { action: "read", resource: "depense", roleId: superAdmin.id },
+      { action: "write", resource: "depense", roleId: superAdmin.id },
+      { action: "read", resource: "depense", roleId: staf.id },
+      { action: "write", resource: "depense", roleId: staf.id },
+      // permissions pour paiement par rôle
+      { action: "read", resource: "paiement", roleId: superAdmin.id },
+      { action: "write", resource: "paiement", roleId: superAdmin.id },
+      { action: "read", resource: "paiement", roleId: staf.id },
+      { action: "write", resource: "paiement", roleId: staf.id },
     ],
   });
 

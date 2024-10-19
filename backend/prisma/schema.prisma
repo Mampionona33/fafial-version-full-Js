@@ -2,6 +2,7 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -73,10 +74,13 @@ model Reservation {
   acomptes         Acompte[]
   activite         String?
   remarques        String?
-  statut           String    @default("EN_ATTENTE")
-  utilisateurType  String
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+
+  statut           String @default("OUVERT") // Possible values: OUVERT, ANNULE
+  validationStatus String @default("EN_ATTENTE") // Possible values: EN_ATTENTE, VALIDE, REFUSE
+
+  utilisateurType String // Staff ou FrontDesk pour identifier qui a créé/modifié
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 model Acompte {
@@ -86,25 +90,30 @@ model Acompte {
   modePaiement  String
   reservationId String
   reservation   Reservation @relation(fields: [reservationId], references: [id])
-  statut        String      @default("EN_ATTENTE")
+  statut        String      @default("EN_ATTENTE") // Possible values: EN_ATTENTE, PAYE
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 }
 
 model Recette {
-  id          String   @id @default(cuid())
-  montant     Float
-  description String?
-  date        DateTime @default(now())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id             String   @id @default(cuid())
+  montant        Float
+  description    String?
+  personnePayeur String
+  moyenPaiement  String
+  date           DateTime @default(now())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @default(now())
 }
 
 model Depense {
-  id          String   @id @default(cuid())
-  montant     Float
-  description String?
-  date        DateTime @default(now())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                String   @id @default(cuid())
+  montant           Float
+  description       String?
+  personneRecepteur String
+  moyenPaiement     String
+  justification     String?
+  date              DateTime @default(now())
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }
