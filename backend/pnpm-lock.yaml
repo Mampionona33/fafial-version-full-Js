@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@latest':
+        specifier: link:@prisma/@latest
+        version: link:@prisma/@latest
       '@prisma/client':
         specifier: ^5.21.0
         version: 5.21.0(prisma@5.20.0)

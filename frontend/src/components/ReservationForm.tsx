@@ -14,9 +14,12 @@ import {
 } from "../interfaces/ReservationInterface";
 import { nanoid } from "nanoid";
 import { useAuth } from "../hooks/useAuth";
+import { useSalles } from "../hooks/useSalles";
+import SelectOptionAdapter from "../utils/SelectOptionAdapter";
 
 const ReservationForm = () => {
   const { user } = useAuth();
+  const { salles } = useSalles();
   // State pour les acomptes
   const [acomptes, setAcomptes] = React.useState<
     {
@@ -25,6 +28,9 @@ const ReservationForm = () => {
       datePrevue: string;
       modePaiement: string;
     }[]
+  >([]);
+  const [salleOptions, setSalleOptions] = React.useState<
+    { label: string; value: string }[]
   >([]);
 
   // State pour les informations de la réservation
@@ -44,12 +50,7 @@ const ReservationForm = () => {
   const [activite, setActivite] = React.useState<string>("");
   const [remarques, setRemarques] = React.useState<string>("");
   const [reference, setReference] = React.useState<string>("");
-
-  const options = [
-    { value: "salle_a", label: "Salle A" },
-    { value: "salle_b", label: "Salle B" },
-    { value: "salle_c", label: "Salle C" },
-  ];
+  const [salleId, setSalleId] = React.useState<string>("");
 
   const modesPaiement = [
     { value: "carte", label: "Carte" },
@@ -91,7 +92,10 @@ const ReservationForm = () => {
 
   React.useEffect(() => {
     setReference(generateRef());
-  }, []);
+    if (salles) {
+      setSalleOptions(SelectOptionAdapter.adapt(salles));
+    }
+  }, [salles]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -124,7 +128,7 @@ const ReservationForm = () => {
       heureDebut,
       dateFin: formattedDateFin,
       heureFin,
-      salleId: "cm2gc064p0000q2pl5td6b6aq", // A remplacer par un Id de salle valid
+      salleId: salleId,
       acomptes: updatedAcomptes,
       activite,
       remarques,
@@ -279,7 +283,11 @@ const ReservationForm = () => {
           {/* Salle */}
           <div className="col-span-1">
             <AppLabel htmlFor="salleId">Choisir une salle</AppLabel>
-            <AppSelect id="salleId" options={options} />
+            <AppSelect
+              id="salleId"
+              options={salleOptions}
+              onChange={(value) => setSalleId(value)}
+            />
           </div>
 
           {/* Acomptes */}

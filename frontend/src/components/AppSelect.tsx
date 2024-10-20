@@ -16,7 +16,7 @@ const AppSelect: React.FC<AppSelectProps> = ({
       (option) => option.value === event.target.value
     );
     if (selectedOption && onChange) {
-      onChange(selectedOption.label); // Retourne le label
+      onChange(selectedOption.value);
     }
   };
 

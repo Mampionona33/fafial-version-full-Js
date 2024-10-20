@@ -52,7 +52,7 @@ model User {
 
 model Salle {
   id           String        @id @default(cuid())
-  nom          String
+  name         String
   capacite     Int
   montantLoyer Float
   reservations Reservation[]

@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@latest": "link:@prisma/@latest",
     "@prisma/client": "^5.21.0",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, ReactNode } from "react";
 import Cookies from "js-cookie";
-import { AuthContext } from "./AuthContext";
+import { AuthContext } from "../contexts/AuthContext";
 import { toast } from "react-toastify";
 import { LoginData } from "../interfaces/LoginDataInterface";
 import AuthServices from "../services/AuthServices";
