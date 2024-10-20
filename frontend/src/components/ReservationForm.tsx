@@ -17,10 +17,12 @@ import { useAuth } from "../hooks/useAuth";
 import { useSalles } from "../hooks/useSalles";
 import SelectOptionAdapter from "../utils/SelectOptionAdapter";
 import { toast, ToastContainer } from "react-toastify";
+import { usePaymentMethodes } from "../hooks/usePaymentMethodes";
 
 const ReservationForm = () => {
   const { user } = useAuth();
   const { salles } = useSalles();
+  const { paymentMethodes } = usePaymentMethodes();
   // State pour les acomptes
   const [acomptes, setAcomptes] = React.useState<
     {
@@ -52,12 +54,12 @@ const ReservationForm = () => {
   const [remarques, setRemarques] = React.useState<string>("");
   const [reference, setReference] = React.useState<string>("");
   const [salleId, setSalleId] = React.useState<string>("");
-
-  const modesPaiement = [
-    { value: "carte", label: "Carte" },
-    { value: "espece", label: "Espèce" },
-    { value: "cheque", label: "Chèque" },
-  ];
+  const [methodePaiement, setMethodePaiement] = React.useState<
+    {
+      label: string;
+      value: string;
+    }[]
+  >([]);
 
   const handleAddAcompt = () => {
     const id = uuidv4();
@@ -96,7 +98,10 @@ const ReservationForm = () => {
     if (salles) {
       setSalleOptions(SelectOptionAdapter.adapt(salles));
     }
-  }, [salles]);
+    if (paymentMethodes) {
+      setMethodePaiement(SelectOptionAdapter.adapt(paymentMethodes));
+    }
+  }, [salles, setReference, setSalleOptions, paymentMethodes]);
 
   const resetForm = () => {
     setAcomptes([]);
@@ -353,7 +358,7 @@ const ReservationForm = () => {
               <AppLabel htmlFor="mode_paiement">Mode de paiement</AppLabel>
               <AppSelect
                 id="mode_paiement"
-                options={modesPaiement}
+                options={methodePaiement}
                 onChange={(value) => setModePaiement(value)}
               />
             </div>

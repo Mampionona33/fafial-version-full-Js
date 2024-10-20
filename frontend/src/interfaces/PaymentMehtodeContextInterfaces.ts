@@ -8,7 +8,7 @@ export interface PaymentMethodContextType {
 }
 
 export interface PaymentMethodInterface {
-  id?: string;
+  id: string;
   name: string;
   createdAt: string;
   updatedAt: string;
