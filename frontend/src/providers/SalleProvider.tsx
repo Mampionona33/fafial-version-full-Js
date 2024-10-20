@@ -14,7 +14,6 @@ export const SalleProvider = ({ children }: { children: React.ReactNode }) => {
     const fetchSalles = async () => {
       try {
         const response = await SalleServices.getAll();
-        console.log(response);
         if (response.status === 200) {
           setSalles(response.data.salles);
           setLoading(false);
@@ -23,7 +22,10 @@ export const SalleProvider = ({ children }: { children: React.ReactNode }) => {
         console.error(error);
         setLoading(false);
         toast.error(
-          "Une erreur est survenue lors de la recuperation des salles"
+          "Une erreur est survenue lors de la recuperation des salles",
+          {
+            toastId: "error-salle",
+          }
         );
         setError("Une erreur est survenue lors de la recuperation des salles");
       }

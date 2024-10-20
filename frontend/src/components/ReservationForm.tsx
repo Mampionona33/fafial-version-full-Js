@@ -16,6 +16,7 @@ import { nanoid } from "nanoid";
 import { useAuth } from "../hooks/useAuth";
 import { useSalles } from "../hooks/useSalles";
 import SelectOptionAdapter from "../utils/SelectOptionAdapter";
+import { toast, ToastContainer } from "react-toastify";
 
 const ReservationForm = () => {
   const { user } = useAuth();
@@ -97,6 +98,26 @@ const ReservationForm = () => {
     }
   }, [salles]);
 
+  const resetForm = () => {
+    setAcomptes([]);
+    setMontant(0);
+    setDatePrevue("");
+    setModePaiement("carte");
+    setNomOrganisation("");
+    setNomPrenomContact("");
+    setEmail("");
+    setTelephone("");
+    setNombrePersonnes(0);
+    setDateDebut("");
+    setHeureDebut("");
+    setDateFin("");
+    setHeureFin("");
+    setActivite("");
+    setRemarques("");
+    setReference(generateRef());
+    setSalleId("");
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -133,16 +154,31 @@ const ReservationForm = () => {
       activite,
       remarques,
       statut: StatutReservation.OUVERT,
-      utilisateurType: UtilisateurType.STAFF, // Valeur par défaut
-      validationStatus: ValidationStatut.VALIDE, // Ajout de la propriété manquante
+      utilisateurType: UtilisateurType.STAFF,
+      validationStatus: ValidationStatut.VALIDE,
     };
 
     try {
       // Création de la réservation
       const res = await ReservationService.create(reservationData);
-      console.log("Réservation créée :", res);
+      if (res.status === 201) {
+        resetForm();
+        if (res.data.message) {
+          toast.success(res.data.message, {
+            position: "bottom-right",
+          });
+        }
+      } else if (res.status === 400) {
+        toast.error(res.data.message, {
+          position: "bottom-right",
+        });
+      }
     } catch (error) {
       console.error("Erreur lors de la création de la réservation", error);
+      toast.error("Erreur lors de la création de la réservation", {
+        position: "bottom-right",
+        toastId: "error-reservation",
+      });
     }
   };
 
@@ -390,6 +426,7 @@ const ReservationForm = () => {
           </div>
         </form>
       </div>
+      <ToastContainer />
     </div>
   );
 };

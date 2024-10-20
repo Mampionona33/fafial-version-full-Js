@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import { ReservationInterface } from "../interfaces/ReservationInterface";
 import { BACKEND_URL } from "../constants/appContants";
 import AuthServices from "./AuthServices";
@@ -29,14 +29,16 @@ class ReservationService {
   // Méthode pour créer une nouvelle réservation
   static async create(
     reservationData: ReservationInterface
-  ): Promise<ReservationInterface> {
+  ): Promise<
+    AxiosResponse<{ message: string; reservation: ReservationInterface }>
+  > {
     try {
       const response = await axios.post(this.API_URL, reservationData, {
         headers: {
           Authorization: `Bearer ${this.getToken()}`,
         },
       });
-      return response.data as ReservationInterface;
+      return response;
     } catch (error) {
       console.error("Erreur lors de la création de la réservation", error);
       throw error;

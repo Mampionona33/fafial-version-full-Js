@@ -2,8 +2,9 @@ import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 const client = new PrismaClient();
+
 /**
- * Liste des compte avec les mots de passes :
+ * Liste des comptes avec les mots de passe :
  * - superadmin@example.com : SuperAdmin123!
  * - staf@example.com : StafPassword456$
  * - frontdesk@example.com : FrontDesk789#
@@ -72,7 +73,7 @@ async function main() {
   const hashedMultiRolePassword = await bcrypt.hash("MultiRole000@", 10);
   const hashedUserPassword = await bcrypt.hash("StafUser321&", 10);
 
-  // créer les salles
+  // Créer les salles
   await client.salle.create({
     data: {
       name: "Salle 01",
@@ -156,6 +157,74 @@ async function main() {
         ],
       },
     },
+  });
+
+  // Ajouter des modes de paiement et leurs champs obligatoires
+  const mobileMoney = await client.paymentMethod.create({
+    data: { name: "Mobile Money" },
+  });
+  await client.paymentField.createMany({
+    data: [
+      {
+        fieldName: "Numéro de l'expéditeur",
+        isRequired: true,
+        paymentMethodId: mobileMoney.id,
+      },
+      {
+        fieldName: "Référence de la transaction",
+        isRequired: true,
+        paymentMethodId: mobileMoney.id,
+      },
+    ],
+  });
+
+  const cheque = await client.paymentMethod.create({
+    data: { name: "Chèque" },
+  });
+  await client.paymentField.createMany({
+    data: [
+      {
+        fieldName: "Numéro du chèque",
+        isRequired: true,
+        paymentMethodId: cheque.id,
+      },
+      {
+        fieldName: "Nom de la banque",
+        isRequired: true,
+        paymentMethodId: cheque.id,
+      },
+    ],
+  });
+
+  const bankTransfer = await client.paymentMethod.create({
+    data: { name: "Virement bancaire" },
+  });
+  await client.paymentField.createMany({
+    data: [
+      {
+        fieldName: "Numéro de compte",
+        isRequired: true,
+        paymentMethodId: bankTransfer.id,
+      },
+      {
+        fieldName: "Référence du virement",
+        isRequired: true,
+        paymentMethodId: bankTransfer.id,
+      },
+    ],
+  });
+
+  const cash = await client.paymentMethod.create({
+    data: { name: "Espèces" },
+  });
+  await client.paymentField.createMany({
+    data: [
+      {
+        fieldName: "Montant payé",
+        isRequired: true,
+        paymentMethodId: cash.id,
+      },
+    ],
   });
 
   console.log("Seeding completed.");
