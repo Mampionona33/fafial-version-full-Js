@@ -38,7 +38,7 @@ export const PaymentMethodesProvider = ({
       }
     };
     fetchPaymentMethodes();
-  });
+  }, []);
 
   return (
     <PaymentMethodesContext.Provider

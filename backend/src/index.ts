@@ -4,6 +4,7 @@ import express, { Request, Response, NextFunction } from "express";
 import loginRouter from "./routes/authRoutes";
 import reservationRouter from "./routes/reservationRouters";
 import salleRouter from "./routes/salleRouter";
+import paymentMethodesRouter from "./routes/paymentMethodesRouter";
 import http from "http";
 import cors from "cors";
 import path from "path";
@@ -41,6 +42,7 @@ app.get("/", (req: Request, res: Response) => {
 app.use("/api/v1", loginRouter);
 app.use("/api/v1", reservationRouter);
 app.use("/api/v1", salleRouter);
+app.use("/api/v1", paymentMethodesRouter);
 
 // Error handling middleware
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {

@@ -6,13 +6,16 @@ import { RouterProvider } from "react-router-dom";
 import router from "./router/router";
 import { AuthProvider } from "./providers/AuthProvider";
 import { SalleProvider } from "./providers/SalleProvider";
+import { PaymentMethodesProvider } from "./providers/PaymentMethodesProvider";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <AuthProvider>
       <PrimeReactProvider>
         <SalleProvider>
-          <RouterProvider router={router} />
+          <PaymentMethodesProvider>
+            <RouterProvider router={router} />
+          </PaymentMethodesProvider>
         </SalleProvider>
       </PrimeReactProvider>
     </AuthProvider>
