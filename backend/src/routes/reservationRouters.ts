@@ -10,4 +10,6 @@ router.post(
   ReservationController.create
 );
 
+router.get("/reservations", ReservationController.getAll);
+
 export default router;

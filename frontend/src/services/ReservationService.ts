@@ -4,7 +4,7 @@ import { BACKEND_URL } from "../constants/appContants";
 import AuthServices from "./AuthServices";
 
 class ReservationService {
-  static API_URL = `${BACKEND_URL}/reservations`;
+  static API_URL: string = `${BACKEND_URL}/reservations`;
 
   // Méthode pour obtenir le token
   private static getToken() {
@@ -12,14 +12,16 @@ class ReservationService {
   }
 
   // Méthode pour obtenir toutes les réservations
-  static async getAll(): Promise<ReservationInterface[]> {
+  static async getAll(): Promise<
+    AxiosResponse<{ message: string; reservations: ReservationInterface[] }>
+  > {
     try {
       const response = await axios.get(this.API_URL, {
         headers: {
           Authorization: `Bearer ${this.getToken()}`,
         },
       });
-      return response.data as ReservationInterface[];
+      return response;
     } catch (error) {
       console.error("Erreur lors de la récupération des réservations", error);
       throw error;

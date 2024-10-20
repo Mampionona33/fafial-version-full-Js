@@ -83,6 +83,31 @@ class ReservationController {
     const newDate = set(date, { hours, minutes, seconds: 0, milliseconds: 0 });
     return newDate;
   }
+
+  public static async getAll(req: Request, res: Response) {
+    try {
+      const reservations = await prisma.reservation.findMany();
+
+      if (reservations.length === 0) {
+        res.status(404).json({
+          message: "Aucune réservation n'est disponible pour le moment",
+        });
+        return;
+      }
+      res.status(200).json({
+        message: "Réservations disponibles",
+        reservations: reservations,
+      });
+      return;
+    } catch (error) {
+      console.error("ReservationController.getAll", error);
+      res.status(500).json({
+        error:
+          "Une erreur s'est produite lors de la création de la réservation",
+      });
+      return;
+    }
+  }
 }
 
 export default ReservationController;
