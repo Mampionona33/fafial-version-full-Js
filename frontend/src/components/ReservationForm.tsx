@@ -11,6 +11,7 @@ import {
   UtilisateurType,
   ReservationInterface,
   ValidationStatut,
+  ReservationFormulaireInterface,
 } from "../interfaces/ReservationInterface";
 import { nanoid } from "nanoid";
 import { useAuth } from "../hooks/useAuth";
@@ -29,11 +30,12 @@ import {
   resetAcompte,
 } from "../actions/AcomptesAction";
 import IndeterminateProgressBar from "./IndeterminateProgressBar";
+import { useParams } from "react-router-dom";
 
 const ReservationForm = ({
   reservationData,
 }: {
-  reservationData?: ReservationInterface;
+  reservationData?: ReservationFormulaireInterface;
 }) => {
   const generateRef = () => {
     const date = new Date();
@@ -48,6 +50,7 @@ const ReservationForm = ({
   const { user } = useAuth();
   const { salles } = useSalles();
   const { paymentMethodes } = usePaymentMethodes();
+  const { idReservation } = useParams();
 
   const [salleOptions, setSalleOptions] = React.useState<
     { label: string; value: string }[]
@@ -66,19 +69,29 @@ const ReservationForm = ({
         setReservation({ ...state.reservation, reference: generateRef() })
       );
     }
-    if (salles) {
+
+    if (salles && salleOptions.length === 0) {
       setSalleOptions(SelectOptionAdapter.adapt(salles));
     }
-    if (paymentMethodes) {
+
+    if (paymentMethodes && methodePaiement.length === 0) {
       setMethodePaiement(SelectOptionAdapter.adapt(paymentMethodes));
+    }
+
+    if (
+      reservationData &&
+      state.reservation.reference !== reservationData.reference
+    ) {
+      dispatch(setReservation({ ...reservationData }));
     }
   }, [
     salles,
-    setSalleOptions,
     paymentMethodes,
-    setMethodePaiement,
     reservationData,
-    state,
+    state.reservation,
+    idReservation,
+    salleOptions.length,
+    methodePaiement.length,
   ]);
 
   const handleSubmit = async (e: React.FormEvent) => {
