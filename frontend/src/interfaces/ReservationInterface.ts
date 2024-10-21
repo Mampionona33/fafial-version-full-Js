@@ -87,9 +87,9 @@ export interface ReservationInterface {
   email: string;
   telephone: string;
   nombrePersonnes: number;
-  dateDebut: Date; // Format ISO
+  dateDebut: Date | string; // Format ISO
   heureDebut: string; // Format ISO
-  dateFin: Date; // Format ISO
+  dateFin: Date | string; // Format ISO
   heureFin: string; // Format ISO
   salleId: string; // Relation avec Salle
   activite?: string;
@@ -100,6 +100,11 @@ export interface ReservationInterface {
   acomptes: Acompte[]; // Liste des acomptes
   createdAt?: string; // Format ISO
   updatedAt?: string; // Format ISO
+}
+
+export interface ReservationFormulaireInterface
+  extends Omit<ReservationInterface, "acomptes"> {
+  acomptes: Acompte;
 }
 
 // Interface pour Recette

@@ -2,7 +2,7 @@ import AppLabel from "./AppLabel";
 import AppInput from "./AppInput";
 import AppTextarea from "./AppTextarea";
 import AppSelect from "./AppSelect";
-import React from "react";
+import React, { useReducer } from "react";
 import { v4 as uuidv4 } from "uuid";
 import ReservationService from "../services/ReservationService";
 import {
@@ -18,6 +18,17 @@ import { useSalles } from "../hooks/useSalles";
 import SelectOptionAdapter from "../utils/SelectOptionAdapter";
 import { toast, ToastContainer } from "react-toastify";
 import { usePaymentMethodes } from "../hooks/usePaymentMethodes";
+import reservationReducer, {
+  initialState,
+} from "../reducers/reservationReducer";
+import { resetReservation, setReservation } from "../actions/reservationAction";
+import acomptesReducer from "../reducers/acomptReducer";
+import {
+  addAcompte,
+  deleteAcompte,
+  resetAcompte,
+} from "../actions/AcomptesAction";
+import IndeterminateProgressBar from "./IndeterminateProgressBar";
 
 const ReservationForm = ({
   reservationData,
@@ -29,132 +40,31 @@ const ReservationForm = ({
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const day = String(date.getDate()).padStart(2, "0");
-
     const formattedDate = `${year}${month}${day}`;
-
     const randomString = nanoid(7);
-
-    // Retourner la référence dans le format : RESYYYYMMDDrandomString
     return `RES-${formattedDate}-${randomString}`;
   };
 
   const { user } = useAuth();
   const { salles } = useSalles();
   const { paymentMethodes } = usePaymentMethodes();
-  // State pour les acomptes
-  const [acomptes, setAcomptes] = React.useState<
-    {
-      id: string;
-      montant: number;
-      datePrevue: string;
-      modePaiement: string;
-    }[]
-  >([]);
+
   const [salleOptions, setSalleOptions] = React.useState<
     { label: string; value: string }[]
   >([]);
-
-  // State pour les informations de la réservation
-  const [reference, setReference] = React.useState<string>(
-    reservationData && reservationData.reference
-      ? reservationData.reference
-      : ""
-  );
-  const [montant, setMontant] = React.useState<number>(0);
-  const [datePrevue, setDatePrevue] = React.useState<string>("");
-  const [modePaiement, setModePaiement] = React.useState<string>("carte");
-
-  const [nomOrganisation, setNomOrganisation] = React.useState<string>(
-    reservationData && reservationData.nomOrganisation
-      ? reservationData.nomOrganisation
-      : ""
-  );
-  const [nomPrenomContact, setNomPrenomContact] = React.useState<string>(
-    reservationData && reservationData.nomPrenomContact
-      ? reservationData.nomPrenomContact
-      : ""
-  );
-  const [email, setEmail] = React.useState<string>(
-    reservationData && reservationData.email ? reservationData.email : ""
-  );
-  const [telephone, setTelephone] = React.useState<string>(
-    reservationData && reservationData.telephone
-      ? reservationData.telephone
-      : ""
-  );
-  const [nombrePersonnes, setNombrePersonnes] = React.useState<number>(
-    reservationData && reservationData.nombrePersonnes
-      ? reservationData.nombrePersonnes
-      : 0
-  );
-  const [dateDebut, setDateDebut] = React.useState<string>(
-    reservationData && reservationData.dateDebut
-      ? new Date(reservationData.dateDebut).toISOString().split("T")[0]
-      : ""
-  );
-
-  const [heureDebut, setHeureDebut] = React.useState<string>(
-    reservationData && reservationData.heureDebut
-      ? new Date(reservationData.heureDebut).toLocaleTimeString("fr-FR", {
-          hour: "2-digit",
-          minute: "2-digit",
-        })
-      : ""
-  );
-
-  const [dateFin, setDateFin] = React.useState<string>(
-    reservationData && reservationData.dateFin
-      ? new Date(reservationData.dateFin).toISOString().split("T")[0]
-      : ""
-  );
-  const [heureFin, setHeureFin] = React.useState<string>(
-    reservationData && reservationData.heureFin
-      ? new Date(reservationData.heureFin).toLocaleTimeString("fr-FR", {
-          hour: "2-digit",
-          minute: "2-digit",
-        })
-      : ""
-  );
-  const [activite, setActivite] = React.useState<string>(
-    reservationData && reservationData.activite ? reservationData.activite : ""
-  );
-  const [remarques, setRemarques] = React.useState<string>(
-    reservationData && reservationData.remarques
-      ? reservationData.remarques
-      : ""
-  );
-
-  const [salleId, setSalleId] = React.useState<string>(
-    reservationData && reservationData.salleId ? reservationData.salleId : ""
-  );
   const [methodePaiement, setMethodePaiement] = React.useState<
-    {
-      label: string;
-      value: string;
-    }[]
+    { label: string; value: string }[]
   >([]);
 
-  const handleAddAcompt = () => {
-    const id = uuidv4();
-    const newAcompte = {
-      id: id,
-      montant,
-      datePrevue,
-      modePaiement,
-    };
-    setAcomptes([...acomptes, newAcompte]);
-    setMontant(0);
-    setDatePrevue("");
-    setModePaiement("carte");
-  };
-
-  const handleDeleteAcompt = (id: string) => {
-    setAcomptes(acomptes.filter((acompte) => acompte.id !== id));
-  };
+  const [state, dispatch] = useReducer(reservationReducer, initialState);
+  const [acomptes, AcomptesDispatch] = useReducer(acomptesReducer, []);
+  const [loading, setLoading] = React.useState<boolean>(false);
 
   React.useEffect(() => {
-    if (!reservationData) {
-      setReference(generateRef());
+    if (!state.reservation.reference) {
+      dispatch(
+        setReservation({ ...state.reservation, reference: generateRef() })
+      );
     }
     if (salles) {
       setSalleOptions(SelectOptionAdapter.adapt(salles));
@@ -164,43 +74,23 @@ const ReservationForm = ({
     }
   }, [
     salles,
-    setReference,
     setSalleOptions,
     paymentMethodes,
     setMethodePaiement,
     reservationData,
+    state,
   ]);
-
-  const resetForm = () => {
-    setAcomptes([]);
-    setMontant(0);
-    setDatePrevue("");
-    setModePaiement("carte");
-    setNomOrganisation("");
-    setNomPrenomContact("");
-    setEmail("");
-    setTelephone("");
-    setNombrePersonnes(0);
-    setDateDebut("");
-    setHeureDebut("");
-    setDateFin("");
-    setHeureFin("");
-    setActivite("");
-    setRemarques("");
-    setReference(generateRef());
-    setSalleId("");
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    const formattedDateDebut = new Date(dateDebut);
-    const formattedDateFin = new Date(dateFin);
-
-    // Met à jour les statuts des acomptes en "EN_ATTENTE"
+    setLoading(true);
+    const formattedDateDebut = new Date(state.reservation.dateDebut as string);
+    const formattedDateFin = new Date(state.reservation.dateFin as string);
     const updatedAcomptes = acomptes.map((acompte) => ({
       ...acompte,
-      // comment supprimer l'id des acomptes ici
+      montant: acompte.montant,
+      datePrevue: acompte.datePrevue,
+      modePaiement: acompte.modePaiement,
       id: undefined,
       statut: PayementStatut.EN_ATTENTE,
     }));
@@ -209,299 +99,448 @@ const ReservationForm = ({
       throw new Error("Utilisateur non connecté");
     }
 
-    // Crée l'objet ReservationInterface
     const reservationData: ReservationInterface = {
       createdById: user?.id,
-      reference,
-      nomOrganisation,
-      nomPrenomContact,
-      email,
-      telephone,
-      nombrePersonnes,
+      reference: state.reservation.reference,
+      nomOrganisation: state.reservation.nomOrganisation,
+      nomPrenomContact: state.reservation.nomPrenomContact,
+      email: state.reservation.email,
+      telephone: state.reservation.telephone,
+      nombrePersonnes: state.reservation.nombrePersonnes,
       dateDebut: formattedDateDebut,
-      heureDebut,
+      heureDebut: state.reservation.heureDebut,
       dateFin: formattedDateFin,
-      heureFin,
-      salleId: salleId,
+      heureFin: state.reservation.heureFin,
+      salleId: state.reservation.salleId,
       acomptes: updatedAcomptes,
-      activite,
-      remarques,
+      activite: state.reservation.activite,
+      remarques: state.reservation.remarques,
       statut: StatutReservation.OUVERT,
       utilisateurType: UtilisateurType.STAFF,
       validationStatus: ValidationStatut.VALIDE,
     };
 
     try {
-      // Création de la réservation
       const res = await ReservationService.create(reservationData);
       if (res.status === 201) {
-        resetForm();
-        if (res.data.message) {
-          toast.success(res.data.message, {
-            position: "bottom-right",
-          });
-        }
+        toast.success(res.data.message, { position: "bottom-right" });
       } else if (res.status === 400) {
-        toast.error(res.data.message, {
-          position: "bottom-right",
-        });
+        toast.error(res.data.message, { position: "bottom-right" });
       }
+      dispatch(resetReservation());
+      AcomptesDispatch(resetAcompte());
     } catch (error) {
-      console.error("Erreur lors de la création de la réservation", error);
+      setLoading(false);
+      console.log(error);
       toast.error("Erreur lors de la création de la réservation", {
         position: "bottom-right",
         toastId: "error-reservation",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center h-full w-full py-8 px-4">
-      <div className="bg-white p-8 shadow-md w-full max-w-3xl">
-        <h1 className="text-3xl font-semibold text-gray-700 text-center mb-6">
-          Réservation de Salle
-        </h1>
-        <hr className="mb-6" />
-        <form
-          onSubmit={handleSubmit}
-          className="grid grid-cols-1 md:grid-cols-2 gap-4"
-        >
-          {/* Référence */}
-          <div>
-            <AppLabel htmlFor="reference">Référence</AppLabel>
-            <AppInput
-              id="reference"
-              type="text"
-              value={reference}
-              disabled
-              placeholder="Référence"
-            />
-          </div>
-
-          {/* Nom Organisation */}
-          <div>
-            <AppLabel htmlFor="nomOrganisation">Nom de l'organisation</AppLabel>
-            <AppInput
-              id="nomOrganisation"
-              type="text"
-              placeholder="Nom de l'organisation"
-              value={nomOrganisation}
-              onChange={(e) => setNomOrganisation(e.target.value)}
-            />
-          </div>
-
-          {/* Nom Prenom Contact */}
-          <div>
-            <AppLabel htmlFor="nomPrenomContact">
-              Nom et prénom du contact
-            </AppLabel>
-            <AppInput
-              id="nomPrenomContact"
-              type="text"
-              placeholder="Nom et prénom"
-              value={nomPrenomContact}
-              onChange={(e) => setNomPrenomContact(e.target.value)}
-            />
-          </div>
-
-          {/* Email */}
-          <div>
-            <AppLabel htmlFor="email">Email</AppLabel>
-            <AppInput
-              id="email"
-              type="email"
-              placeholder="exemple@domaine.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-
-          {/* Téléphone */}
-          <div>
-            <AppLabel htmlFor="telephone">Téléphone</AppLabel>
-            <AppInput
-              id="telephone"
-              type="text"
-              placeholder="Numéro de téléphone"
-              value={telephone}
-              onChange={(e) => setTelephone(e.target.value)}
-            />
-          </div>
-
-          {/* Nombre de personnes */}
-          <div>
-            <AppLabel htmlFor="nombrePersonnes">Nombre de personnes</AppLabel>
-            <AppInput
-              id="nombrePersonnes"
-              type="number"
-              required
-              placeholder="Nombre de personnes"
-              value={nombrePersonnes}
-              onChange={(e) => setNombrePersonnes(e.target.valueAsNumber)}
-            />
-          </div>
-
-          {/* Date et Heure de début */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <>
+      <div className="min-h-screen flex items-center justify-center h-full w-full py-8 px-4">
+        <div className="bg-white p-8 shadow-md w-full max-w-3xl">
+          <h1 className="text-3xl font-semibold text-gray-700 text-center mb-6">
+            Réservation de Salle
+          </h1>
+          <hr className="mb-6" />
+          <form
+            onSubmit={handleSubmit}
+            className="grid grid-cols-1 md:grid-cols-2 gap-4"
+          >
+            {/* Référence */}
             <div>
-              <AppLabel htmlFor="dateDebut">Date de début</AppLabel>
+              <AppLabel htmlFor="reference">Référence</AppLabel>
               <AppInput
-                id="dateDebut"
-                type="date"
-                required
-                value={dateDebut}
-                onChange={(e) => setDateDebut(e.target.value)}
+                id="reference"
+                type="text"
+                value={state.reservation.reference}
+                disabled
+                placeholder="Référence"
               />
             </div>
-            <div>
-              <AppLabel htmlFor="heureDebut">Heure de début</AppLabel>
-              <AppInput
-                id="heureDebut"
-                type="time"
-                required
-                value={heureDebut}
-                onChange={(e) => setHeureDebut(e.target.value)}
-              />
-            </div>
-          </div>
 
-          {/* Date et Heure de fin */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Nom Organisation */}
             <div>
-              <AppLabel htmlFor="dateFin">Date de fin</AppLabel>
-              <AppInput
-                id="dateFin"
-                type="date"
-                required
-                value={dateFin}
-                onChange={(e) => setDateFin(e.target.value)}
-              />
-            </div>
-            <div>
-              <AppLabel htmlFor="heureFin">Heure de fin</AppLabel>
-              <AppInput
-                id="heureFin"
-                type="time"
-                required
-                value={heureFin}
-                onChange={(e) => setHeureFin(e.target.value)}
-              />
-            </div>
-          </div>
-
-          {/* Salle */}
-          <div className="col-span-1">
-            <AppLabel htmlFor="salleId">Choisir une salle</AppLabel>
-            <AppSelect
-              id="salleId"
-              options={salleOptions}
-              value={salleId}
-              onChange={(value) => setSalleId(value)}
-            />
-          </div>
-
-          {/* Acomptes */}
-          <div className="col-span-1 md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <AppLabel htmlFor="val_account">Montant acompte</AppLabel>
-              <AppInput
-                id="val_account"
-                type="number"
-                value={montant}
-                onChange={(e) => setMontant(Number(e.target.value))}
-                placeholder="Montant en €"
-              />
-            </div>
-            <div>
-              <AppLabel htmlFor="date_paiement">
-                Date prévue de paiement
+              <AppLabel htmlFor="nomOrganisation">
+                Nom de l'organisation
               </AppLabel>
               <AppInput
-                type="date"
-                id="date_paiement"
-                value={datePrevue}
-                onChange={(e) => setDatePrevue(e.target.value)}
+                id="nomOrganisation"
+                type="text"
+                placeholder="Nom de l'organisation"
+                value={state.reservation.nomOrganisation}
+                onChange={(e) =>
+                  dispatch(
+                    setReservation({
+                      ...state.reservation,
+                      nomOrganisation: e.target.value,
+                    })
+                  )
+                }
               />
             </div>
+
+            {/* Nom Prenom Contact */}
             <div>
-              <AppLabel htmlFor="mode_paiement">Mode de paiement</AppLabel>
-              <AppSelect
-                id="mode_paiement"
-                options={methodePaiement}
-                onChange={(value) => setModePaiement(value)}
+              <AppLabel htmlFor="nomPrenomContact">
+                Nom et prénom du contact
+              </AppLabel>
+              <AppInput
+                id="nomPrenomContact"
+                type="text"
+                placeholder="Nom et prénom"
+                value={state.reservation.nomPrenomContact}
+                onChange={(e) =>
+                  dispatch(
+                    setReservation({
+                      ...state.reservation,
+                      nomPrenomContact: e.target.value,
+                    })
+                  )
+                }
               />
             </div>
-          </div>
 
-          {/* Ajouter acompte */}
-          <div className="col-span-1 md:col-span-2 flex justify-center items-center">
-            <input
-              type="button"
-              onClick={handleAddAcompt}
-              value="Ajouter acompte"
-              className="bg-gray-600 hover:bg-gray-500 text-white py-1 px-8 rounded cursor-pointer"
-            />
-          </div>
+            {/* Email */}
+            <div>
+              <AppLabel htmlFor="email">Email</AppLabel>
+              <AppInput
+                id="email"
+                type="email"
+                placeholder="exemple@domaine.com"
+                value={state.reservation.email}
+                onChange={(e) =>
+                  dispatch(
+                    setReservation({
+                      ...state.reservation,
+                      email: e.target.value,
+                    })
+                  )
+                }
+              />
+            </div>
 
-          {/* Liste des acomptes */}
-          <div className="col-span-1 md:col-span-2">
-            <h3>Liste des acomptes</h3>
-            <ul>
-              {acomptes.map((acompte) => (
-                <li
-                  key={acompte.id}
-                  className="flex justify-between items-center space-y-2"
-                >
-                  <span>{acompte.datePrevue}</span>
-                  <span>{acompte.montant} Ar</span>
-                  <span>{acompte.modePaiement}</span>
-                  <button
-                    onClick={() => handleDeleteAcompt(acompte.id)}
-                    className="text-red-600 border border-red-600 px-2 py-1 rounded hover:bg-red-600 hover:text-white"
-                  >
-                    Supprimer
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
+            {/* Téléphone */}
+            <div>
+              <AppLabel htmlFor="telephone">Téléphone</AppLabel>
+              <AppInput
+                id="telephone"
+                type="text"
+                placeholder="Numéro de téléphone"
+                value={state.reservation.telephone}
+                onChange={(e) =>
+                  dispatch(
+                    setReservation({
+                      ...state.reservation,
+                      telephone: e.target.value,
+                    })
+                  )
+                }
+              />
+            </div>
 
-          <hr className="col-span-1 md:col-span-2" />
+            {/* Nombre de personnes */}
+            <div>
+              <AppLabel htmlFor="nombrePersonnes">Nombre de personnes</AppLabel>
+              <AppInput
+                id="nombrePersonnes"
+                type="number"
+                min={1}
+                required
+                placeholder="Nombre de personnes"
+                value={state.reservation.nombrePersonnes}
+                onChange={(e) => {
+                  dispatch(
+                    setReservation({
+                      ...state.reservation,
+                      nombrePersonnes: parseInt(e.target.value),
+                    })
+                  );
+                }}
+              />
+            </div>
 
-          {/* Activité */}
-          <div className="col-span-1 md:col-span-2">
-            <AppLabel htmlFor="activite">Activité</AppLabel>
-            <AppTextarea
-              id="activite"
-              placeholder="Description de l'activité"
-              value={activite}
-              onChange={(e) => setActivite(e.target.value)}
-            />
-          </div>
+            {/* Date et Heure de début */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <AppLabel htmlFor="dateDebut">Date de début</AppLabel>
+                <AppInput
+                  id="dateDebut"
+                  type="date"
+                  required
+                  value={state.reservation.dateDebut as string}
+                  onChange={(e) =>
+                    dispatch(
+                      setReservation({
+                        ...state.reservation,
+                        dateDebut: e.target.value,
+                      })
+                    )
+                  }
+                />
+              </div>
+              <div>
+                <AppLabel htmlFor="heureDebut">Heure de début</AppLabel>
+                <AppInput
+                  id="heureDebut"
+                  type="time"
+                  required
+                  value={state.reservation.heureDebut as string}
+                  onChange={(e) =>
+                    dispatch(
+                      setReservation({
+                        ...state.reservation,
+                        heureDebut: e.target.value,
+                      })
+                    )
+                  }
+                />
+              </div>
+            </div>
 
-          {/* Remarques */}
-          <div className="col-span-1 md:col-span-2">
-            <AppLabel htmlFor="remarques">Remarques</AppLabel>
-            <AppTextarea
-              id="remarques"
-              placeholder="Ajoutez vos remarques ici..."
-              value={remarques}
-              onChange={(e) => setRemarques(e.target.value)}
-            />
-          </div>
+            {/* Date et Heure de fin */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <AppLabel htmlFor="dateFin">Date de fin</AppLabel>
+                <AppInput
+                  id="dateFin"
+                  type="date"
+                  required
+                  value={state.reservation.dateFin as string}
+                  onChange={(e) =>
+                    dispatch(
+                      setReservation({
+                        ...state.reservation,
+                        dateFin: e.target.value,
+                      })
+                    )
+                  }
+                />
+              </div>
+              <div>
+                <AppLabel htmlFor="heureFin">Heure de fin</AppLabel>
+                <AppInput
+                  id="heureFin"
+                  type="time"
+                  required
+                  value={state.reservation.heureFin as string}
+                  onChange={(e) =>
+                    dispatch(
+                      setReservation({
+                        ...state.reservation,
+                        heureFin: e.target.value,
+                      })
+                    )
+                  }
+                />
+              </div>
+            </div>
 
-          {/* Bouton soumettre */}
-          <div className="text-center flex justify-center items-center w-full col-span-1 md:col-span-2">
-            <input
-              type="submit"
-              value="Enregistrer"
-              className="bg-gray-800 hover:bg-gray-700 text-white px-8 py-1 mt-6 cursor-pointer rounded-md"
-            />
-          </div>
-        </form>
+            {/* Salle */}
+            <div>
+              <AppLabel htmlFor="salleId">Salle</AppLabel>
+              <AppSelect
+                id="salleId"
+                options={salleOptions}
+                value={state.reservation.salleId}
+                onChange={(e) =>
+                  dispatch(
+                    setReservation({
+                      ...state.reservation,
+                      salleId: e,
+                    })
+                  )
+                }
+              />
+            </div>
+
+            {/* Activité */}
+            <div className="col-span-1 md:col-span-2">
+              <AppLabel htmlFor="activite">Activité</AppLabel>
+              <AppTextarea
+                id="activite"
+                placeholder="Description de l'activité"
+                value={state.reservation.activite}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                  dispatch(
+                    setReservation({
+                      ...state.reservation,
+                      activite: e.target.value,
+                    })
+                  )
+                }
+              />
+            </div>
+
+            {/* Remarques */}
+            <div className="md:col-span-2">
+              <AppLabel htmlFor="remarques">Remarques</AppLabel>
+              <AppTextarea
+                id="remarques"
+                placeholder="Vos remarques"
+                value={state.reservation.remarques}
+                onChange={(e) =>
+                  dispatch(
+                    setReservation({
+                      ...state.reservation,
+                      remarques: e.target.value,
+                    })
+                  )
+                }
+              />
+            </div>
+
+            {/* Acomptes */}
+            <div className="md:col-span-2">
+              <h2 className="text-xl font-semibold text-gray-600">Acomptes</h2>
+
+              <div className="col-span-1 md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <AppLabel htmlFor="val_account">Montant acompte</AppLabel>
+                  <AppInput
+                    id="val_account"
+                    type="number"
+                    value={state.reservation.acomptes.montant}
+                    onChange={(e) =>
+                      dispatch(
+                        setReservation({
+                          ...state.reservation,
+                          acomptes: {
+                            ...state.reservation.acomptes,
+                            montant: parseInt(e.target.value),
+                          },
+                        })
+                      )
+                    }
+                    placeholder="Montant en €"
+                  />
+                </div>
+                <div>
+                  <AppLabel htmlFor="date_paiement">
+                    Date prévue de paiement
+                  </AppLabel>
+                  <AppInput
+                    type="date"
+                    id="date_paiement"
+                    value={state.reservation.acomptes.datePrevue}
+                    onChange={(e) =>
+                      dispatch(
+                        setReservation({
+                          ...state.reservation,
+                          acomptes: {
+                            ...state.reservation.acomptes,
+                            datePrevue: e.target.value as string,
+                          },
+                        })
+                      )
+                    }
+                  />
+                </div>
+                <div>
+                  <AppLabel htmlFor="mode_paiement">Mode de paiement</AppLabel>
+                  <AppSelect
+                    id="mode_paiement"
+                    options={methodePaiement}
+                    onChange={(value) =>
+                      dispatch(
+                        setReservation({
+                          ...state.reservation,
+                          acomptes: {
+                            ...state.reservation.acomptes,
+                            modePaiement: value as string,
+                          },
+                        })
+                      )
+                    }
+                  />
+                </div>
+              </div>
+
+              <div className="col-span-1 md:col-span-2">
+                <h3 className="text-xl font-semibold text-gray-600 py-2 underline">
+                  Liste des acomptes :
+                </h3>
+                <ul>
+                  {acomptes.map((acompte) => (
+                    <li
+                      key={acompte.id}
+                      className="flex justify-between items-center space-y-2"
+                    >
+                      <span>{acompte.datePrevue}</span>
+                      <span>{acompte.montant} Ar</span>
+                      <span>{acompte.modePaiement}</span>
+                      <button
+                        onClick={() => {
+                          AcomptesDispatch(deleteAcompte(acompte.id as string));
+                        }}
+                        className="text-red-600 border border-red-600 px-2 py-1 rounded hover:bg-red-600 hover:text-white"
+                      >
+                        Supprimer
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            <div className="col-span-1 md:col-span-2 flex justify-center items-center">
+              <input
+                type="button"
+                onClick={(e: React.FormEvent) => {
+                  e.preventDefault();
+                  AcomptesDispatch(
+                    addAcompte({
+                      id: uuidv4(),
+                      montant: state.reservation.acomptes.montant,
+                      datePrevue: state.reservation.acomptes.datePrevue,
+                      modePaiement: paymentMethodes.filter(
+                        (method) =>
+                          method.id === state.reservation.acomptes.modePaiement
+                      )[0].name,
+                      statut: PayementStatut.EN_ATTENTE,
+                    })
+                  );
+                  dispatch(
+                    setReservation({
+                      ...state.reservation,
+                      acomptes: {
+                        ...state.reservation.acomptes,
+                        montant: 0,
+                        datePrevue: "",
+                        modePaiement: "",
+                      },
+                    })
+                  );
+                }}
+                value="Ajouter acompte"
+                className="bg-gray-600 hover:bg-gray-500 text-white py-1 px-8 rounded cursor-pointer"
+              />
+            </div>
+            {loading && (
+              <div className="w-full col-span-1 md:col-span-2">
+                <IndeterminateProgressBar />
+              </div>
+            )}
+
+            {/* Submit */}
+            <div className="text-center flex justify-center items-center w-full col-span-1 md:col-span-2">
+              <input
+                type="submit"
+                value="Enregistrer"
+                className="bg-gray-800 hover:bg-gray-700 text-white px-8 py-1 mt-6 cursor-pointer rounded-md"
+              />
+            </div>
+          </form>
+          <ToastContainer />
+        </div>
       </div>
-      <ToastContainer />
-    </div>
+    </>
   );
 };
 

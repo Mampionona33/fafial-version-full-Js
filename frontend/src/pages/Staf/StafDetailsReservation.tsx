@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useGetReservation } from "../../hooks/useGetReservation";
 import { ReservationInterface } from "../../interfaces/ReservationInterface";
 
+
 const StafDetailsReservation = () => {
   const { idReservation } = useParams();
   const [reservationData, setReservationData] =
@@ -32,7 +33,7 @@ const StafDetailsReservation = () => {
 
   return (
     <div>
-      {reservationData && <ReservationForm reservationData={reservationData} />}
+      <div>Detail reservation</div>
     </div>
   );
 };
