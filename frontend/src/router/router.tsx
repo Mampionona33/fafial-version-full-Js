@@ -14,6 +14,7 @@ import SelectDashboard from "../pages/SelectDashboard";
 import FrontDesckDashboard from "../pages/FrontDesck/FrontDesck.Dashboard";
 import StafCalendar from "../pages/Staf/StafCalendar";
 import StafAjoutReservation from "../pages/Staf/StafAjoutReservation";
+import StafDetailsReservation from "../pages/Staf/StafDetailsReservation";
 
 // Créer les routes
 const router = createBrowserRouter(
@@ -35,8 +36,17 @@ const router = createBrowserRouter(
           {/* Route pour le tableau de bord Staf */}
           <Route path="/staf">
             <Route path="dashboard" element={<StafDashboard />} />
-            <Route path="calendar" element={<StafCalendar />} />
-            <Route path="ajout-reservation" element={<StafAjoutReservation />} />
+            <Route path="calendar">
+              <Route path="" element={<StafCalendar />} />
+              <Route
+                path="reservations/:idReservation"
+                element={<StafDetailsReservation />}
+              />
+            </Route>
+            <Route
+              path="ajout-reservation"
+              element={<StafAjoutReservation />}
+            />
           </Route>
         </Route>
 

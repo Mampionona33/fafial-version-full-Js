@@ -1,9 +1,5 @@
-export interface CalendarEvent<K> {
-  title: string;
-  start: Date;
-  end: Date;
-  resourceId: K;
-}
+import { CalendarEvent } from "../interfaces/CalendarEventInterface";
+
 class CalendarDataAdapter {
   constructor() {}
 
@@ -20,6 +16,7 @@ class CalendarDataAdapter {
   // Utilisation d'un type explicite pour les événements du calendrier
   public static adaptEvents<
     T extends {
+      id?: K;
       nomOrganisation: string;
       heureDebut: string;
       heureFin: string;
@@ -28,12 +25,11 @@ class CalendarDataAdapter {
     K
   >(items: T[]): CalendarEvent<K>[] {
     return items.map((item) => {
-      console.log("test date", new Date(2024, 9, 16, 10, 0));
-      console.log("date from api", new Date(item.heureDebut));
       const startDate = new Date(item.heureDebut);
       const endDate = new Date(item.heureFin);
 
       return {
+        id: item.id,
         title: item.nomOrganisation,
         start: startDate,
         end: endDate,

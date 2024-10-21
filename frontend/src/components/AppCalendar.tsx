@@ -5,9 +5,9 @@ import "react-big-calendar/lib/css/react-big-calendar.css"; // Importer les styl
 import { useReservations } from "../hooks/useReservations";
 import { useSalles } from "../hooks/useSalles";
 import { useEffect, useState } from "react";
-import CalendarDataAdapter, {
-  CalendarEvent,
-} from "../utils/CalendarDataAdapter";
+import CalendarDataAdapter from "../utils/CalendarDataAdapter";
+import { CalendarEvent } from "../interfaces/CalendarEventInterface";
+import { useNavigate } from "react-router-dom";
 
 const localizer = momentLocalizer(moment);
 
@@ -20,6 +20,7 @@ const AppCalendar = () => {
     { id: string | number; title: string }[]
   >([]);
   const [eventList, setEventList] = useState<CalendarEvent<unknown>[]>([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (salles) {
@@ -39,6 +40,7 @@ const AppCalendar = () => {
         localizer={localizer}
         events={eventList}
         startAccessor="start"
+        selectable
         endAccessor="end"
         style={{
           height: "59vh",
@@ -46,6 +48,7 @@ const AppCalendar = () => {
           maxWidth: "100%",
           fontSize: "12px",
         }}
+        onSelectEvent={(event) => navigate(`reservations/${event.id}`)}
         messages={{
           next: "Suivant",
           previous: "Précédent",
