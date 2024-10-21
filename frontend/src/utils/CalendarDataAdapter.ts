@@ -21,45 +21,25 @@ class CalendarDataAdapter {
   public static adaptEvents<
     T extends {
       nomOrganisation: string;
-      dateDebut: Date; // Utilisation de Date directement
       heureDebut: string;
-      dateFin: Date; // Utilisation de Date directement
       heureFin: string;
       salleId: K;
     },
     K
   >(items: T[]): CalendarEvent<K>[] {
     return items.map((item) => {
-      const startDate = CalendarDataAdapter.combineDateAndTime(
-        item.dateDebut,
-        item.heureDebut
-      );
-      const endDate = CalendarDataAdapter.combineDateAndTime(
-        item.dateFin,
-        item.heureFin
-      );
+      console.log("test date", new Date(2024, 9, 16, 10, 0));
+      console.log("date from api", new Date(item.heureDebut));
+      const startDate = new Date(item.heureDebut);
+      const endDate = new Date(item.heureFin);
 
       return {
-        title: item.nomOrganisation, // Utilise nomOrganisation comme titre
-        start: startDate, // Date de début combinée
-        end: endDate, // Date de fin combinée
-        resourceId: item.salleId, // Id de la salle ou ressource associée
+        title: item.nomOrganisation,
+        start: startDate,
+        end: endDate,
+        resourceId: item.salleId,
       };
     });
-  }
-
-  // Combiner la date et l'heure en un objet Date
-  private static combineDateAndTime(date: Date, time: string): Date {
-    console.log(date, time);
-    const timeParts = time.split(":"); // Supposer que l'heure est au format "HH:MM"
-    return new Date(
-      date.getFullYear(),
-      date.getMonth(),
-      date.getDate(),
-      parseInt(timeParts[0], 10), // Heures
-      parseInt(timeParts[1], 10), // Minutes
-      0 // Seconds à 0
-    );
   }
 }
 

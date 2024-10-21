@@ -70,7 +70,7 @@ class ReservationController {
         data: newReservation,
       });
     } catch (error) {
-      console.error(error); // Pour plus de détails sur l'erreur
+      console.error(error);
       res.status(500).json({
         error:
           "Une erreur s'est produite lors de la création de la réservation",
@@ -89,9 +89,11 @@ class ReservationController {
       const reservations = await prisma.reservation.findMany();
 
       if (reservations.length === 0) {
-        res.status(404).json({
+        res.status(200).json({
           message: "Aucune réservation n'est disponible pour le moment",
+          reservations: reservations,
         });
+
         return;
       }
       res.status(200).json({
