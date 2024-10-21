@@ -8,6 +8,7 @@ import paymentMethodesRouter from "./routes/paymentMethodesRouter";
 import http from "http";
 import cors from "cors";
 import path from "path";
+import ErrorHandler from "./middlewares/ErrorHandler";
 
 const app = express();
 const server = http.createServer(app);
@@ -38,7 +39,7 @@ const PORT = process.env.PORT || 5000;
 app.get("/", (req: Request, res: Response) => {
   res.send("Hello World from TypeScript + Express!");
 });
-
+app.use(ErrorHandler.handleError);
 app.use("/api/v1", loginRouter);
 app.use("/api/v1", reservationRouter);
 app.use("/api/v1", salleRouter);

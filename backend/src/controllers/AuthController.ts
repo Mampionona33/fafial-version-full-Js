@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import bcrypt from "bcryptjs";
 import prisma from "../../prisma/prisma";
 import jwt, { JwtPayload } from "jsonwebtoken";
@@ -6,101 +6,80 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 const JWT_SECRET = process.env.JWT_SECRET;
 
 class AuthController {
-  // Méthode statique de connexion
-  public static async login(req: Request, res: Response): Promise<void> {
+  public static async login(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
     const { email, password } = req.body;
 
     try {
-      // Recherche de l'utilisateur dans la base de données par email
-      const user = await prisma.user.findUnique({
-        where: {
-          email,
-        },
-      });
+      const user = await prisma.user.findUnique({ where: { email } });
 
       if (!user) {
-        res.status(401).json({
-          message: "Email ou mot de passe incorrect",
-        });
+        res.status(401).json({ message: "Incorrect email or password" });
         return;
       }
 
-      // Comparer le mot de passe avec celui stocké en base
       const isMatch = await bcrypt.compare(password, user.password);
-
       if (!isMatch) {
-        res.status(401).json({
-          message: "Email ou mot de passe incorrect",
-        });
+        res.status(401).json({ message: "Incorrect email or password" });
         return;
       }
 
       if (!JWT_SECRET) {
-        throw new Error(
-          "La clé secrète JWT n'est pas définie dans les variables d'environnement."
-        );
+        next("JWT secret key not defined in environment variables.");
+        return;
       }
 
-      // Si la connexion est réussie, générer un token JWT
       const token = jwt.sign({ userId: user.id }, JWT_SECRET, {
-        expiresIn: "1h", // On peut ajuster la durée d'expiration
+        expiresIn: "1h",
       });
 
-      // Retourner le token JWT et un message à la vue
-      res.json({ token, message: "Connexion réussie" });
+      res.json({ token, message: "Login successful" });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ error: "Erreur interne du serveur" });
+      next(error); // Pass error to the next middleware
     }
   }
 
-  // Méthode pour récupérer l'utilisateur à partir du token JWT
   public static async getAuthenticatedUser(
     req: Request,
-    res: Response
+    res: Response,
+    next: NextFunction
   ): Promise<void> {
     try {
-      // Récupérer le token depuis l'en-tête Authorization
-      const token = req.headers.authorization?.split(" ")[1]; // "Bearer <token>"
+      const token = req.headers.authorization?.split(" ")[1];
 
       if (!token) {
-        res.status(401).json({ message: "Le token est manquant" });
+        res.status(401).json({ message: "Token is missing" });
         return;
       }
 
       if (!JWT_SECRET) {
-        throw new Error(
-          "La clé secrète JWT n'est pas définie dans les variables d'environnement."
-        );
+        throw new Error("JWT secret key not defined in environment variables.");
       }
 
-      // Vérifier et décoder le token
       const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
-
       if (!decoded || !decoded.userId) {
-        res.status(401).json({ message: "Token invalide" });
+        res.status(401).json({ message: "Invalid token" });
         return;
       }
 
       const user = await prisma.user.findUnique({
-        where: {
-          id: decoded.userId,
-        },
-        include: {
-          roles: true,
-        },
+        where: { id: decoded.userId },
+        include: { roles: true },
       });
 
       if (!user) {
-        res.status(404).json({ message: "Utilisateur non trouvé" });
+        res.status(404).json({ message: "User not found" });
         return;
       }
-      console.log("AuthController: ", user);
-      // Retourner les informations de l'utilisateur
+
       res.status(200).json(user);
     } catch (error) {
       console.error(error);
-      res.status(500).json({ message: "Erreur interne du serveur" });
+      next(error);
     }
   }
 }

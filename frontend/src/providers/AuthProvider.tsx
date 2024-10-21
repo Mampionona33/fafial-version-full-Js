@@ -26,7 +26,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     if (token) {
       const storedUser = localStorage.getItem("user");
       if (storedUser) {
-        setSuser(JSON.parse(storedUser)); // Récupère l'utilisateur depuis localStorage
+        setSuser(JSON.parse(storedUser));
         setIsAuthenticated(true);
       }
     } else {

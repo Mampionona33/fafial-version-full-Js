@@ -1,8 +1,8 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import prisma from "../../prisma/prisma";
 
 class PaymentMethodesController {
-  static async getAll(req: Request, res: Response) {
+  static async getAll(req: Request, res: Response, next: NextFunction) {
     try {
       const paymentMethodes = await prisma.paymentMethod.findMany();
 
@@ -16,7 +16,11 @@ class PaymentMethodesController {
         message: "Moyens de paiement disponibles",
         paymentMethodes: paymentMethodes,
       });
-    } catch (error) {}
+      return;
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
   }
 }
 export default PaymentMethodesController;

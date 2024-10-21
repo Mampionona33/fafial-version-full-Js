@@ -1,8 +1,8 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import prisma from "../../prisma/prisma";
 
 class SalleController {
-  static async getAll(req: Request, res: Response) {
+  static async getAll(req: Request, res: Response, next: NextFunction) {
     try {
       const salles = await prisma.salle.findMany();
 
@@ -20,11 +20,7 @@ class SalleController {
       return;
     } catch (error) {
       console.error("SalleController.getAll", error);
-      res.status(500).json({
-        message:
-          "Une erreur est survenue lors de la tentative de recherche des salles",
-      });
-      return;
+      next(error);
     }
   }
 }

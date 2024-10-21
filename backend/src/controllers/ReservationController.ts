@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { set } from "date-fns"; // Importation des fonctions nécessaires
 import prisma from "../../prisma/prisma";
 import { ReservationRequestBody } from "interfaces/ReservationRequestBody";
@@ -6,7 +6,8 @@ import { ReservationRequestBody } from "interfaces/ReservationRequestBody";
 class ReservationController {
   public static async create(
     req: Request<{}, {}, ReservationRequestBody>,
-    res: Response
+    res: Response,
+    next: NextFunction
   ) {
     try {
       const body = req.body;
@@ -58,10 +59,7 @@ class ReservationController {
       });
 
       if (!newReservation) {
-        res.status(500).json({
-          error:
-            "Une erreur s'est produite lors de la création de la réservation",
-        });
+        next("Une erreur s'est produite lors de la.CreateCommande");
         return;
       }
 
@@ -69,12 +67,10 @@ class ReservationController {
         message: "Réservation créée avec succès",
         data: newReservation,
       });
+      return;
     } catch (error) {
       console.error(error);
-      res.status(500).json({
-        error:
-          "Une erreur s'est produite lors de la création de la réservation",
-      });
+      next(error);
     }
   }
 
