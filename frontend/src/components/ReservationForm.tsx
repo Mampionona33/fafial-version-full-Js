@@ -80,6 +80,7 @@ const ReservationForm = ({
 
     if (
       reservationData &&
+      idReservation &&
       state.reservation.reference !== reservationData.reference
     ) {
       dispatch(setReservation({ ...reservationData }));
