@@ -11,5 +11,6 @@ router.post(
 );
 
 router.get("/reservations", ReservationController.getAll);
+router.get("/reservations/:id", ReservationController.get);
 
 export default router;

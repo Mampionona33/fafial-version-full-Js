@@ -28,6 +28,24 @@ class ReservationService {
     }
   }
 
+  static async get(
+    id: string
+  ): Promise<
+    AxiosResponse<{ message: string; reservation: ReservationInterface }>
+  > {
+    try {
+      const response = await axios.get(`${this.API_URL}/${id}`, {
+        headers: {
+          Authorization: `Bearer ${this.getToken()}`,
+        },
+      });
+      return response;
+    } catch (error) {
+      console.error("Erreur lors de la sélection de la réservation", error);
+      throw error;
+    }
+  }
+
   // Méthode pour créer une nouvelle réservation
   static async create(
     reservationData: ReservationInterface

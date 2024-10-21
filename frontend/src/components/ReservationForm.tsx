@@ -19,7 +19,25 @@ import SelectOptionAdapter from "../utils/SelectOptionAdapter";
 import { toast, ToastContainer } from "react-toastify";
 import { usePaymentMethodes } from "../hooks/usePaymentMethodes";
 
-const ReservationForm = () => {
+const ReservationForm = ({
+  reservationData,
+}: {
+  reservationData?: ReservationInterface;
+}) => {
+  const generateRef = () => {
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    const formattedDate = `${year}${month}${day}`;
+
+    const randomString = nanoid(7);
+
+    // Retourner la référence dans le format : RESYYYYMMDDrandomString
+    return `RES-${formattedDate}-${randomString}`;
+  };
+
   const { user } = useAuth();
   const { salles } = useSalles();
   const { paymentMethodes } = usePaymentMethodes();
@@ -37,23 +55,78 @@ const ReservationForm = () => {
   >([]);
 
   // State pour les informations de la réservation
+  const [reference, setReference] = React.useState<string>(
+    reservationData && reservationData.reference
+      ? reservationData.reference
+      : ""
+  );
   const [montant, setMontant] = React.useState<number>(0);
   const [datePrevue, setDatePrevue] = React.useState<string>("");
   const [modePaiement, setModePaiement] = React.useState<string>("carte");
 
-  const [nomOrganisation, setNomOrganisation] = React.useState<string>("");
-  const [nomPrenomContact, setNomPrenomContact] = React.useState<string>("");
-  const [email, setEmail] = React.useState<string>("");
-  const [telephone, setTelephone] = React.useState<string>("");
-  const [nombrePersonnes, setNombrePersonnes] = React.useState<number>(0);
-  const [dateDebut, setDateDebut] = React.useState<string>("");
-  const [heureDebut, setHeureDebut] = React.useState<string>("");
-  const [dateFin, setDateFin] = React.useState<string>("");
-  const [heureFin, setHeureFin] = React.useState<string>("");
-  const [activite, setActivite] = React.useState<string>("");
-  const [remarques, setRemarques] = React.useState<string>("");
-  const [reference, setReference] = React.useState<string>("");
-  const [salleId, setSalleId] = React.useState<string>("");
+  const [nomOrganisation, setNomOrganisation] = React.useState<string>(
+    reservationData && reservationData.nomOrganisation
+      ? reservationData.nomOrganisation
+      : ""
+  );
+  const [nomPrenomContact, setNomPrenomContact] = React.useState<string>(
+    reservationData && reservationData.nomPrenomContact
+      ? reservationData.nomPrenomContact
+      : ""
+  );
+  const [email, setEmail] = React.useState<string>(
+    reservationData && reservationData.email ? reservationData.email : ""
+  );
+  const [telephone, setTelephone] = React.useState<string>(
+    reservationData && reservationData.telephone
+      ? reservationData.telephone
+      : ""
+  );
+  const [nombrePersonnes, setNombrePersonnes] = React.useState<number>(
+    reservationData && reservationData.nombrePersonnes
+      ? reservationData.nombrePersonnes
+      : 0
+  );
+  const [dateDebut, setDateDebut] = React.useState<string>(
+    reservationData && reservationData.dateDebut
+      ? new Date(reservationData.dateDebut).toISOString().split("T")[0]
+      : ""
+  );
+
+  const [heureDebut, setHeureDebut] = React.useState<string>(
+    reservationData && reservationData.heureDebut
+      ? new Date(reservationData.heureDebut).toLocaleTimeString("fr-FR", {
+          hour: "2-digit",
+          minute: "2-digit",
+        })
+      : ""
+  );
+
+  const [dateFin, setDateFin] = React.useState<string>(
+    reservationData && reservationData.dateFin
+      ? new Date(reservationData.dateFin).toISOString().split("T")[0]
+      : ""
+  );
+  const [heureFin, setHeureFin] = React.useState<string>(
+    reservationData && reservationData.heureFin
+      ? new Date(reservationData.heureFin).toLocaleTimeString("fr-FR", {
+          hour: "2-digit",
+          minute: "2-digit",
+        })
+      : ""
+  );
+  const [activite, setActivite] = React.useState<string>(
+    reservationData && reservationData.activite ? reservationData.activite : ""
+  );
+  const [remarques, setRemarques] = React.useState<string>(
+    reservationData && reservationData.remarques
+      ? reservationData.remarques
+      : ""
+  );
+
+  const [salleId, setSalleId] = React.useState<string>(
+    reservationData && reservationData.salleId ? reservationData.salleId : ""
+  );
   const [methodePaiement, setMethodePaiement] = React.useState<
     {
       label: string;
@@ -79,29 +152,24 @@ const ReservationForm = () => {
     setAcomptes(acomptes.filter((acompte) => acompte.id !== id));
   };
 
-  const generateRef = () => {
-    const date = new Date();
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-
-    const formattedDate = `${year}${month}${day}`;
-
-    const randomString = nanoid(7);
-
-    // Retourner la référence dans le format : RESYYYYMMDDrandomString
-    return `RES-${formattedDate}-${randomString}`;
-  };
-
   React.useEffect(() => {
-    setReference(generateRef());
+    if (!reservationData) {
+      setReference(generateRef());
+    }
     if (salles) {
       setSalleOptions(SelectOptionAdapter.adapt(salles));
     }
     if (paymentMethodes) {
       setMethodePaiement(SelectOptionAdapter.adapt(paymentMethodes));
     }
-  }, [salles, setReference, setSalleOptions, paymentMethodes]);
+  }, [
+    salles,
+    setReference,
+    setSalleOptions,
+    paymentMethodes,
+    setMethodePaiement,
+    reservationData,
+  ]);
 
   const resetForm = () => {
     setAcomptes([]);
@@ -327,6 +395,7 @@ const ReservationForm = () => {
             <AppSelect
               id="salleId"
               options={salleOptions}
+              value={salleId}
               onChange={(value) => setSalleId(value)}
             />
           </div>

@@ -2,38 +2,38 @@ import React from "react";
 
 interface AppSelectProps {
   options?: { value: string; label: string }[];
-  onChange?: (label: string) => void;
+  value?: string;
+  onChange?: (value: string) => void;
   id?: string;
 }
 
 const AppSelect: React.FC<AppSelectProps> = ({
   options = [],
+  value,
   onChange,
   id,
 }) => {
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedOption = options.find(
-      (option) => option.value === event.target.value
-    );
-    if (selectedOption && onChange) {
-      onChange(selectedOption.value);
+    if (onChange) {
+      onChange(event.target.value);
     }
   };
 
   return (
     <select
       id={id}
+      value={value} // Manage default value here
       onChange={handleChange}
-      className="mt-1 block w-full py-1 px-2 bg-transparent border-b-2 border-gray-300 focus:outline-none focus:border-gray-700 transition-all duration-100"
+      className="px-2 text-sm mt-1 block w-full py-1 bg-transparent border-b-2 border-gray-300 focus:outline-none focus:border-gray-700 transition-all duration-100"
     >
       <option value="" disabled>
-        Sélectionnez une option
+        Veuillez choisir une option
       </option>
       {options.map((option) => (
         <option
           key={option.value}
           value={option.value}
-          className="py-1 px-2 hover:bg-gray-200 cursor-pointer"
+          className="py-2 px-3 hover:bg-gray-100 cursor-pointer"
         >
           {option.label}
         </option>

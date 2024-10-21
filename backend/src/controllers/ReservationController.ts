@@ -110,6 +110,35 @@ class ReservationController {
       return;
     }
   }
+
+  public static async get(req: Request, res: Response) {
+    try {
+      const reservation = await prisma.reservation.findUnique({
+        where: {
+          id: req.params.id,
+        },
+      });
+
+      if (!reservation) {
+        res.status(404).json({
+          error: "Réservation non disponible",
+        });
+        return;
+      }
+      res.status(200).json({
+        message: "Réservation disponible",
+        reservation: reservation,
+      });
+      return;
+    } catch (error) {
+      console.error("ReservationController.get", error);
+      res.status(500).json({
+        error:
+          "Une erreur s'est produite lors de la création de la réservation",
+      });
+      return;
+    }
+  }
 }
 
 export default ReservationController;
