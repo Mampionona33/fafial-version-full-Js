@@ -45,8 +45,19 @@ class AuthServices {
     return !!token;
   }
 
-  public static logout() {
-    Cookies.remove(AuthServices.COOKIE_NAME);
+  public static async logout() {
+    try {
+      const refreshToken = Cookies.get(REFRESH_TOKEN_NAME); // Récupérer le refresh token
+      Cookies.remove(AuthServices.COOKIE_NAME); // Supprimer le cookie du token d'accès
+
+      const resp = await api.post("/logout", {
+        refreshToken, // Envoyer le refresh token dans le corps de la requête
+      });
+
+      return resp;
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
   }
 
   public static getToken(): string | undefined {

@@ -32,8 +32,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   const logout = useCallback(async () => {
-    Cookies.remove(COOKIE_NAME);
-    Cookies.remove(REFRESH_TOKEN_NAME);
+    // Cookies.remove(COOKIE_NAME);
+    // Cookies.remove(REFRESH_TOKEN_NAME);
+    const resp = await AuthServices.logout();
+    // if()
     setIsAuthenticated(false);
     setUser(null);
   }, [setIsAuthenticated, setUser]);
