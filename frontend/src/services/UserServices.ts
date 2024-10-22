@@ -1,17 +1,18 @@
 import api from "./axiosConfig"; // Remplacez axios par votre instance api
 import { BACKEND_URL } from "../constants/appContants";
-import AuthServices from "./AuthServices";
 import { AxiosResponse, isAxiosError } from "axios";
 
 class UserServices {
   private static URL_API: string = `${BACKEND_URL}`;
 
   // Méthode pour récupérer un utilisateur
-  public static async getAuthenticatedUser(): Promise<AxiosResponse> {
+  public static async getAuthenticatedUser(
+    tocken: string
+  ): Promise<AxiosResponse> {
     try {
-      const token = AuthServices.getToken(); // Récupération dynamique du token à chaque appel
+      // const token = AuthServices.getToken();
 
-      if (!token) {
+      if (!tocken) {
         throw new Error("Token is missing");
       }
 
@@ -20,7 +21,7 @@ class UserServices {
         `${UserServices.URL_API}/authenticated`,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${tocken}`,
           },
         }
       );

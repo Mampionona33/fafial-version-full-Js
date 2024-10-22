@@ -46,8 +46,9 @@ model User {
   updatedAt DateTime @updatedAt
   status    Boolean  @default(true)
 
-  createdReservations Reservation[] @relation("CreatedByUser")
-  updatedReservations Reservation[] @relation("UpdatedByUser")
+  createdReservations Reservation[]  @relation("CreatedByUser")
+  updatedReservations Reservation[]  @relation("UpdatedByUser")
+  RefreshToken        RefreshToken[]
 }
 
 model Salle {
@@ -162,4 +163,13 @@ model PaymentFieldValue {
   payment        Payment      @relation(fields: [paymentId], references: [id])
   paymentFieldId String
   paymentField   PaymentField @relation(fields: [paymentFieldId], references: [id])
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
 }

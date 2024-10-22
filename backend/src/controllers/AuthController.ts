@@ -6,6 +6,8 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 const JWT_SECRET = process.env.JWT_SECRET;
 
 // Fonction pour gérer la connexion
+const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
+
 export const login = async (
   req: Request,
   res: Response,
@@ -30,16 +32,22 @@ export const login = async (
       return;
     }
 
-    if (!JWT_SECRET) {
-      next("JWT secret key not defined in environment variables.");
-      return;
-    }
-
-    const token = jwt.sign({ userId: user.id }, JWT_SECRET, {
-      expiresIn: "30s",
+    const accessToken = jwt.sign({ userId: user.id }, JWT_SECRET!, {
+      expiresIn: "15m",
+    });
+    const refreshToken = jwt.sign({ userId: user.id }, JWT_REFRESH_SECRET!, {
+      expiresIn: "7d",
     });
 
-    res.json({ token, message: "Login successful" });
+    // Store refresh token in the database (optional)
+    await prisma.refreshToken.create({
+      data: {
+        token: refreshToken,
+        userId: user.id,
+      },
+    });
+
+    res.json({ accessToken, refreshToken, message: "Login successful" });
   } catch (error) {
     console.error(error);
     next(error);
@@ -84,5 +92,55 @@ export const getAuthenticatedUser = async (
   } catch (error) {
     console.error(error);
     next(error);
+  }
+};
+
+export const refreshToken = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  const { refreshToken } = req.body;
+
+  if (!refreshToken) {
+    res.status(401).json({ message: "Refresh token is missing" });
+    return;
+  }
+
+  try {
+    const decoded = jwt.verify(refreshToken, JWT_REFRESH_SECRET!) as JwtPayload;
+
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.userId },
+    });
+
+    if (!user) {
+      res.status(403).json({ message: "Invalid refresh token" });
+      return;
+    }
+
+    // Create a new access token
+    const newAccessToken = jwt.sign({ userId: user.id }, JWT_SECRET!, {
+      expiresIn: "15m",
+    });
+
+    res.json({ accessToken: newAccessToken });
+  } catch (error) {
+    console.error(error);
+    res.status(403).json({ message: "Invalid refresh token" });
+  }
+};
+
+export const logout = async (req: Request, res: Response): Promise<void> => {
+  const { refreshToken } = req.body;
+
+  try {
+    await prisma.refreshToken.deleteMany({
+      where: { token: refreshToken },
+    });
+
+    res.json({ message: "Logged out successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error logging out" });
   }
 };

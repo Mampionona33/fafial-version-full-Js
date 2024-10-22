@@ -1,7 +1,7 @@
 // src/services/AuthServices.js
 import Cookies from "js-cookie";
 import api from "./axiosConfig"; // Importez votre instance api
-import { COOKIE_NAME } from "../constants/appContants";
+import { COOKIE_NAME, REFRESH_TOKEN_NAME } from "../constants/appContants";
 import { AxiosResponse, isAxiosError } from "axios"; // Importez isAxiosError
 
 class AuthServices {
@@ -51,6 +51,12 @@ class AuthServices {
 
   public static getToken(): string | undefined {
     return Cookies.get(AuthServices.COOKIE_NAME);
+  }
+
+  static async refreshToken(): Promise<AxiosResponse> {
+    const refreshToken = Cookies.get(REFRESH_TOKEN_NAME);
+    const response = await api.post("/refresh-token", { refreshToken });
+    return response;
   }
 }
 
