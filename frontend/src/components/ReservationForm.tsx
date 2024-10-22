@@ -31,6 +31,7 @@ import {
   resetAcompte,
 } from "../actions/AcomptesAction";
 import { useParams } from "react-router-dom";
+import { useLoading } from "../hooks/useLoading";
 
 const ReservationForm = ({
   reservationData,
@@ -66,6 +67,7 @@ const ReservationForm = ({
   const [state, dispatch] = useReducer(reservationReducer, initialState);
   const [acomptes, AcomptesDispatch] = useReducer(acomptesReducer, []);
   const [acomptesEmpty, setAcomptesEmpty] = React.useState<boolean>(false);
+  const { setLoading } = useLoading();
 
   const handleClickDeleteAcompte = (acompteId: string) => {
     AcomptesDispatch(deleteAcompte(acompteId));
@@ -167,6 +169,7 @@ const ReservationForm = ({
       validationStatus: ValidationStatut.VALIDE,
     };
 
+    setLoading(true);
     try {
       const res = await ReservationService.create(reservationData);
       if (res.status === 201) {
@@ -183,7 +186,7 @@ const ReservationForm = ({
         toastId: "error-reservation",
       });
     } finally {
-      // setLoading(false);
+      setLoading(false);
     }
   };
 

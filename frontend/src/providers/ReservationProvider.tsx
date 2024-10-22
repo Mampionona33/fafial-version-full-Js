@@ -3,6 +3,7 @@ import { ReservationInterface } from "../interfaces/ReservationInterface";
 import ReservationService from "../services/ReservationService";
 import { toast, ToastContainer } from "react-toastify";
 import { ReservationContext } from "../contexts/ReservationContext";
+import { useLoading } from "../hooks/useLoading";
 
 export const ReservationProvider = ({
   children,
@@ -10,18 +11,19 @@ export const ReservationProvider = ({
   children: React.ReactNode;
 }) => {
   const [reservations, setReservations] = useState<ReservationInterface[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  // const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const { setLoading, loading } = useLoading();
 
   useEffect(() => {
     const fetchReservations = async () => {
+      setLoading(true);
       try {
         const resp = await ReservationService.getAll();
 
         if (resp.status === 200) {
           console.log(resp.data);
           setReservations(resp.data.reservations);
-          setLoading(false);
         }
       } catch (error) {
         console.error(error);
@@ -35,15 +37,19 @@ export const ReservationProvider = ({
         setError(
           "Une erreur est survenue lors de la recuperation des reservations"
         );
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchReservations();
-  }, []);
+  }, [setLoading]);
+
+  console.log(loading);
 
   return (
     <ReservationContext.Provider
-      value={{ reservations, loading, error, setReservations }}
+      value={{ reservations, error, setReservations }}
     >
       {children}
       <ToastContainer />
