@@ -65,7 +65,6 @@ const ReservationForm = ({
 
   const [state, dispatch] = useReducer(reservationReducer, initialState);
   const [acomptes, AcomptesDispatch] = useReducer(acomptesReducer, []);
-  const [loading, setLoading] = React.useState<boolean>(false);
   const [acomptesEmpty, setAcomptesEmpty] = React.useState<boolean>(false);
 
   const handleClickDeleteAcompte = (acompteId: string) => {
@@ -132,7 +131,6 @@ const ReservationForm = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     const formattedDateDebut = new Date(state.reservation.dateDebut as string);
     const formattedDateFin = new Date(state.reservation.dateFin as string);
     const updatedAcomptes = acomptes.map((acompte) => ({
@@ -179,14 +177,13 @@ const ReservationForm = ({
       dispatch(resetReservation());
       AcomptesDispatch(resetAcompte());
     } catch (error) {
-      setLoading(false);
       console.log(error);
       toast.error("Erreur lors de la création de la réservation", {
         position: "bottom-right",
         toastId: "error-reservation",
       });
     } finally {
-      setLoading(false);
+      // setLoading(false);
     }
   };
 
@@ -549,6 +546,7 @@ const ReservationForm = ({
                           montant: 0,
                           datePrevue: "",
                           modePaiement: "",
+                          statut: PayementStatut.EN_ATTENTE,
                         },
                       })
                     );
@@ -591,7 +589,7 @@ const ReservationForm = ({
               <input
                 type="submit"
                 value="Enregistrer"
-                className="bg-gray-800 hover:bg-gray-700 text-white px-8 py-1 mt-6 cursor-pointer rounded-md"
+                className="bg-gray-800 hover:bg-gray-700 text-white px-10 py-2 mt-6 cursor-pointer rounded-md"
               />
             </div>
           </form>
