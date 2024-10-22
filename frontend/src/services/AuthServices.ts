@@ -1,30 +1,30 @@
-import axios from "axios";
+// src/services/AuthServices.js
 import Cookies from "js-cookie";
-import { BACKEND_URL, COOKIE_NAME } from "../constants/appContants";
+import api from "./axiosConfig"; // Importez votre instance api
+import { COOKIE_NAME } from "../constants/appContants";
 import { LoginData } from "../interfaces/LoginDataInterface";
+import { isAxiosError } from "axios"; // Importez isAxiosError
 
 class AuthServices {
-  private static URL_API: string;
   private static COOKIE_NAME: string;
 
   static {
-    AuthServices.URL_API = BACKEND_URL;
     AuthServices.COOKIE_NAME = COOKIE_NAME;
   }
 
-  // Login function to authenticate and store the token in a cookie
+  // Fonction de connexion pour authentifier et stocker le token dans un cookie
   public static async login(
     email: string,
     password: string
   ): Promise<{ status: number; data: LoginData }> {
     try {
-      const response = await axios.post(`${AuthServices.URL_API}/login`, {
+      const response = await api.post("/login", {
         email,
         password,
       });
 
       Cookies.set(AuthServices.COOKIE_NAME, response.data.token, {
-        expires: 7, // Cookie expires in 7 days
+        expires: 7, // Le cookie expire dans 7 jours
         sameSite: "Strict",
       });
 
@@ -33,7 +33,9 @@ class AuthServices {
         data: response.data,
       };
     } catch (error) {
-      if (axios.isAxiosError(error)) {
+      // Utilisez isAxiosError importé ici
+      if (isAxiosError(error)) {
+        // Vérifiez si l'erreur est une erreur Axios
         if (error.response) {
           return {
             status: error.response.status,
@@ -41,7 +43,7 @@ class AuthServices {
           };
         }
       }
-      throw new Error("An unexpected error occurred");
+      throw new Error("Une erreur inattendue s'est produite");
     }
   }
 

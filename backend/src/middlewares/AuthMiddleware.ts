@@ -13,31 +13,31 @@ export const authenticateToken = (
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
-) => {
-  // Récupère le token depuis les headers de la requête
+): void => {
+  // Assurez-vous que le type de retour est void
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
 
   if (!token) {
-    return res.status(401).json({ error: "Accès refusé. Aucun token fourni." });
+    res.status(401).json({ error: "Accès refusé. Aucun token fourni." });
+    return; // Assurez-vous de ne pas retourner une valeur
   }
 
   if (!JWT_SECRET) {
-    return res.status(500).json({
+    res.status(500).json({
       error: "Erreur de configuration du serveur (clé JWT manquante)",
     });
+    return; // Assurez-vous de ne pas retourner une valeur
   }
 
-  // Vérifie et décode le token
   jwt.verify(token, JWT_SECRET, (err, decoded) => {
     if (err) {
-      return res.status(403).json({ error: "Token invalide ou expiré." });
+      res.status(403).json({ error: "Token invalide ou expiré." });
+      return;
     }
 
-    // Si le token est valide, attache l'utilisateur à l'objet req
-    req.user = decoded; // Typiquement, ce serait { userId: string, etc. } en fonction de ce que tu inclus dans ton token JWT
-
-    next(); // Passe à l'étape suivante (le contrôleur)
+    (req as AuthenticatedRequest).user = decoded; // Type assertion pour utiliser AuthenticatedRequest
+    next(); // Passe au middleware suivant
   });
 };
 
@@ -47,12 +47,10 @@ export const verifyToken = (
   res: Response,
   next: NextFunction
 ): void => {
-  // Vérifie si l'utilisateur est défini dans la requête
   if (!req.user) {
     res.status(401).json({ error: "Accès refusé. Token manquant." });
-    return;
+    return; // Assurez-vous de ne pas retourner une valeur
   }
 
-  // Si tout va bien, passez à l'étape suivante
-  next();
+  next(); // Passe au middleware suivant
 };

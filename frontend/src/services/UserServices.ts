@@ -1,6 +1,7 @@
-import axios from "axios";
+import api from "./axiosConfig"; // Remplacez axios par votre instance api
 import { BACKEND_URL } from "../constants/appContants";
 import AuthServices from "./AuthServices";
+import { isAxiosError } from "axios";
 
 class UserServices {
   private static URL_API: string = `${BACKEND_URL}`;
@@ -14,7 +15,8 @@ class UserServices {
         throw new Error("Token is missing");
       }
 
-      const response = await axios.get(
+      const response = await api.get(
+        // Utilisez api ici
         `${UserServices.URL_API}/authenticated`,
         {
           headers: {
@@ -26,7 +28,8 @@ class UserServices {
       return response.data;
     } catch (error) {
       // Gestion des erreurs spécifiques
-      if (axios.isAxiosError(error) && error.response) {
+      if (isAxiosError(error) && error.response) {
+        // Utilisez api.isAxiosError
         return {
           status: error.response.status,
           data: error.response.data,

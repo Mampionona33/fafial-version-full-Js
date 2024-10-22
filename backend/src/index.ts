@@ -10,7 +10,7 @@ import cors from "cors";
 import path from "path";
 import morgan from "morgan";
 import handleError from "./middlewares/ErrorHandler";
-import { verifyToken } from "./middlewares/AuthMiddleware";
+import { authenticateToken, verifyToken } from "./middlewares/AuthMiddleware";
 
 const app = express();
 const server = http.createServer(app);
@@ -44,10 +44,10 @@ app.get("/", (req: Request, res: Response) => {
   res.send("Hello World from TypeScript + Express!");
 });
 app.use(handleError);
-app.use("/api/v1", verifyToken, loginRouter);
-app.use("/api/v1", verifyToken, reservationRouter);
-app.use("/api/v1", verifyToken, salleRouter);
-app.use("/api/v1", verifyToken, paymentMethodesRouter);
+app.use("/api/v1", loginRouter);
+app.use("/api/v1", authenticateToken, reservationRouter);
+app.use("/api/v1", authenticateToken, salleRouter);
+app.use("/api/v1", authenticateToken, paymentMethodesRouter);
 
 // Error handling middleware
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {

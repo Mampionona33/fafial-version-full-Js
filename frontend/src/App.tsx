@@ -9,24 +9,33 @@ import IndeterminateProgressBar from "./components/IndeterminateProgressBar";
 import "primeicons/primeicons.css";
 import "material-symbols";
 import { useLoading } from "./hooks/useLoading";
+import { SalleProvider } from "./providers/SalleProvider";
+import { PaymentMethodesProvider } from "./providers/PaymentMethodesProvider";
+import { ReservationProvider } from "./providers/ReservationProvider";
 
 const App = () => {
   const { loading: authLoading } = useAuth();
   const { loading: globalLoading } = useLoading();
 
   return (
-    <PrimeReactProvider>
-      {authLoading && <IndeterminateProgressBar />}
-      <div className="bg-gradient-to-t from-gradient-start to-gradient-end h-full w-full">
-        {/* Header, navbar, or other shared components */}
-        <NavBar />
-        <div className="min-h-screen pt-14">
-          {globalLoading && <IndeterminateProgressBar />}
-          {/* Ajuster en fonction de la hauteur de la NavBar */}
-          <Outlet />
-        </div>
-      </div>
-    </PrimeReactProvider>
+    <SalleProvider>
+      <PaymentMethodesProvider>
+        <ReservationProvider>
+          <PrimeReactProvider>
+            {authLoading && <IndeterminateProgressBar />}
+            <div className="bg-gradient-to-t from-gradient-start to-gradient-end h-full w-full">
+              {/* Header, navbar, or other shared components */}
+              <NavBar />
+              <div className="min-h-screen pt-14">
+                {globalLoading && <IndeterminateProgressBar />}
+                {/* Ajuster en fonction de la hauteur de la NavBar */}
+                <Outlet />
+              </div>
+            </div>
+          </PrimeReactProvider>
+        </ReservationProvider>
+      </PaymentMethodesProvider>
+    </SalleProvider>
   );
 };
 

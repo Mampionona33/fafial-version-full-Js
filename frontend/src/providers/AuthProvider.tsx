@@ -1,14 +1,13 @@
 import React, { useState, useEffect, ReactNode } from "react";
 import Cookies from "js-cookie";
 import { AuthContext } from "../contexts/AuthContext";
-import { toast } from "react-toastify";
 import { LoginData } from "../interfaces/LoginDataInterface";
 import AuthServices from "../services/AuthServices";
 import { AxiosError } from "axios";
 import UserServices from "../services/UserServices";
 import { UserInterface } from "../interfaces/userInterface";
 import { COOKIE_NAME } from "../constants/appContants";
-import { ToastContainer } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 
 // Le provider AuthContext
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({
@@ -45,16 +44,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       if (response.status === 200) {
         const user = await UserServices.getAuthenticatedUser();
         console.log(user);
-        toast.success(response.data.message || "Connexion réussie.", {
-          position: "bottom-right",
-        });
 
         if (user) {
           setSuser(user);
-          localStorage.setItem("user", JSON.stringify(user)); // Stocker l'utilisateur dans localStorage
+          localStorage.setItem("user", JSON.stringify(user));
         }
 
-        Cookies.set(COOKIE_NAME, response.data.token); // Stocker le token dans les cookies
+        Cookies.set(COOKIE_NAME, response.data.token);
         setIsAuthenticated(true);
       } else if (response.status === 401) {
         setIsAuthenticated(false);
@@ -75,15 +71,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       }
       throw error;
     } finally {
-      setLoading(false); // Fin du chargement
+      setLoading(false);
     }
   };
 
   const logout = async () => {
     Cookies.remove(COOKIE_NAME);
-    localStorage.removeItem("user"); // Supprimer l'utilisateur de localStorage
     setIsAuthenticated(false);
-
     setSuser(null);
   };
 

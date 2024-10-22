@@ -173,9 +173,9 @@ const ReservationForm = ({
     try {
       const res = await ReservationService.create(reservationData);
       if (res.status === 201) {
-        toast.success(res.data.message, { position: "bottom-right" });
+        toast.success(res.message, { position: "bottom-right" });
       } else if (res.status === 400) {
-        toast.error(res.data.message, { position: "bottom-right" });
+        toast.error(res.message, { position: "bottom-right" });
       }
       dispatch(resetReservation());
       AcomptesDispatch(resetAcompte());

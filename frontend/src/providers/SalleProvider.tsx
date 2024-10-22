@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { SalleInterface } from "../interfaces/SalleInterface";
 import SalleServices from "../services/SalleServices";
 import { SalleContext } from "../contexts/SalleContext";
-import { toast, ToastContainer } from "react-toastify";
 
 export const SalleProvider = ({ children }: { children: React.ReactNode }) => {
   const [salles, setSalles] = useState<SalleInterface[]>([]);
@@ -21,12 +20,6 @@ export const SalleProvider = ({ children }: { children: React.ReactNode }) => {
       } catch (error) {
         console.error(error);
         setLoading(false);
-        toast.error(
-          "Une erreur est survenue lors de la recuperation des salles",
-          {
-            toastId: "error-salle",
-          }
-        );
         setError("Une erreur est survenue lors de la recuperation des salles");
       }
     };
@@ -46,7 +39,6 @@ export const SalleProvider = ({ children }: { children: React.ReactNode }) => {
       }}
     >
       {children}
-      <ToastContainer />
     </SalleContext.Provider>
   );
 };

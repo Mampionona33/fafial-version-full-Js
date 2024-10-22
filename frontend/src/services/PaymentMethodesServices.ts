@@ -1,4 +1,4 @@
-import axios from "axios";
+import api from "./axiosConfig"; // Importez votre instance api
 import { BACKEND_URL } from "../constants/appContants";
 import AuthServices from "./AuthServices";
 
@@ -7,15 +7,16 @@ class PaymentMethodesServices {
 
   public static async getAll() {
     try {
-      const response = await axios.get(this.API_URL, {
+      const response = await api.get(this.API_URL, {
+        // Utilisez api au lieu de axios
         headers: {
           Authorization: `Bearer ${AuthServices.getToken()}`,
         },
       });
       return response;
     } catch (error) {
-      console.error(error);
-      throw error;
+      console.error(error); 
+      throw error; 
     }
   }
 }

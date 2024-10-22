@@ -5,9 +5,7 @@ import "./index.css";
 import { RouterProvider } from "react-router-dom";
 import router from "./router/router";
 import { AuthProvider } from "./providers/AuthProvider";
-import { SalleProvider } from "./providers/SalleProvider";
-import { PaymentMethodesProvider } from "./providers/PaymentMethodesProvider";
-import { ReservationProvider } from "./providers/ReservationProvider";
+
 import LoadingProvider from "./providers/LoadingProvider";
 
 createRoot(document.getElementById("root")!).render(
@@ -15,13 +13,7 @@ createRoot(document.getElementById("root")!).render(
     <AuthProvider>
       <PrimeReactProvider>
         <LoadingProvider>
-          <SalleProvider>
-            <ReservationProvider>
-              <PaymentMethodesProvider>
-                <RouterProvider router={router} />
-              </PaymentMethodesProvider>
-            </ReservationProvider>
-          </SalleProvider>
+          <RouterProvider router={router} />
         </LoadingProvider>
       </PrimeReactProvider>
     </AuthProvider>
