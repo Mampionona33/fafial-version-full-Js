@@ -40,12 +40,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     setLoading(true);
     try {
       const response = await AuthServices.login(email, password);
-
       if (response.status === 200) {
-        const user = await UserServices.getAuthenticatedUser();
-        console.log(user);
+        const resp = await UserServices.getAuthenticatedUser();
 
-        if (user) {
+        if (resp.status === 200) {
+          const user = resp.data.user;
           setSuser(user);
           localStorage.setItem("user", JSON.stringify(user));
         }

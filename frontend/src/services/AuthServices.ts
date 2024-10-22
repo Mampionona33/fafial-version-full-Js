@@ -2,8 +2,7 @@
 import Cookies from "js-cookie";
 import api from "./axiosConfig"; // Importez votre instance api
 import { COOKIE_NAME } from "../constants/appContants";
-import { LoginData } from "../interfaces/LoginDataInterface";
-import { isAxiosError } from "axios"; // Importez isAxiosError
+import { AxiosResponse, isAxiosError } from "axios"; // Importez isAxiosError
 
 class AuthServices {
   private static COOKIE_NAME: string;
@@ -16,7 +15,7 @@ class AuthServices {
   public static async login(
     email: string,
     password: string
-  ): Promise<{ status: number; data: LoginData }> {
+  ): Promise<AxiosResponse> {
     try {
       const response = await api.post("/login", {
         email,
@@ -28,19 +27,13 @@ class AuthServices {
         sameSite: "Strict",
       });
 
-      return {
-        status: response.status,
-        data: response.data,
-      };
+      return response;
     } catch (error) {
       // Utilisez isAxiosError importé ici
       if (isAxiosError(error)) {
         // Vérifiez si l'erreur est une erreur Axios
         if (error.response) {
-          return {
-            status: error.response.status,
-            data: error.response.data,
-          };
+          return error.response;
         }
       }
       throw new Error("Une erreur inattendue s'est produite");

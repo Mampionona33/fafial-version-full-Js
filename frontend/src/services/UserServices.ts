@@ -1,13 +1,13 @@
 import api from "./axiosConfig"; // Remplacez axios par votre instance api
 import { BACKEND_URL } from "../constants/appContants";
 import AuthServices from "./AuthServices";
-import { isAxiosError } from "axios";
+import { AxiosResponse, isAxiosError } from "axios";
 
 class UserServices {
   private static URL_API: string = `${BACKEND_URL}`;
 
   // Méthode pour récupérer un utilisateur
-  public static async getAuthenticatedUser() {
+  public static async getAuthenticatedUser(): Promise<AxiosResponse> {
     try {
       const token = AuthServices.getToken(); // Récupération dynamique du token à chaque appel
 
@@ -25,26 +25,15 @@ class UserServices {
         }
       );
 
-      return response.data;
+      return response;
     } catch (error) {
       // Gestion des erreurs spécifiques
       if (isAxiosError(error) && error.response) {
         // Utilisez api.isAxiosError
-        return {
-          status: error.response.status,
-          data: error.response.data,
-        };
+        return error.response;
       }
       // Gestion des erreurs génériques
-      return {
-        status: 500,
-        data: {
-          message:
-            error instanceof Error
-              ? error.message
-              : "An unexpected error occurred",
-        },
-      };
+      throw new Error("Une erreur inattendue s'est produite");
     }
   }
 }

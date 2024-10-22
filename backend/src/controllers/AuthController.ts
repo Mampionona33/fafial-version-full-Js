@@ -14,7 +14,10 @@ export const login = async (
   const { email, password } = req.body;
 
   try {
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = await prisma.user.findUnique({
+      where: { email },
+      select: { id: true, password: true },
+    });
 
     if (!user) {
       res.status(401).json({ message: "Incorrect email or password" });
@@ -77,7 +80,7 @@ export const getAuthenticatedUser = async (
       return;
     }
 
-    res.status(200).json(user);
+    res.status(200).json({ message: "User authenticated", user: user });
   } catch (error) {
     console.error(error);
     next(error);
