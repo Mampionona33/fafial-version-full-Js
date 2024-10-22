@@ -2,19 +2,23 @@ import { useNavigate, useParams } from "react-router-dom";
 import ReservationForm from "../../components/ReservationForm";
 import { useEffect, useState } from "react";
 import {
+  Acompte,
   PayementStatut,
   ReservationFormulaireInterface,
 } from "../../interfaces/ReservationInterface";
 import ReservationService from "../../services/ReservationService";
 import IndeterminateProgressBar from "../../components/IndeterminateProgressBar";
+import NotFound from "../NotFound";
 
 const StafDetailsReservation = () => {
   const { idReservation } = useParams();
   const [reservationData, setReservationData] = useState<
     ReservationFormulaireInterface | undefined
   >(undefined);
+  const [acomptes_, setAcomptes_] = useState<Acompte[]>([]);
   const navigate = useNavigate();
   const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -55,10 +59,24 @@ const StafDetailsReservation = () => {
             },
           };
           setReservationData(formatReservationData);
+
+          // Format acomptes
+          console.log(reservation);
+          const acomptes = reservation?.acomptes || [];
+          const acomptesFormatted = acomptes.map((acompte) => ({
+            ...acompte,
+            datePrevue: new Date(acompte.datePrevue)
+              .toISOString()
+              .split("T")[0],
+          }));
+          console.log(acomptesFormatted);
+          setAcomptes_(acomptesFormatted);
         }
       } catch (error) {
         console.log("Error fetching reservation data:", error);
-        navigate("/staf/notFound");
+        setError(
+          "Une erreur est survenue lors de la recuperation des reservations"
+        );
       } finally {
         setLoading(false);
       }
@@ -69,6 +87,10 @@ const StafDetailsReservation = () => {
     }
   }, [idReservation, navigate]);
 
+  if (error) {
+    <NotFound />;
+  }
+
   return (
     <div>
       {loading && (
@@ -76,7 +98,11 @@ const StafDetailsReservation = () => {
           <IndeterminateProgressBar />
         </div>
       )}
-      <ReservationForm reservationData={reservationData} />
+      <ReservationForm
+        reservationData={reservationData}
+        acomptes_={acomptes_}
+        idReservationEdit={idReservation}
+      />
     </div>
   );
 };

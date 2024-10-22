@@ -12,6 +12,7 @@ import {
   ReservationInterface,
   ValidationStatut,
   ReservationFormulaireInterface,
+  Acompte,
 } from "../interfaces/ReservationInterface";
 import { nanoid } from "nanoid";
 import { useAuth } from "../hooks/useAuth";
@@ -29,13 +30,16 @@ import {
   deleteAcompte,
   resetAcompte,
 } from "../actions/AcomptesAction";
-import IndeterminateProgressBar from "./IndeterminateProgressBar";
 import { useParams } from "react-router-dom";
 
 const ReservationForm = ({
   reservationData,
+  acomptes_,
+  idReservationEdit,
 }: {
   reservationData?: ReservationFormulaireInterface;
+  acomptes_?: Acompte[];
+  idReservationEdit?: string;
 }) => {
   const generateRef = () => {
     const date = new Date();
@@ -62,37 +66,68 @@ const ReservationForm = ({
   const [state, dispatch] = useReducer(reservationReducer, initialState);
   const [acomptes, AcomptesDispatch] = useReducer(acomptesReducer, []);
   const [loading, setLoading] = React.useState<boolean>(false);
+  const [acomptesEmpty, setAcomptesEmpty] = React.useState<boolean>(false);
+
+  const handleClickDeleteAcompte = (acompteId: string) => {
+    AcomptesDispatch(deleteAcompte(acompteId));
+
+    // Si la liste des acomptes contient un seul élément, la vider
+    if (acomptes.length === 1) {
+      setAcomptesEmpty(true);
+    }
+  };
 
   React.useEffect(() => {
-    if (!state.reservation.reference) {
-      dispatch(
-        setReservation({ ...state.reservation, reference: generateRef() })
-      );
-    }
+    let mount = true;
+    if (mount) {
+      if (!state.reservation.reference) {
+        dispatch(
+          setReservation({ ...state.reservation, reference: generateRef() })
+        );
+      }
 
-    if (salles && salleOptions.length === 0) {
-      setSalleOptions(SelectOptionAdapter.adapt(salles));
-    }
+      if (salles && salleOptions.length === 0) {
+        setSalleOptions(SelectOptionAdapter.adapt(salles));
+      }
 
-    if (paymentMethodes && methodePaiement.length === 0) {
-      setMethodePaiement(SelectOptionAdapter.adapt(paymentMethodes));
-    }
+      if (paymentMethodes && methodePaiement.length === 0) {
+        setMethodePaiement(SelectOptionAdapter.adapt(paymentMethodes));
+      }
 
-    if (
-      reservationData &&
-      idReservation &&
-      state.reservation.reference !== reservationData.reference
-    ) {
-      dispatch(setReservation({ ...reservationData }));
+      if (
+        reservationData &&
+        idReservation &&
+        state.reservation.reference !== reservationData.reference
+      ) {
+        dispatch(setReservation({ ...reservationData }));
+      }
+
+      if (
+        acomptes_ &&
+        acomptes.length === 0 &&
+        idReservationEdit &&
+        acomptesEmpty === false
+      ) {
+        acomptes_.forEach((acompte) => {
+          AcomptesDispatch(addAcompte(acompte));
+        });
+      }
     }
+    return () => {
+      mount = false;
+    };
   }, [
     salles,
+    acomptesEmpty,
     paymentMethodes,
     reservationData,
     state.reservation,
     idReservation,
     salleOptions.length,
     methodePaiement.length,
+    acomptes_,
+    acomptes,
+    idReservationEdit,
   ]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -411,15 +446,21 @@ const ReservationForm = ({
             </div>
 
             {/* Acomptes */}
-            <div className="md:col-span-2">
-              <h2 className="text-xl font-semibold text-gray-600">Acomptes</h2>
+            <div className="md:col-span-2 border-t border-gray-300 pt-6 mt-6">
+              <h2 className="text-2xl font-semibold text-gray-700 mb-4">
+                Acomptes
+              </h2>
 
-              <div className="col-span-1 md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Formulaire pour l'ajout d'un acompte */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-gray-50 p-4 rounded-md shadow-sm">
                 <div>
-                  <AppLabel htmlFor="val_account">Montant acompte</AppLabel>
+                  <AppLabel htmlFor="val_account">
+                    Montant de l'acompte
+                  </AppLabel>
                   <AppInput
                     id="val_account"
                     type="number"
+                    min={0}
                     value={state.reservation.acomptes.montant}
                     onChange={(e) =>
                       dispatch(
@@ -427,7 +468,7 @@ const ReservationForm = ({
                           ...state.reservation,
                           acomptes: {
                             ...state.reservation.acomptes,
-                            montant: parseInt(e.target.value),
+                            montant: parseInt(e.target.value) || 0,
                           },
                         })
                       )
@@ -435,9 +476,10 @@ const ReservationForm = ({
                     placeholder="Montant en €"
                   />
                 </div>
+
                 <div>
                   <AppLabel htmlFor="date_paiement">
-                    Date prévue de paiement
+                    Date de paiement prévue
                   </AppLabel>
                   <AppInput
                     type="date"
@@ -449,13 +491,14 @@ const ReservationForm = ({
                           ...state.reservation,
                           acomptes: {
                             ...state.reservation.acomptes,
-                            datePrevue: e.target.value as string,
+                            datePrevue: e.target.value,
                           },
                         })
                       )
                     }
                   />
                 </div>
+
                 <div>
                   <AppLabel htmlFor="mode_paiement">Mode de paiement</AppLabel>
                   <AppSelect
@@ -467,7 +510,7 @@ const ReservationForm = ({
                           ...state.reservation,
                           acomptes: {
                             ...state.reservation.acomptes,
-                            modePaiement: value as string,
+                            modePaiement: value,
                           },
                         })
                       )
@@ -476,23 +519,63 @@ const ReservationForm = ({
                 </div>
               </div>
 
-              <div className="col-span-1 md:col-span-2">
-                <h3 className="text-xl font-semibold text-gray-600 py-2 underline">
+              {/* Bouton pour ajouter un acompte */}
+              <div className="col-span-1 md:col-span-2 flex justify-center items-center mt-4">
+                <input
+                  type="button"
+                  onClick={(e: React.FormEvent) => {
+                    e.preventDefault();
+
+                    const selectedPaymentMethod =
+                      paymentMethodes.find(
+                        (method) =>
+                          method.id === state.reservation.acomptes.modePaiement
+                      )?.name || "";
+
+                    AcomptesDispatch(
+                      addAcompte({
+                        id: uuidv4(),
+                        montant: state.reservation.acomptes.montant,
+                        datePrevue: state.reservation.acomptes.datePrevue,
+                        modePaiement: selectedPaymentMethod,
+                        statut: PayementStatut.EN_ATTENTE,
+                      })
+                    );
+
+                    dispatch(
+                      setReservation({
+                        ...state.reservation,
+                        acomptes: {
+                          montant: 0,
+                          datePrevue: "",
+                          modePaiement: "",
+                        },
+                      })
+                    );
+                  }}
+                  value="Ajouter un acompte"
+                  className="py-2 px-8 rounded cursor-pointer border border-gray-600 hover:bg-gray-600 hover:text-white"
+                />
+              </div>
+
+              {/* Liste des acomptes */}
+              <div className="mt-6">
+                <h3 className="text-lg font-semibold text-gray-600 py-2 underline">
                   Liste des acomptes :
                 </h3>
-                <ul>
+                <ul className="space-y-2">
                   {acomptes.map((acompte) => (
                     <li
                       key={acompte.id}
-                      className="flex justify-between items-center space-y-2"
+                      className="flex justify-between items-center bg-gray-50 p-2 rounded shadow-sm"
                     >
                       <span>{acompte.datePrevue}</span>
-                      <span>{acompte.montant} Ar</span>
+                      <span>{acompte.montant} €</span>
                       <span>{acompte.modePaiement}</span>
                       <button
-                        onClick={() => {
-                          AcomptesDispatch(deleteAcompte(acompte.id as string));
-                        }}
+                        onClick={() =>
+                          handleClickDeleteAcompte(acompte.id ?? "")
+                        }
                         className="text-red-600 border border-red-600 px-2 py-1 rounded hover:bg-red-600 hover:text-white"
                       >
                         Supprimer
@@ -503,47 +586,8 @@ const ReservationForm = ({
               </div>
             </div>
 
-            <div className="col-span-1 md:col-span-2 flex justify-center items-center">
-              <input
-                type="button"
-                onClick={(e: React.FormEvent) => {
-                  e.preventDefault();
-                  AcomptesDispatch(
-                    addAcompte({
-                      id: uuidv4(),
-                      montant: state.reservation.acomptes.montant,
-                      datePrevue: state.reservation.acomptes.datePrevue,
-                      modePaiement: paymentMethodes.filter(
-                        (method) =>
-                          method.id === state.reservation.acomptes.modePaiement
-                      )[0].name,
-                      statut: PayementStatut.EN_ATTENTE,
-                    })
-                  );
-                  dispatch(
-                    setReservation({
-                      ...state.reservation,
-                      acomptes: {
-                        ...state.reservation.acomptes,
-                        montant: 0,
-                        datePrevue: "",
-                        modePaiement: "",
-                      },
-                    })
-                  );
-                }}
-                value="Ajouter acompte"
-                className="bg-gray-600 hover:bg-gray-500 text-white py-1 px-8 rounded cursor-pointer"
-              />
-            </div>
-            {loading && (
-              <div className="w-full col-span-1 md:col-span-2">
-                <IndeterminateProgressBar />
-              </div>
-            )}
-
             {/* Submit */}
-            <div className="text-center flex justify-center items-center w-full col-span-1 md:col-span-2">
+            <div className="text-center flex justify-end items-center w-full col-span-1 md:col-span-2">
               <input
                 type="submit"
                 value="Enregistrer"

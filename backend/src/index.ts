@@ -9,6 +9,7 @@ import http from "http";
 import cors from "cors";
 import path from "path";
 import ErrorHandler from "./middlewares/ErrorHandler";
+import morgan from "morgan";
 
 const app = express();
 const server = http.createServer(app);
@@ -20,6 +21,8 @@ const corsOptions = {
   allowedHeaders: ["Content-Type", "Authorization"], // Allow headers required by your requests
   credentials: true, // Allow credentials (cookies, authorization headers)
 };
+
+app.use(morgan("dev"));
 
 app.use(cors(corsOptions));
 

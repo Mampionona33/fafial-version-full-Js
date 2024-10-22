@@ -82,7 +82,14 @@ class ReservationController {
 
   public static async getAll(req: Request, res: Response) {
     try {
-      const reservations = await prisma.reservation.findMany();
+      const reservations = await prisma.reservation.findMany({
+        where: {
+          validationStatus: "VALIDE",
+        },
+        include: {
+          acomptes: true,
+        },
+      });
 
       if (reservations.length === 0) {
         res.status(200).json({
@@ -112,6 +119,9 @@ class ReservationController {
       const reservation = await prisma.reservation.findUnique({
         where: {
           id: req.params.id,
+        },
+        include: {
+          acomptes: true,
         },
       });
 

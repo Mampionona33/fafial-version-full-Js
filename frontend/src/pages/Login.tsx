@@ -14,7 +14,10 @@ const Login = () => {
 
   React.useEffect(() => {
     if (!isAuthenticated) {
-      toast.info("Déconnexion réussie.");
+      toast.info("Déconnexion réussie.", {
+        position: "bottom-right",
+        toastId: "login-toast",
+      });
     }
   }, [isAuthenticated]);
 
