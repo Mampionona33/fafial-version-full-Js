@@ -8,8 +8,9 @@ import paymentMethodesRouter from "./routes/paymentMethodesRouter";
 import http from "http";
 import cors from "cors";
 import path from "path";
-import ErrorHandler from "./middlewares/ErrorHandler";
 import morgan from "morgan";
+import handleError from "./middlewares/ErrorHandler";
+import { verifyToken } from "./middlewares/AuthMiddleware";
 
 const app = express();
 const server = http.createServer(app);
@@ -42,11 +43,11 @@ const PORT = process.env.PORT || 5000;
 app.get("/", (req: Request, res: Response) => {
   res.send("Hello World from TypeScript + Express!");
 });
-app.use(ErrorHandler.handleError);
-app.use("/api/v1", loginRouter);
-app.use("/api/v1", reservationRouter);
-app.use("/api/v1", salleRouter);
-app.use("/api/v1", paymentMethodesRouter);
+app.use(handleError);
+app.use("/api/v1", verifyToken, loginRouter);
+app.use("/api/v1", verifyToken, reservationRouter);
+app.use("/api/v1", verifyToken, salleRouter);
+app.use("/api/v1", verifyToken, paymentMethodesRouter);
 
 // Error handling middleware
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {

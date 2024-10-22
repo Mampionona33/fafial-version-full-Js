@@ -1,9 +1,9 @@
-import AuthController from "../controllers/AuthController";
+import { getAuthenticatedUser, login } from "../controllers/AuthController";
 import express from "express";
 
 const router = express.Router();
 
-router.post("/login", AuthController.login);
-router.get("/authenticated", AuthController.getAuthenticatedUser);
+router.post("/login", login);
+router.get("/authenticated", getAuthenticatedUser);
 
 export default router;

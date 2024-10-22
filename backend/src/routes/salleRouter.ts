@@ -1,8 +1,8 @@
-import SalleController from "../controllers/SalleController";
+import { getAllSalles } from "../controllers/SalleController";
 import express from "express";
 
 const router = express.Router();
 
-router.get("/salles", SalleController.getAll);
+router.get("/salles", getAllSalles);
 
 export default router;
