@@ -19,7 +19,7 @@ export const getAllSalles = async (
 
     res.status(200).json({
       message: "Salles disponibles",
-      salles: salles,
+      salles,
     });
     return;
   } catch (error) {

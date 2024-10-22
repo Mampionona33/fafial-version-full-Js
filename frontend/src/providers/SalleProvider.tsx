@@ -9,21 +9,25 @@ export const SalleProvider = ({ children }: { children: React.ReactNode }) => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    setLoading(true);
     const fetchSalles = async () => {
+      setLoading(true);
       try {
         const response = await SalleServices.getAll();
         if (response.status === 200) {
-          setSalles(response.data.salles);
-          setLoading(false);
+          setSalles(response.data.salles || []);
+        } else {
+          setError(response.data.messages || "Une erreur est survenue");
         }
       } catch (error) {
         console.error(error);
+        setError("Une erreur est survenue lors de la récupération des salles");
+      } finally {
         setLoading(false);
-        setError("Une erreur est survenue lors de la recuperation des salles");
       }
     };
+
     fetchSalles();
+
     return () => {
       setSalles([]);
     };
@@ -34,8 +38,8 @@ export const SalleProvider = ({ children }: { children: React.ReactNode }) => {
       value={{
         salles,
         loading,
-        setSalles,
         error,
+        setSalles,
       }}
     >
       {children}

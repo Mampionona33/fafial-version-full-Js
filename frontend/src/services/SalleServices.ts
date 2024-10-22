@@ -1,9 +1,10 @@
 import { BACKEND_URL } from "../constants/appContants";
 import api from "./axiosConfig"; // Importez votre instance api
 import AuthServices from "./AuthServices";
+import { AxiosResponse } from "axios";
 
 class SalleServices {
-  public static async getAll() {
+  public static async getAll(): Promise<AxiosResponse> {
     try {
       const response = await api.get(`${BACKEND_URL}/salles`, {
         // Utilisez api ici
@@ -11,7 +12,7 @@ class SalleServices {
           Authorization: `Bearer ${AuthServices.getToken()}`,
         },
       });
-      return response.data;
+      return response;
     } catch (error) {
       console.error("Erreur lors de la récupération des salles", error);
       throw error;
