@@ -2,6 +2,7 @@ import api from "./axiosConfig"; // Importez votre instance api
 import { ReservationInterface } from "../interfaces/ReservationInterface";
 import { BACKEND_URL } from "../constants/appContants";
 import AuthServices from "./AuthServices";
+import { AxiosResponse } from "axios";
 
 class ReservationService {
   static API_URL: string = `${BACKEND_URL}/reservations`;
@@ -12,10 +13,7 @@ class ReservationService {
   }
 
   // Méthode pour obtenir toutes les réservations
-  static async getAll(): Promise<{
-    message: string;
-    reservations: ReservationInterface[];
-  }> {
+  static async getAll(): Promise<AxiosResponse> {
     try {
       const response = await api.get(this.API_URL, {
         // Utilisez api ici
@@ -23,7 +21,7 @@ class ReservationService {
           Authorization: `Bearer ${this.getToken()}`,
         },
       });
-      return response.data; // Retournez directement les données
+      return response;
     } catch (error) {
       console.error("Erreur lors de la récupération des réservations", error);
       throw error;
@@ -49,18 +47,16 @@ class ReservationService {
   }
 
   // Méthode pour créer une nouvelle réservation
-  static async create(reservationData: ReservationInterface): Promise<{
-    message: string;
-    status: number;
-    reservation: ReservationInterface;
-  }> {
+  static async create(
+    reservationData: ReservationInterface
+  ): Promise<AxiosResponse> {
     try {
       const response = await api.post(this.API_URL, reservationData, {
         headers: {
           Authorization: `Bearer ${this.getToken()}`,
         },
       });
-      return response.data;
+      return response;
     } catch (error) {
       console.error("Erreur lors de la création de la réservation", error);
       throw error;

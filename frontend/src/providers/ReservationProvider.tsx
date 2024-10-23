@@ -11,9 +11,8 @@ export const ReservationProvider = ({
   children: React.ReactNode;
 }) => {
   const [reservations, setReservations] = useState<ReservationInterface[]>([]);
-  // const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const { setLoading, loading } = useLoading();
+  const { setLoading } = useLoading();
 
   useEffect(() => {
     const fetchReservations = async () => {
@@ -44,8 +43,6 @@ export const ReservationProvider = ({
 
     fetchReservations();
   }, [setLoading]);
-
-  console.log(loading);
 
   return (
     <ReservationContext.Provider

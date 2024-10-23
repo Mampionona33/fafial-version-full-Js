@@ -88,7 +88,7 @@ const ReservationForm = ({
       }
 
       if (salles && salleOptions.length === 0) {
-        console.log(salles)
+        console.log(salles);
         setSalleOptions(SelectOptionAdapter.adapt(salles));
       }
 
@@ -173,19 +173,21 @@ const ReservationForm = ({
     setLoading(true);
     try {
       const res = await ReservationService.create(reservationData);
-      if (res.status === 201) {
-        toast.success(res.message, { position: "bottom-right" });
-      } else if (res.status === 400) {
-        toast.error(res.message, { position: "bottom-right" });
+      if (res.status === 201 || res.status === 200) {
+        console.log(res.data.message);
+        toast.success(res.data.message, {
+          position: "bottom-right",
+          autoClose: 5000,
+          toastId: "success-reservation",
+        });
+        dispatch(resetReservation());
       }
-      dispatch(resetReservation());
+      if (res.status === 400) {
+        console.log(res.data.message);
+      }
       AcomptesDispatch(resetAcompte());
     } catch (error) {
       console.log(error);
-      toast.error("Erreur lors de la création de la réservation", {
-        position: "bottom-right",
-        toastId: "error-reservation",
-      });
     } finally {
       setLoading(false);
     }
