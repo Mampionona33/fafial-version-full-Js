@@ -1,7 +1,6 @@
 import { ReactNode, useEffect, useState } from "react";
 import { PaymentMethodesContext } from "../contexts/PaymentMethodesContext";
 import { PaymentMethodInterface } from "../interfaces/PaymentMehtodeContextInterfaces";
-import { toast, ToastContainer } from "react-toastify";
 import PaymentMethodesServices from "../services/PaymentMethodesServices";
 
 export const PaymentMethodesProvider = ({
@@ -26,15 +25,10 @@ export const PaymentMethodesProvider = ({
       } catch (error) {
         console.error(error);
         setLoading(false);
-        toast.error(
-          "Une erreur est survenue lors de la recuperation des paymentMethodes",
-          {
-            toastId: "error-paymentMethodes",
-          }
-        );
         setError(
           "Une erreur est survenue lors de la recuperation des paymentMethodes"
         );
+        throw error;
       }
     };
     fetchPaymentMethodes();
@@ -50,7 +44,6 @@ export const PaymentMethodesProvider = ({
       }}
     >
       {children}
-      <ToastContainer />
     </PaymentMethodesContext.Provider>
   );
 };

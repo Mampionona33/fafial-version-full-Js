@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { ReservationInterface } from "../interfaces/ReservationInterface";
 import ReservationService from "../services/ReservationService";
-import { toast, ToastContainer } from "react-toastify";
 import { ReservationContext } from "../contexts/ReservationContext";
 import { useLoading } from "../hooks/useLoading";
 
@@ -27,12 +26,6 @@ export const ReservationProvider = ({
       } catch (error) {
         console.error(error);
         setLoading(false);
-        toast.error(
-          "Une erreur est survenue lors de la recuperation des reservations",
-          {
-            toastId: "error-reservation",
-          }
-        );
         setError(
           "Une erreur est survenue lors de la recuperation des reservations"
         );
@@ -49,7 +42,6 @@ export const ReservationProvider = ({
       value={{ reservations, error, setReservations }}
     >
       {children}
-      <ToastContainer />
     </ReservationContext.Provider>
   );
 };

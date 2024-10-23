@@ -599,8 +599,8 @@ const ReservationForm = ({
               />
             </div>
           </form>
-          <ToastContainer />
         </div>
+        <ToastContainer />
       </div>
     </>
   );
