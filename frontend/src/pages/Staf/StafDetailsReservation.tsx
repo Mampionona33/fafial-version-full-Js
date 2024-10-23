@@ -63,7 +63,7 @@ const StafDetailsReservation = () => {
           // Format acomptes
           console.log(reservation);
           const acomptes = reservation?.acomptes || [];
-          const acomptesFormatted = acomptes.map((acompte) => ({
+          const acomptesFormatted = acomptes.map((acompte: Acompte) => ({
             ...acompte,
             datePrevue: new Date(acompte.datePrevue)
               .toISOString()
