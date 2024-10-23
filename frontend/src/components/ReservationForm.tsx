@@ -184,6 +184,11 @@ const ReservationForm = ({
       }
       if (res.status === 400) {
         console.log(res.data.message);
+        toast.error(res.data.message, {
+          position: "bottom-right",
+          autoClose: 5000,
+          toastId: "error-reservation",
+        });
       }
       AcomptesDispatch(resetAcompte());
     } catch (error) {
