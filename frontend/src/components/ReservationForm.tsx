@@ -135,14 +135,19 @@ const ReservationForm = ({
     e.preventDefault();
     const formattedDateDebut = new Date(state.reservation.dateDebut as string);
     const formattedDateFin = new Date(state.reservation.dateFin as string);
-    const updatedAcomptes = acomptes.map((acompte) => ({
-      ...acompte,
-      montant: acompte.montant,
-      datePrevue: acompte.datePrevue,
-      modePaiement: acompte.modePaiement,
-      id: undefined,
-      statut: PayementStatut.EN_ATTENTE,
-    }));
+    const updatedAcomptes = acomptes.map((acompte) => {
+      console.log(acompte);
+      return {
+        ...acompte,
+        montant: acompte.montant,
+        datePrevue: acompte.datePrevue,
+        modePaiement: methodePaiement.find(
+          (methode) => methode.label === acompte.modePaiement
+        )!.value,
+        id: idReservationEdit ? acompte.id : undefined,
+        statut: PayementStatut.EN_ATTENTE,
+      };
+    });
 
     if (!user || !user.id) {
       throw new Error("Utilisateur non connecté");
@@ -171,6 +176,33 @@ const ReservationForm = ({
 
     setLoading(true);
     try {
+      // Modifier une reservation
+      console.log("reservationData", reservationData);
+      if (idReservationEdit) {
+        const res = await ReservationService.update(
+          idReservationEdit,
+          reservationData
+        );
+        if (res.status === 200) {
+          console.log(res.data.message);
+          toast.success(res.data.message, {
+            position: "bottom-right",
+            autoClose: 5000,
+            toastId: "success-reservation",
+          });
+        }
+        if (res.status === 400) {
+          console.log(res.data.message);
+          toast.error(res.data.message, {
+            position: "bottom-right",
+            autoClose: 5000,
+            toastId: "error-reservation",
+          });
+        }
+        return;
+      }
+
+      // Creer une nouvelle reservation
       const res = await ReservationService.create(reservationData);
       if (res.status === 201 || res.status === 200) {
         console.log(res.data.message);
@@ -202,7 +234,7 @@ const ReservationForm = ({
       <div className="min-h-screen flex items-center justify-center h-full w-full py-8 px-4">
         <div className="bg-white p-8 shadow-md w-full max-w-3xl">
           <h1 className="text-3xl font-semibold text-gray-700 text-center mb-6">
-            Réservation de Salle
+            {`${idReservation ? "Modifier" : "Ajouter"} Réservation`}
           </h1>
           <hr className="mb-6" />
           <form
@@ -511,17 +543,19 @@ const ReservationForm = ({
                   <AppSelect
                     id="mode_paiement"
                     options={methodePaiement}
-                    onChange={(value) =>
+                    onChange={(value) => {
+                      const idModePayemen = value;
+                      console.log(idModePayemen);
                       dispatch(
                         setReservation({
                           ...state.reservation,
                           acomptes: {
                             ...state.reservation.acomptes,
-                            modePaiement: value,
+                            modePaiement: idModePayemen,
                           },
                         })
-                      )
-                    }
+                      );
+                    }}
                   />
                 </div>
               </div>

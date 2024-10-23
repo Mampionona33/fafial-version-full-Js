@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { set } from "date-fns"; // Importation des fonctions nécessaires
 import prisma from "../../prisma/prisma";
 import { ReservationRequestBody } from "interfaces/ReservationRequestBody";
+import { Acompte } from "@prisma/client";
 
 // Fonction pour créer une réservation
 export const createReservation = async (
@@ -140,5 +141,74 @@ export const getReservation = async (req: Request, res: Response) => {
         "Une erreur s'est produite lors de la récupération de la réservation",
     });
     return;
+  }
+};
+
+export const updateReservation = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const body = req.body;
+
+    // Convertir la date de début et de fin au format Date
+    const dateDebut = new Date(body.dateDebut);
+    const dateFin = new Date(body.dateFin);
+
+    const heureDebut = addTimeToDate(dateDebut, body.heureDebut);
+    const heureFin = addTimeToDate(dateFin, body.heureFin);
+
+    // Préparer les acomptes à mettre à jour
+    const acomptes = body.acomptes.map((acompte: Acompte) => ({
+      id: acompte.id, // Inclure l'ID pour la mise à jour
+      datePrevue: new Date(acompte.datePrevue).toISOString(),
+      montant: acompte.montant,
+      modePaiement: acompte.modePaiement,
+    }));
+
+    // Mettre à jour la réservation
+    const updatedReservation = await prisma.reservation.update({
+      where: {
+        id: req.params.id,
+      },
+      data: {
+        reference: body.reference,
+        nomOrganisation: body.nomOrganisation,
+        nomPrenomContact: body.nomPrenomContact,
+        email: body.email,
+        telephone: body.telephone,
+        nombrePersonnes: body.nombrePersonnes,
+        dateDebut,
+        heureDebut,
+        dateFin,
+        heureFin,
+        salleId: body.salleId,
+        createdById: body.createdById,
+        acomptes: {
+          // Mettre à jour les acomptes
+          deleteMany: {},
+          create: acomptes,
+        },
+        activite: body.activite,
+        remarques: body.remarques,
+        statut: body.statut,
+        utilisateurType: body.utilisateurType,
+        validationStatus: body.validationStatus,
+      },
+    });
+
+    if (!updatedReservation) {
+      res.status(404).json({ message: "Réservation non trouvée" });
+      return;
+    }
+
+    res.status(200).json({
+      message: "Réservation mise à jour avec succès",
+      data: updatedReservation,
+    });
+  } catch (error) {
+    console.error("Erreur lors de la mise à jour de la réservation", error);
+    next(error);
   }
 };

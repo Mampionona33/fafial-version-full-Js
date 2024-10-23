@@ -6,10 +6,16 @@ import AuthServices from "../services/AuthServices";
 import { AxiosError } from "axios";
 import UserServices from "../services/UserServices";
 import { UserInterface } from "../interfaces/userInterface";
-import { ACCESS_TOKEN_NAME, REFRESH_TOKEN_NAME, EXPIRATION_BUFFER } from "../constants/appContants";
-import {jwtDecode} from "jwt-decode";
+import {
+  ACCESS_TOKEN_NAME,
+  REFRESH_TOKEN_NAME,
+  EXPIRATION_BUFFER,
+} from "../constants/appContants";
+import { jwtDecode } from "jwt-decode";
 
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<UserInterface | null>(null);
   const [loading, setLoading] = useState(false);
@@ -52,21 +58,22 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   // Vérification de l'authentification lors du montage du composant
   useEffect(() => {
+    let tokenRefreshInterval: NodeJS.Timeout;
+
     const checkAuthStatus = async () => {
       const accessToken = localStorage.getItem(ACCESS_TOKEN_NAME);
       const refreshTokenCookie = Cookies.get(REFRESH_TOKEN_NAME);
 
-      // Vérifier si le token est expiré
       if (isAccessTokenExpired() && isAuthenticated) {
-        console.log("Token expired, refreshing...");
-        const newAccessToken = await refreshToken(); // Essayer de rafraîchir le token
+        const newAccessToken = await refreshToken();
         if (newAccessToken) {
-          const userResponse = await UserServices.getAuthenticatedUser(newAccessToken);
-          console.log("userResponse",userResponse)
+          const userResponse = await UserServices.getAuthenticatedUser(
+            newAccessToken
+          );
           if (userResponse.status === 200) {
             const user = userResponse.data.user;
             setUser(user);
-            localStorage.setItem("user", JSON.stringify(user)); 
+            localStorage.setItem("user", JSON.stringify(user));
             setIsAuthenticated(true);
           }
         } else {
@@ -74,20 +81,35 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           localStorage.removeItem("user");
         }
       } else if (accessToken && refreshTokenCookie) {
-        // Si les tokens existent et sont valides
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
-          setUser(JSON.parse(storedUser)); // Utiliser l'utilisateur stocké
+          setUser(JSON.parse(storedUser));
           setIsAuthenticated(true);
         }
       } else {
-        setIsAuthenticated(false); // Sinon, déconnexion
+        setIsAuthenticated(false);
         localStorage.removeItem("user");
       }
     };
 
-    checkAuthStatus(); // Appeler la vérification au démarrage
-  }, [isAccessTokenExpired, refreshToken,isAuthenticated]);
+    checkAuthStatus();
+
+    if (isAuthenticated) {
+      const accessToken = AuthServices.getTokenAccess();
+      if (accessToken) {
+        const decodedToken: { exp: number } = jwtDecode(accessToken);
+        const expirationTime = decodedToken.exp * 1000;
+        const currentTime = Date.now();
+        const anticipatedTime = expirationTime - EXPIRATION_BUFFER;
+        tokenRefreshInterval = setInterval(async () => {
+          console.log("Refreshing token...");
+          await refreshToken();
+        }, anticipatedTime - currentTime);
+      }
+    }
+
+    return () => clearInterval(tokenRefreshInterval);
+  }, [isAccessTokenExpired, refreshToken, isAuthenticated]);
 
   // Fonction de connexion
   const login = async (
@@ -110,11 +132,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         });
 
         // Récupérer les informations de l'utilisateur
-        const userResponse = await UserServices.getAuthenticatedUser(accessToken);
-        
+        const userResponse = await UserServices.getAuthenticatedUser(
+          accessToken
+        );
+
         if (userResponse.status === 200) {
           const user = userResponse.data.user;
-          console.log("user",user)
+          console.log("user", user);
           setUser(user);
           setIsAuthenticated(true);
           localStorage.setItem("user", JSON.stringify(user));
@@ -145,7 +169,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         localStorage.removeItem("user");
         Cookies.remove(REFRESH_TOKEN_NAME);
       }
-    }catch (error) {
+    } catch (error) {
       console.error("Logout failed:", error);
       throw error;
     }

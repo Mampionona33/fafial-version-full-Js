@@ -10,6 +10,7 @@ import ReservationService from "../../services/ReservationService";
 import IndeterminateProgressBar from "../../components/IndeterminateProgressBar";
 import NotFound from "../NotFound";
 import { AxiosError } from "axios";
+import { usePaymentMethodes } from "../../hooks/usePaymentMethodes";
 
 const StafDetailsReservation = () => {
   const { idReservation } = useParams();
@@ -20,6 +21,7 @@ const StafDetailsReservation = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const { paymentMethodes } = usePaymentMethodes();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -64,14 +66,19 @@ const StafDetailsReservation = () => {
           const acomptes = reservation?.acomptes || [];
           const acomptesFormatted = acomptes.map((acompte: Acompte) => ({
             ...acompte,
+            modePaiement: paymentMethodes.find(
+              (payment) => payment.id === acompte.modePaiement
+            )?.name,
             datePrevue: new Date(acompte.datePrevue)
               .toISOString()
               .split("T")[0],
           }));
+
+          console.log(acomptesFormatted);
           setAcomptes_(acomptesFormatted);
         }
       } catch (error) {
-        if(error instanceof AxiosError && error.status === 404) {
+        if (error instanceof AxiosError && error.status === 404) {
           setError("La reservation n'existe pas");
         }
         setError(
@@ -88,7 +95,7 @@ const StafDetailsReservation = () => {
   }, [idReservation, navigate]);
 
   if (error) {
-    return <NotFound />
+    return <NotFound />;
   }
 
   return (
