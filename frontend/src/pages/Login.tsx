@@ -10,28 +10,27 @@ import IndeterminateProgressBar from "../components/IndeterminateProgressBar";
 import { PrimeReactProvider } from "primereact/api";
 
 const Login = () => {
-  const { login, loading, isAuthenticated } = useAuth();
-
-  React.useEffect(() => {
-    if (!isAuthenticated) {
-      toast.info("Déconnexion réussie.", {
-        position: "bottom-right",
-        toastId: "login-toast",
-      });
-    }
-  }, [isAuthenticated]);
+  const { login, loading } = useAuth();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const formData = new FormData(event.currentTarget);
+    const form = event.currentTarget as HTMLFormElement;
+    const formData = new FormData(form);
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
 
     try {
       const resp = await login(email, password);
-      console.log(resp);
-      if (!resp) {
-        throw new Error("Login failed. Please try again.");
+      if (resp?.status === 401) {
+        toast.error(resp.data.message);
+        form.reset();
+      }
+
+      if (resp?.status === 200) {
+        toast.success("Connexion reussie.", {
+          position: "bottom-right",
+          toastId: "login-toast",
+        });
       }
     } catch (error: AxiosError | unknown) {
       if (error instanceof AxiosError) {

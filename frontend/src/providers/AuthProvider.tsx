@@ -8,7 +8,6 @@ import { AxiosError } from "axios";
 import UserServices from "../services/UserServices";
 import { UserInterface } from "../interfaces/userInterface";
 import { COOKIE_NAME, REFRESH_TOKEN_NAME } from "../constants/appContants";
-import { ToastContainer, toast } from "react-toastify";
 
 // Le provider AuthContext
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({
@@ -103,6 +102,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     setLoading(true);
     try {
       const response = await AuthServices.login(email, password);
+
+      if (response.status === 401) {
+        setIsAuthenticated(false);
+      }
       if (response.status === 200) {
         const { accessToken, refreshToken } = response.data;
 
@@ -119,24 +122,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         Cookies.set(COOKIE_NAME, accessToken);
 
         await authenticateUser(accessToken);
-      } else if (response.status === 401) {
-        setIsAuthenticated(false);
-        toast.error(
-          response.data.message || "Unauthorized. Check your credentials."
-        );
       }
 
       return response;
     } catch (error) {
       if (error instanceof AxiosError && error.response?.status === 401) {
-        toast.error(
-          error.response.data.message || "Unauthorized. Check your credentials."
-        );
+        throw error;
       } else {
         console.error("Login failed:", error);
-        toast.error("An unexpected error occurred. Please try again.");
+        throw error;
       }
-      throw error;
     } finally {
       setLoading(false);
     }
@@ -156,7 +151,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       }}
     >
       {children}
-      <ToastContainer />
     </AuthContext.Provider>
   );
 };
