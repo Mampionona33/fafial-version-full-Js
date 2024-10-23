@@ -28,10 +28,7 @@ class ReservationService {
     }
   }
 
-  static async get(id: string): Promise<{
-    message: string;
-    reservation: ReservationInterface;
-  }> {
+  static async get(id: string): Promise<AxiosResponse> {
     try {
       const response = await api.get(`${this.API_URL}/${id}`, {
         // Utilisez api ici
@@ -39,7 +36,7 @@ class ReservationService {
           Authorization: `Bearer ${this.getToken()}`,
         },
       });
-      return response.data; // Retournez directement les données
+      return response;
     } catch (error) {
       console.error("Erreur lors de la sélection de la réservation", error);
       throw error;
