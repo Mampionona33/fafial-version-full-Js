@@ -45,10 +45,10 @@ class AuthServices {
     return !!token;
   }
 
-  public static async logout() {
+  public static async logout(): Promise<AxiosResponse> {
     try {
-      const refreshToken = Cookies.get(REFRESH_TOKEN_NAME); // Récupérer le refresh token
-      Cookies.remove(AuthServices.COOKIE_NAME); // Supprimer le cookie du token d'accès
+      const refreshToken = Cookies.get(REFRESH_TOKEN_NAME);
+      Cookies.remove(AuthServices.COOKIE_NAME);
 
       const resp = await api.post("/logout", {
         refreshToken, // Envoyer le refresh token dans le corps de la requête
@@ -57,6 +57,7 @@ class AuthServices {
       return resp;
     } catch (error) {
       console.error("Error during logout:", error);
+      throw error;
     }
   }
 
