@@ -1,7 +1,7 @@
 // axiosConfig.js
 import axios from "axios";
 import Cookies from "js-cookie";
-import { BACKEND_URL, COOKIE_NAME } from "../constants/appContants";
+import { BACKEND_URL, REFRESH_TOKEN_NAME } from "../constants/appContants";
 
 // Créez une instance d'Axios
 const api = axios.create({
@@ -15,7 +15,7 @@ api.interceptors.response.use(
   },
   (error) => {
     if (error.response && error.response.status === 403) {
-      Cookies.remove(COOKIE_NAME);
+      Cookies.remove(REFRESH_TOKEN_NAME);
 
       window.location.href = "/login";
     } else {
