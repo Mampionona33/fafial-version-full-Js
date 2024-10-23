@@ -9,6 +9,7 @@ import {
 import ReservationService from "../../services/ReservationService";
 import IndeterminateProgressBar from "../../components/IndeterminateProgressBar";
 import NotFound from "../NotFound";
+import { AxiosError } from "axios";
 
 const StafDetailsReservation = () => {
   const { idReservation } = useParams();
@@ -29,8 +30,7 @@ const StafDetailsReservation = () => {
         const resp = await ReservationService.get(idReservation);
 
         if (resp.status === 404) {
-          navigate("/staf/notFound");
-          return;
+          setError("La reservation n'existe pas");
         }
 
         if (resp.data.reservation) {
@@ -61,7 +61,6 @@ const StafDetailsReservation = () => {
           setReservationData(formatReservationData);
 
           // Format acomptes
-          console.log(reservation);
           const acomptes = reservation?.acomptes || [];
           const acomptesFormatted = acomptes.map((acompte: Acompte) => ({
             ...acompte,
@@ -69,11 +68,12 @@ const StafDetailsReservation = () => {
               .toISOString()
               .split("T")[0],
           }));
-          console.log(acomptesFormatted);
           setAcomptes_(acomptesFormatted);
         }
       } catch (error) {
-        console.log("Error fetching reservation data:", error);
+        if(error instanceof AxiosError && error.status === 404) {
+          setError("La reservation n'existe pas");
+        }
         setError(
           "Une erreur est survenue lors de la recuperation des reservations"
         );
@@ -88,7 +88,7 @@ const StafDetailsReservation = () => {
   }, [idReservation, navigate]);
 
   if (error) {
-    <NotFound />;
+    return <NotFound />
   }
 
   return (

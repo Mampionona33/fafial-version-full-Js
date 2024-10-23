@@ -20,7 +20,6 @@ export const ReservationProvider = ({
         const resp = await ReservationService.getAll();
 
         if (resp.status === 200) {
-          console.log(resp.data);
           setReservations(resp.data.reservations);
         }
       } catch (error) {

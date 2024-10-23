@@ -88,7 +88,6 @@ const ReservationForm = ({
       }
 
       if (salles && salleOptions.length === 0) {
-        console.log(salles);
         setSalleOptions(SelectOptionAdapter.adapt(salles));
       }
 

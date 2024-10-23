@@ -2,7 +2,7 @@ import api from "./axiosConfig"; // Importez votre instance api
 import { ReservationInterface } from "../interfaces/ReservationInterface";
 import { BACKEND_URL } from "../constants/appContants";
 import AuthServices from "./AuthServices";
-import { AxiosResponse } from "axios";
+import {  AxiosResponse } from "axios";
 
 class ReservationService {
   static API_URL: string = `${BACKEND_URL}/reservations`;
@@ -37,7 +37,7 @@ class ReservationService {
         },
       });
       return response;
-    } catch (error) {
+    } catch (error ) {
       console.error("Erreur lors de la sélection de la réservation", error);
       throw error;
     }
