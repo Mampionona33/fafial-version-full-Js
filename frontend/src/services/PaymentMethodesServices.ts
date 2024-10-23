@@ -10,7 +10,7 @@ class PaymentMethodesServices {
       const response = await api.get(this.API_URL, {
         // Utilisez api au lieu de axios
         headers: {
-          Authorization: `Bearer ${AuthServices.getToken()}`,
+          Authorization: `Bearer ${AuthServices.getTokenAccess()}`,
         },
       });
       return response;

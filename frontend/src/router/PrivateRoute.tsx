@@ -1,7 +1,7 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import Cookies from "js-cookie";
-import { COOKIE_NAME } from "../constants/appContants";
+import { REFRESH_TOKEN_NAME} from "../constants/appContants";
 
 interface ProtectedRouteProps {
   allowedRoles: string[];
@@ -9,7 +9,7 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
   const { user } = useAuth();
-  const token = Cookies.get(COOKIE_NAME);
+  const token = Cookies.get(REFRESH_TOKEN_NAME);
 
   // Si l'utilisateur n'est pas authentifié, rediriger vers la page de login
   if (!token) {

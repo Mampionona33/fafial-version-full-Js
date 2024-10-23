@@ -9,7 +9,7 @@ class SalleServices {
       const response = await api.get(`${BACKEND_URL}/salles`, {
         // Utilisez api ici
         headers: {
-          Authorization: `Bearer ${AuthServices.getToken()}`,
+          Authorization: `Bearer ${AuthServices.getTokenAccess()}`,
         },
       });
       return response;

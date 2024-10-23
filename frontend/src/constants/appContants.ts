@@ -4,3 +4,4 @@ export const REFRESH_TOKEN_NAME =
   import.meta.env.VITE_REFRESH_TOKEN_NAME || "refresh_token";
 export const ACCESS_TOKEN_NAME =
   import.meta.env.VITE_ACCESS_TOKEN_NAME || "access_token";
+export const EXPIRATION_BUFFER = import.meta.env.VITE_EXPIRATION_BUFFER || 60000;

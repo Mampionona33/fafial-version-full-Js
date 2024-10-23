@@ -9,7 +9,7 @@ class ReservationService {
 
   // Méthode pour obtenir le token
   private static getToken() {
-    return AuthServices.getToken();
+    return AuthServices.getTokenAccess();
   }
 
   // Méthode pour obtenir toutes les réservations

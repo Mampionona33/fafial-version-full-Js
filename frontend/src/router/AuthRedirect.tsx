@@ -2,12 +2,12 @@ import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import RoleChecker from "../utils/RoleChecker";
 import Cookies from "js-cookie";
-import { COOKIE_NAME } from "../constants/appContants";
+import { REFRESH_TOKEN_NAME } from "../constants/appContants";
 
 const AuthRedirect = () => {
   const { user } = useAuth();
   const location = useLocation();
-  const token = Cookies.get(COOKIE_NAME);
+  const token = Cookies.get(REFRESH_TOKEN_NAME);
 
   // Si l'utilisateur n'est pas authentifié
   if (!token) {
@@ -17,6 +17,7 @@ const AuthRedirect = () => {
       <Navigate to="/login" state={{ from: location }} />
     );
   }
+
 
   // Si l'utilisateur est authentifié
   if (user) {
