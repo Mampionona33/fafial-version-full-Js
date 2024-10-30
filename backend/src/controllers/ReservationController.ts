@@ -212,3 +212,36 @@ export const updateReservation = async (
     next(error);
   }
 };
+
+export const cancelReservation = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const reservation = await prisma.reservation.update({
+      where: {
+        id: req.params.id,
+      },
+      data: {
+        validationStatus: "ANNULE",
+      },
+    });
+
+    if (!reservation) {
+      res.status(404).json({ message: "Réservation non trouvée" });
+      return;
+    }
+
+    res.status(200).json({
+      message: "Réservation annulée avec succès",
+      data: reservation,
+    });
+  } catch (error) {
+    console.error("Erreur lors de l'annulation de la réservation", error);
+    res.status(500).json({
+      error: "Une erreur s'est produite lors de l'annulation de la réservation",
+    });
+    next(error);
+  }
+};
