@@ -3,6 +3,7 @@ import { ReservationInterface } from "../interfaces/ReservationInterface";
 import ReservationService from "../services/ReservationService";
 import { ReservationContext } from "../contexts/ReservationContext";
 import { useLoading } from "../hooks/useLoading";
+import AuthServices from "../services/AuthServices";
 
 export const ReservationProvider = ({
   children,
@@ -12,6 +13,7 @@ export const ReservationProvider = ({
   const [reservations, setReservations] = useState<ReservationInterface[]>([]);
   const [error, setError] = useState<string | null>(null);
   const { setLoading } = useLoading();
+  const accessToken = AuthServices.getTokenAccess();
 
   useEffect(() => {
     const fetchReservations = async () => {
@@ -33,8 +35,10 @@ export const ReservationProvider = ({
       }
     };
 
-    fetchReservations();
-  }, [setLoading]);
+    if (accessToken) {
+      fetchReservations();
+    }
+  }, [setLoading, accessToken]);
 
   return (
     <ReservationContext.Provider

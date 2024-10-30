@@ -2,6 +2,7 @@ import { ReactNode, useEffect, useState } from "react";
 import { PaymentMethodesContext } from "../contexts/PaymentMethodesContext";
 import { PaymentMethodInterface } from "../interfaces/PaymentMehtodeContextInterfaces";
 import PaymentMethodesServices from "../services/PaymentMethodesServices";
+import AuthServices from "../services/AuthServices";
 
 export const PaymentMethodesProvider = ({
   children,
@@ -13,6 +14,7 @@ export const PaymentMethodesProvider = ({
   >([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const accessToken = AuthServices.getTokenAccess();
 
   useEffect(() => {
     const fetchPaymentMethodes = async () => {
@@ -31,8 +33,11 @@ export const PaymentMethodesProvider = ({
         throw error;
       }
     };
-    fetchPaymentMethodes();
-  }, []);
+
+    if (accessToken) {
+      fetchPaymentMethodes();
+    }
+  }, [accessToken]);
 
   return (
     <PaymentMethodesContext.Provider

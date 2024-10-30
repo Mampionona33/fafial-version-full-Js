@@ -168,6 +168,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         setUser(null);
         localStorage.removeItem("user");
         Cookies.remove(REFRESH_TOKEN_NAME);
+        AuthServices.removeAccessToken();
       }
     } catch (error) {
       console.error("Logout failed:", error);

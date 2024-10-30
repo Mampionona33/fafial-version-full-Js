@@ -1,6 +1,9 @@
 import Cookies from "js-cookie";
 import api from "./axiosConfig"; // Importez votre instance api
-import {  REFRESH_TOKEN_NAME,ACCESS_TOKEN_NAME } from "../constants/appContants";
+import {
+  REFRESH_TOKEN_NAME,
+  ACCESS_TOKEN_NAME,
+} from "../constants/appContants";
 import { AxiosResponse, isAxiosError } from "axios"; // Importez isAxiosError
 
 class AuthServices {
@@ -23,7 +26,6 @@ class AuthServices {
       });
 
       return response;
-
     } catch (error) {
       // Utilisez isAxiosError importé ici
       if (isAxiosError(error)) {
@@ -45,7 +47,7 @@ class AuthServices {
       const refreshToken = Cookies.get(REFRESH_TOKEN_NAME);
 
       const resp = await api.post("/logout", {
-        refreshToken, 
+        refreshToken,
       });
 
       return resp;
@@ -61,6 +63,14 @@ class AuthServices {
 
   public static getRefreshToken(): string | undefined {
     return Cookies.get(AuthServices.REFRESH_TOKEN_NAME);
+  }
+
+  public static setTokenAccess(token: string): void {
+    localStorage.setItem(AuthServices.ACCESS_TOKEN_NAME, token);
+  }
+
+  public static removeAccessToken(): void {
+    localStorage.removeItem(AuthServices.ACCESS_TOKEN_NAME);
   }
 
   static async refreshToken(): Promise<AxiosResponse> {
