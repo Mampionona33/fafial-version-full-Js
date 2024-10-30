@@ -78,16 +78,16 @@ class ReservationService {
     }
   }
 
-  // Méthode pour supprimer une réservation
-  static async delete(id: string): Promise<void> {
+  static async cancel(id: string): Promise<AxiosResponse> {
     try {
-      await api.delete(`${this.API_URL}/${id}`, {
+      const response = await api.put(`${this.API_URL}/cancel/${id}`, "", {
         headers: {
           Authorization: `Bearer ${this.getToken()}`,
         },
       });
+      return response;
     } catch (error) {
-      console.error("Erreur lors de la suppression de la réservation", error);
+      console.error("Erreur lors de l'annulation de la réservation", error);
       throw error;
     }
   }

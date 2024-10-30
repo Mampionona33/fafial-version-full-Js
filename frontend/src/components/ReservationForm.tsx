@@ -30,7 +30,7 @@ import {
   deleteAcompte,
   resetAcompte,
 } from "../actions/AcomptesAction";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useLoading } from "../hooks/useLoading";
 
 const ReservationForm = ({
@@ -56,6 +56,8 @@ const ReservationForm = ({
   const { salles } = useSalles();
   const { paymentMethodes } = usePaymentMethodes();
   const { idReservation } = useParams();
+
+  const navigate = useNavigate();
 
   const [salleOptions, setSalleOptions] = React.useState<
     { label: string; value: string }[]
@@ -224,6 +226,37 @@ const ReservationForm = ({
       AcomptesDispatch(resetAcompte());
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCancel = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      if (idReservationEdit) {
+        const resp = await ReservationService.cancel(idReservationEdit);
+        if (resp.status === 200) {
+          toast.success(resp.data.message, {
+            position: "bottom-right",
+            autoClose: 5000,
+            toastId: "success-reservation",
+          });
+          navigate("/calendar/reservations");
+        }
+      }
+    } catch (error) {
+      toast.error(
+        "Une erreur est survenue lors de la suppression de la reservation",
+        {
+          position: "bottom-right",
+          autoClose: 5000,
+          toastId: "error-reservation",
+        }
+      );
+      throw error;
     } finally {
       setLoading(false);
     }
@@ -629,7 +662,15 @@ const ReservationForm = ({
             </div>
 
             {/* Submit */}
-            <div className="text-center flex justify-end items-center w-full col-span-1 md:col-span-2">
+            <div className="text-center flex justify-end items-center w-full col-span-1 md:col-span-2 gap-4">
+              {idReservationEdit && (
+                <input
+                  type="button"
+                  value="Annuler"
+                  onClick={handleCancel}
+                  className="px-10 py-2 mt-6 ml-4 cursor-pointer rounded-md border border-gray-600 hover:bg-gray-600 hover:text-white"
+                />
+              )}
               <input
                 type="submit"
                 value="Enregistrer"
