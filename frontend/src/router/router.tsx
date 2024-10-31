@@ -16,6 +16,7 @@ import StafCalendar from "../pages/Staf/StafCalendar";
 import StafAjoutReservation from "../pages/Staf/StafAjoutReservation";
 import StafDetailsReservation from "../pages/Staf/StafDetailsReservation";
 import JournalCaisse from "../pages/JournalCaisse";
+import AjoutEntree from "../pages/AjoutEntree";
 
 // Créer les routes
 const router = createBrowserRouter(
@@ -50,6 +51,7 @@ const router = createBrowserRouter(
             />
             <Route path="journal-des-caisses">
               <Route path="" element={<JournalCaisse />} />
+              <Route path="ajout-entree" element={<AjoutEntree />} />
             </Route>
           </Route>
         </Route>
