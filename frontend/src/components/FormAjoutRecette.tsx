@@ -7,12 +7,14 @@ import AppInput from "./AppInput";
 import { usePaymentMethodesFields } from "../hooks/usePaymentMethodesFields";
 import { useLoading } from "../hooks/useLoading";
 import { toast } from "react-toastify";
+import AppTextarea from "./AppTextarea";
 
-const FormAjoutEntree = () => {
+const FormAjoutRecette = () => {
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const { paymentMethodesFields, fetchPaymentFields, setPaymentMethodes } =
     usePaymentMethodesFields();
   const { setLoading } = useLoading();
+  const [personnePayeur, setPersonnePayeur] = useState("");
 
   const [methodePaiementOptions, setMethodePaiementOptions] = useState<
     { label: string; value: string }[]
@@ -71,18 +73,51 @@ const FormAjoutEntree = () => {
   return (
     <div className="max-w-md mx-auto mt-8 p-6 bg-white rounded shadow-md">
       <h2 className="text-2xl font-semibold mb-6 text-center">
-        Ajout d'une Entrée
+        Ajouter une recette
       </h2>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div>
-          <AppLabel htmlFor="date">Date</AppLabel>
+          <AppLabel htmlFor="personnePayeur">Nom et prenom du payeur</AppLabel>
+          <AppInput
+            type="text"
+            id="personnePayeur"
+            value={personnePayeur}
+            onChange={(e) => setPersonnePayeur(e.target.value)}
+            required
+          />
+        </div>
+
+        <div>
+          <AppLabel htmlFor="numeroTelephone">
+            Numero telephone du payeur
+          </AppLabel>
+          <AppInput type="tel" id="numeroTelephone" required />
+        </div>
+
+        <div>
+          <AppLabel htmlFor="date">Date de paiement</AppLabel>
           <AppInput
             type="date"
             id="date"
             name="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className="w-full px-3 py-2 border rounded"
+            required
+          />
+        </div>
+
+        <div>
+          <AppLabel htmlFor="description">Description</AppLabel>
+          <AppTextarea id="description" name="description" rows={4} />
+        </div>
+
+        <div>
+          <AppLabel htmlFor="montant">Montant</AppLabel>
+          <AppInput
+            type="number"
+            id="montant"
+            name="montant"
+            min={1}
             required
           />
         </div>
@@ -116,7 +151,6 @@ const FormAjoutEntree = () => {
                     });
                     setPaymentMethodes(updatedFields);
                   }}
-                  className="w-full px-3 py-2 border rounded"
                   required={field.isRequired}
                 />
               </div>
@@ -137,4 +171,4 @@ const FormAjoutEntree = () => {
   );
 };
 
-export default FormAjoutEntree;
+export default FormAjoutRecette;

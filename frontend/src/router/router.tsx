@@ -16,7 +16,7 @@ import StafCalendar from "../pages/Staf/StafCalendar";
 import StafAjoutReservation from "../pages/Staf/StafAjoutReservation";
 import StafDetailsReservation from "../pages/Staf/StafDetailsReservation";
 import JournalCaisse from "../pages/JournalCaisse";
-import AjoutEntree from "../pages/AjoutEntree";
+import AjoutEntree from "../pages/AjoutRecette";
 
 // Créer les routes
 const router = createBrowserRouter(

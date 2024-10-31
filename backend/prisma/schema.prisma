@@ -108,6 +108,7 @@ model Acompte {
 model Recette {
   id             String   @id @default(cuid())
   montant        Float
+  reference      String   @unique
   description    String?
   personnePayeur String
   moyenPaiement  String

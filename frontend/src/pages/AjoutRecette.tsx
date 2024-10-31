@@ -1,9 +1,9 @@
-import FormAjoutEntree from "../components/FormAjoutEntree";
+import FormAjoutRecette from "../components/FormAjoutRecette";
 
 const AjoutEntree = () => {
   return (
     <div>
-      <FormAjoutEntree />
+      <FormAjoutRecette />
     </div>
   );
 };

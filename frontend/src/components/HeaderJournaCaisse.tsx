@@ -18,7 +18,7 @@ const HeaderJournaCaisse = () => {
           to="ajout-entree"
           className="bg-gray-700 hover:bg-gray-200 hover:text-gray-700 text-white font-bold py-2 px-10 rounded"
         >
-          Ajout entree
+          Ajouter recette
         </Link>
       </div>
     </div>
