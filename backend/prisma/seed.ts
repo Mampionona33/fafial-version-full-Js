@@ -177,6 +177,12 @@ async function main() {
         paymentMethodId: mobileMoney.id,
         type: "text",
       },
+      {
+        fieldName: "Montant de la transaction",
+        isRequired: true,
+        paymentMethodId: mobileMoney.id,
+        type: "number",
+      },
     ],
   });
 
@@ -196,6 +202,12 @@ async function main() {
         isRequired: true,
         paymentMethodId: cheque.id,
         type: "text",
+      },
+      {
+        fieldName: "Montant du chèque",
+        isRequired: true,
+        paymentMethodId: cheque.id,
+        type: "number",
       },
     ],
   });
@@ -217,6 +229,12 @@ async function main() {
         paymentMethodId: bankTransfer.id,
         type: "text",
       },
+      {
+        fieldName: "Montant du virement",
+        isRequired: true,
+        paymentMethodId: bankTransfer.id,
+        type: "number",
+      },
     ],
   });
 
@@ -230,6 +248,18 @@ async function main() {
         isRequired: true,
         paymentMethodId: cash.id,
         type: "number",
+      },
+      {
+        fieldName: "Nom de la personne payante",
+        isRequired: true,
+        paymentMethodId: cash.id,
+        type: "text",
+      },
+      {
+        fieldName: "Numéro du reçu",
+        isRequired: true,
+        paymentMethodId: cash.id,
+        type: "text",
       },
     ],
   });
