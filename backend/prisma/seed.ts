@@ -166,22 +166,25 @@ async function main() {
   await client.paymentField.createMany({
     data: [
       {
-        fieldName: "Numéro de l'expéditeur",
+        fieldName: "num_expediteur",
         isRequired: true,
         paymentMethodId: mobileMoney.id,
         type: "text",
+        label: "Numéro de l'expéditeur",
       },
       {
-        fieldName: "Référence de la transaction",
+        label: "Référence de la transaction",
         isRequired: true,
         paymentMethodId: mobileMoney.id,
         type: "text",
+        fieldName: "reference_transaction",
       },
       {
-        fieldName: "Montant de la transaction",
+        label: "Montant de la transaction",
         isRequired: true,
         paymentMethodId: mobileMoney.id,
         type: "number",
+        fieldName: "montant_transaction",
       },
     ],
   });
@@ -192,22 +195,25 @@ async function main() {
   await client.paymentField.createMany({
     data: [
       {
-        fieldName: "Numéro du chèque",
+        label: "Numéro du chèque",
         isRequired: true,
         paymentMethodId: cheque.id,
         type: "text",
+        fieldName: "num_cheque",
       },
       {
-        fieldName: "Nom de la banque",
+        fieldName: "nom_banque",
         isRequired: true,
         paymentMethodId: cheque.id,
         type: "text",
+        label: "Nom de la banque",
       },
       {
-        fieldName: "Montant du chèque",
+        label: "Montant du chèque",
         isRequired: true,
         paymentMethodId: cheque.id,
         type: "number",
+        fieldName: "montant_cheque",
       },
     ],
   });
@@ -218,22 +224,25 @@ async function main() {
   await client.paymentField.createMany({
     data: [
       {
-        fieldName: "Numéro de compte",
+        label: "Numéro de compte",
         isRequired: true,
         paymentMethodId: bankTransfer.id,
         type: "text",
+        fieldName: "num_compte",
       },
       {
-        fieldName: "Référence du virement",
+        label: "Référence du virement",
         isRequired: true,
         paymentMethodId: bankTransfer.id,
         type: "text",
+        fieldName: "reference_virement",
       },
       {
-        fieldName: "Montant du virement",
+        label: "Montant du virement",
         isRequired: true,
         paymentMethodId: bankTransfer.id,
         type: "number",
+        fieldName: "montant_virement",
       },
     ],
   });
@@ -244,22 +253,25 @@ async function main() {
   await client.paymentField.createMany({
     data: [
       {
-        fieldName: "Montant payé",
+        label: "Montant payé",
         isRequired: true,
         paymentMethodId: cash.id,
         type: "number",
+        fieldName: "montant_paye",
       },
       {
-        fieldName: "Nom de la personne payante",
+        label: "Nom de la personne payante",
         isRequired: true,
         paymentMethodId: cash.id,
         type: "text",
+        fieldName: "nom_payant",
       },
       {
-        fieldName: "Numéro du reçu",
+        label: "Numéro du reçu",
         isRequired: true,
         paymentMethodId: cash.id,
         type: "text",
+        fieldName: "num_recu",
       },
     ],
   });

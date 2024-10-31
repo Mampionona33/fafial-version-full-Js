@@ -10,7 +10,7 @@ import { toast } from "react-toastify";
 
 const FormAjoutEntree = () => {
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
-  const { paymentMethodesFields, fetchPaymentFields } =
+  const { paymentMethodesFields, fetchPaymentFields, setPaymentMethodes } =
     usePaymentMethodesFields();
   const { setLoading } = useLoading();
 
@@ -19,6 +19,7 @@ const FormAjoutEntree = () => {
   >([]);
   const { paymentMethodes } = usePaymentMethodes();
 
+  // Fonction pour changer la méthode de paiement
   const handlePaymentMethodeChange = useCallback(
     async (id: string) => {
       setLoading(true);
@@ -37,6 +38,7 @@ const FormAjoutEntree = () => {
     [fetchPaymentFields, setLoading]
   );
 
+  // Effet pour initialiser les options de méthode de paiement et charger les champs par défaut
   useEffect(() => {
     if (paymentMethodes && paymentMethodes.length > 0) {
       const paymentMethodesOptions = SelectOptionAdapter.adapt(
@@ -49,14 +51,21 @@ const FormAjoutEntree = () => {
       if (defaultOption && paymentMethodesFields.length === 0) {
         handlePaymentMethodeChange(defaultOption.value);
       }
-
-      console.log("paymentMethodesFields : ", paymentMethodesFields);
     }
   }, [paymentMethodes, paymentMethodesFields, handlePaymentMethodeChange]);
 
+  // Gestion de la soumission du formulaire
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Données de l'entrée ajoutée :");
+
+    const formData = {
+      date,
+      paymentFields: paymentMethodesFields,
+    };
+
+    // Logique pour soumettre les données
+    console.log("Données de l'entrée ajoutée : ", formData);
+    // Vous pourriez vouloir envoyer formData à une API ou à un autre traitement ici
   };
 
   return (
@@ -64,7 +73,7 @@ const FormAjoutEntree = () => {
       <h2 className="text-2xl font-semibold mb-6 text-center">
         Ajout d'une Entrée
       </h2>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div>
           <AppLabel htmlFor="date">Date</AppLabel>
           <AppInput
@@ -87,6 +96,35 @@ const FormAjoutEntree = () => {
             onChange={(e) => handlePaymentMethodeChange(e)}
           />
         </div>
+
+        {paymentMethodesFields && paymentMethodesFields.length > 0 ? (
+          <div className="flex flex-col gap-4">
+            {paymentMethodesFields.map((field) => (
+              <div key={field.id}>
+                <AppLabel htmlFor={field.id as string}>{field.label}</AppLabel>
+                <AppInput
+                  type={field.type}
+                  id={field.id as string}
+                  name={field.fieldName}
+                  value={(field.value as string) || ""}
+                  onChange={(e) => {
+                    const updatedFields = paymentMethodesFields.map((f) => {
+                      if (f.id === field.id) {
+                        return { ...f, value: e.target.value };
+                      }
+                      return f;
+                    });
+                    setPaymentMethodes(updatedFields);
+                  }}
+                  className="w-full px-3 py-2 border rounded"
+                  required={field.isRequired}
+                />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p>Aucun champ de paiement disponible</p>
+        )}
 
         <button
           type="submit"

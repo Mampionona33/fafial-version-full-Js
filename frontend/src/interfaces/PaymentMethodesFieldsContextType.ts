@@ -11,8 +11,10 @@ export interface PaymentMethodesFieldsContextType {
 
 export interface PaymentMethodesFieldsInterface {
   id: string | undefined | number;
-  fieldName: number;
-  isRequired: string;
+  fieldName: string;
+  isRequired: boolean;
   paymentMethodId: string;
   type: string;
+  label: string;
+  value: number | string | boolean | Date | null;
 }
