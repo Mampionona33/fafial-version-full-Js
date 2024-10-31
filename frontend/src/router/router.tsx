@@ -15,6 +15,7 @@ import FrontDesckDashboard from "../pages/FrontDesck/FrontDesck.Dashboard";
 import StafCalendar from "../pages/Staf/StafCalendar";
 import StafAjoutReservation from "../pages/Staf/StafAjoutReservation";
 import StafDetailsReservation from "../pages/Staf/StafDetailsReservation";
+import JournalCaisse from "../pages/JournalCaisse";
 
 // Créer les routes
 const router = createBrowserRouter(
@@ -47,6 +48,9 @@ const router = createBrowserRouter(
               path="ajout-reservation"
               element={<StafAjoutReservation />}
             />
+            <Route path="journal-des-caisses">
+              <Route path="" element={<JournalCaisse />} />
+            </Route>
           </Route>
         </Route>
 
