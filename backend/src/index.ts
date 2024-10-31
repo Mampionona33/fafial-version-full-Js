@@ -5,6 +5,7 @@ import loginRouter from "./routes/authRoutes";
 import reservationRouter from "./routes/reservationRouters";
 import salleRouter from "./routes/salleRouter";
 import paymentMethodesRouter from "./routes/paymentMethodesRouter";
+import paymentMethodesFieldsRouter from "./routes/paymentMethodesFieldsRouter";
 import http from "http";
 import cors from "cors";
 import path from "path";
@@ -48,6 +49,7 @@ app.use("/api/v1", loginRouter);
 app.use("/api/v1", authenticateToken, reservationRouter);
 app.use("/api/v1", authenticateToken, salleRouter);
 app.use("/api/v1", authenticateToken, paymentMethodesRouter);
+app.use("/api/v1", authenticateToken, paymentMethodesFieldsRouter);
 
 // Error handling middleware
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {

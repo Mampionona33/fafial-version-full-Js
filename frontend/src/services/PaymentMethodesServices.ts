@@ -1,4 +1,4 @@
-import api from "./axiosConfig"; // Importez votre instance api
+import api from "./axiosConfig"; 
 import { BACKEND_URL } from "../constants/appContants";
 import AuthServices from "./AuthServices";
 

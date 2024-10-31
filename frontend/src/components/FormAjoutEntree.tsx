@@ -5,6 +5,7 @@ import AppLabel from "./AppLabel";
 import AppSelect from "./AppSelect";
 import AppInput from "./AppInput";
 import { usePaymentMethodesFields } from "../hooks/usePaymentMethodesFields";
+import PaymentMethodesFieldsService from "../services/PaymentMethodesFieldsService";
 
 const FormAjoutEntree = () => {
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
@@ -15,16 +16,32 @@ const FormAjoutEntree = () => {
   >([]);
   const { paymentMethodes } = usePaymentMethodes();
 
-  console.log(paymentFields);
+  // console.log(paymentFields);
 
   useEffect(() => {
     if (paymentMethodes && paymentMethodes.length > 0) {
+      console.log(paymentMethodes);
+
       const paymentMethodesOptions = SelectOptionAdapter.adapt(
         paymentMethodes
       ) as { label: string; value: string }[];
       setMethodePaiementOptions(paymentMethodesOptions);
     }
   }, [paymentMethodes]);
+
+  const handlePaymentMethodeChange = async (id: string) => {
+    try {
+      const resp =
+        await PaymentMethodesFieldsService.getFiledByPaymentsMethodesId(id);
+
+      if (resp.status === 200) {
+        console.log(resp.data);
+      }
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,6 +73,7 @@ const FormAjoutEntree = () => {
             id="methodePaiement"
             name="methodePaiement"
             options={methodePaiementOptions}
+            onChange={(e) => handlePaymentMethodeChange(e)}
           />
         </div>
 
