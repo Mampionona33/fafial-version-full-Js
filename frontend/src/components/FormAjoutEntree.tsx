@@ -1,47 +1,58 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { usePaymentMethodes } from "../hooks/usePaymentMethodes";
 import SelectOptionAdapter from "../utils/SelectOptionAdapter";
 import AppLabel from "./AppLabel";
 import AppSelect from "./AppSelect";
 import AppInput from "./AppInput";
 import { usePaymentMethodesFields } from "../hooks/usePaymentMethodesFields";
-import PaymentMethodesFieldsService from "../services/PaymentMethodesFieldsService";
+import { useLoading } from "../hooks/useLoading";
+import { toast } from "react-toastify";
 
 const FormAjoutEntree = () => {
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
-  const { paymentFields } = usePaymentMethodesFields();
+  const { paymentMethodesFields, fetchPaymentFields } =
+    usePaymentMethodesFields();
+  const { setLoading } = useLoading();
 
   const [methodePaiementOptions, setMethodePaiementOptions] = useState<
-    { label: string; value: string }[] | []
+    { label: string; value: string }[]
   >([]);
   const { paymentMethodes } = usePaymentMethodes();
 
-  // console.log(paymentFields);
+  const handlePaymentMethodeChange = useCallback(
+    async (id: string) => {
+      setLoading(true);
+      try {
+        await fetchPaymentFields(id);
+      } catch (error) {
+        if (error instanceof Error) {
+          toast.error(
+            error.message || "Erreur lors du chargement des champs de paiement"
+          );
+        }
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchPaymentFields, setLoading]
+  );
 
   useEffect(() => {
     if (paymentMethodes && paymentMethodes.length > 0) {
-      console.log(paymentMethodes);
-
       const paymentMethodesOptions = SelectOptionAdapter.adapt(
         paymentMethodes
       ) as { label: string; value: string }[];
       setMethodePaiementOptions(paymentMethodesOptions);
-    }
-  }, [paymentMethodes]);
 
-  const handlePaymentMethodeChange = async (id: string) => {
-    try {
-      const resp =
-        await PaymentMethodesFieldsService.getFiledByPaymentsMethodesId(id);
-
-      if (resp.status === 200) {
-        console.log(resp.data);
+      // Appel initial de fetchPaymentFields si une option par défaut existe
+      const defaultOption = paymentMethodesOptions[0];
+      if (defaultOption && paymentMethodesFields.length === 0) {
+        handlePaymentMethodeChange(defaultOption.value);
       }
-    } catch (error) {
-      console.error(error);
-      throw error;
+
+      console.log("paymentMethodesFields : ", paymentMethodesFields);
     }
-  };
+  }, [paymentMethodes, paymentMethodesFields, handlePaymentMethodeChange]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

@@ -2,11 +2,11 @@ import { useContext } from "react";
 import { PaymentMethodesFieldsContext } from "../contexts/PaymentMethodesFieldsContext";
 
 export const usePaymentMethodesFields = () => {
-  const paymentFields = useContext(PaymentMethodesFieldsContext);
-  if (!paymentFields) {
+  const context = useContext(PaymentMethodesFieldsContext);
+  if (!context) {
     throw new Error(
-      "usePaymentMethodesFields must be used within an PaymentMethodesProvider"
+      "usePaymentMethodesFields must be used within a PaymentMethodesProvider"
     );
   }
-  return { paymentFields };
+  return context;
 };

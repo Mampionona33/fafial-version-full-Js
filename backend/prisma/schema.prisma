@@ -142,6 +142,7 @@ model PaymentField {
   fieldName         String // Nom du champ (ex : numéro de l'expéditeur, référence)
   isRequired        Boolean // Indique si le champ est obligatoire
   paymentMethodId   String
+  type              String // Type de champ (ex: texte, nombre, date)
   paymentMethod     PaymentMethod       @relation(fields: [paymentMethodId], references: [id])
   PaymentFieldValue PaymentFieldValue[]
 }

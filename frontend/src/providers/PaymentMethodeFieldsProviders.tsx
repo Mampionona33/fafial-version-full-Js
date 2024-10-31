@@ -1,25 +1,52 @@
-// PaymentMethodeFieldsProviders.tsx
-import React from "react";
+import React, { useState } from "react";
 import { PaymentMethodesFieldsContext } from "../contexts/PaymentMethodesFieldsContext";
 import {
   PaymentMethodesFieldsContextType,
   PaymentMethodesFieldsInterface,
 } from "../interfaces/PaymentMethodesFieldsContextType";
+import PaymentMethodesFieldsService from "../services/PaymentMethodesFieldsService";
+import { useLoading } from "../hooks/useLoading";
 
 export const PaymentMethodeFieldsProviders: React.FC<{
   children: React.ReactNode;
 }> = ({ children }) => {
-  const [paymentMethodesFields, setPaymentMethodesFields] =
-    React.useState<PaymentMethodesFieldsInterface | null>(null); // Initialisez avec null ou une valeur par défaut
+  const [paymentMethodesFields, setPaymentMethodesFields] = useState<
+    PaymentMethodesFieldsInterface[]
+  >([]);
 
-  // Vérifiez que paymentMethodesFields n'est pas null avant de passer au contexte
+  const { loading, setLoading } = useLoading();
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchPaymentFields = async (id: string) => {
+    setLoading(true);
+    try {
+      const response =
+        await PaymentMethodesFieldsService.getFiledByPaymentsMethodesId(id);
+      if (
+        response.status === 200 &&
+        Array.isArray(response.data.paymentFields)
+      ) {
+        setPaymentMethodesFields(response.data.paymentFields);
+      } else {
+        throw new Error("Invalid data format");
+      }
+    } catch (error) {
+      console.error(
+        "Erreur lors du chargement des champs de méthode de paiement :",
+        error
+      );
+      setError("Erreur de chargement");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const contextValue: PaymentMethodesFieldsContextType = {
-    paymentMethodes: paymentMethodesFields
-      ? [paymentMethodesFields.paymentMethod]
-      : [],
-    loading: false,
-    error: null,
+    paymentMethodesFields: paymentMethodesFields,
+    loading,
+    error,
     setPaymentMethodes: setPaymentMethodesFields,
+    fetchPaymentFields,
   };
 
   return (

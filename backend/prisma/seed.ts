@@ -169,11 +169,13 @@ async function main() {
         fieldName: "Numéro de l'expéditeur",
         isRequired: true,
         paymentMethodId: mobileMoney.id,
+        type: "text",
       },
       {
         fieldName: "Référence de la transaction",
         isRequired: true,
         paymentMethodId: mobileMoney.id,
+        type: "text",
       },
     ],
   });
@@ -187,11 +189,13 @@ async function main() {
         fieldName: "Numéro du chèque",
         isRequired: true,
         paymentMethodId: cheque.id,
+        type: "text",
       },
       {
         fieldName: "Nom de la banque",
         isRequired: true,
         paymentMethodId: cheque.id,
+        type: "text",
       },
     ],
   });
@@ -205,11 +209,13 @@ async function main() {
         fieldName: "Numéro de compte",
         isRequired: true,
         paymentMethodId: bankTransfer.id,
+        type: "text",
       },
       {
         fieldName: "Référence du virement",
         isRequired: true,
         paymentMethodId: bankTransfer.id,
+        type: "text",
       },
     ],
   });
@@ -223,6 +229,7 @@ async function main() {
         fieldName: "Montant payé",
         isRequired: true,
         paymentMethodId: cash.id,
+        type: "number",
       },
     ],
   });
