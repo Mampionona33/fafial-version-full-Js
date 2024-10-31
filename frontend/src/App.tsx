@@ -12,6 +12,7 @@ import { useLoading } from "./hooks/useLoading";
 import { SalleProvider } from "./providers/SalleProvider";
 import { PaymentMethodesProvider } from "./providers/PaymentMethodesProvider";
 import { ReservationProvider } from "./providers/ReservationProvider";
+import { PaymentMethodeFieldsProviders } from "./providers/PaymentMethodeFieldsProviders";
 
 const App = () => {
   const { loading: authLoading } = useAuth();
@@ -23,15 +24,17 @@ const App = () => {
         <ReservationProvider>
           <PrimeReactProvider>
             {authLoading && <IndeterminateProgressBar />}
-            <div className="bg-gradient-to-t from-gradient-start to-gradient-end h-full w-full">
-              {/* Header, navbar, or other shared components */}
-              <NavBar />
-              <div className="min-h-screen pt-14">
-                {globalLoading && <IndeterminateProgressBar />}
-                {/* Ajuster en fonction de la hauteur de la NavBar */}
-                <Outlet />
+            <PaymentMethodeFieldsProviders>
+              <div className="bg-gradient-to-t from-gradient-start to-gradient-end h-full w-full">
+                {/* Header, navbar, or other shared components */}
+                <NavBar />
+                <div className="min-h-screen pt-14">
+                  {globalLoading && <IndeterminateProgressBar />}
+                  {/* Ajuster en fonction de la hauteur de la NavBar */}
+                  <Outlet />
+                </div>
               </div>
-            </div>
+            </PaymentMethodeFieldsProviders>
           </PrimeReactProvider>
         </ReservationProvider>
       </PaymentMethodesProvider>

@@ -1,30 +1,34 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { usePaymentMethodes } from "../hooks/usePaymentMethodes";
+import SelectOptionAdapter from "../utils/SelectOptionAdapter";
+import AppLabel from "./AppLabel";
+import AppSelect from "./AppSelect";
+import AppInput from "./AppInput";
+import { usePaymentMethodesFields } from "../hooks/usePaymentMethodesFields";
 
 const FormAjoutEntree = () => {
-  const [formData, setFormData] = useState({
-    date: "",
-    montant: "",
-    methodePaiement: "",
-    quiAPaye: "",
-    description: "",
-  });
+  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
+  const { paymentFields } = usePaymentMethodesFields();
 
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+  const [methodePaiementOptions, setMethodePaiementOptions] = useState<
+    { label: string; value: string }[] | []
+  >([]);
+  const { paymentMethodes } = usePaymentMethodes();
+
+  console.log(paymentFields);
+
+  useEffect(() => {
+    if (paymentMethodes && paymentMethodes.length > 0) {
+      const paymentMethodesOptions = SelectOptionAdapter.adapt(
+        paymentMethodes
+      ) as { label: string; value: string }[];
+      setMethodePaiementOptions(paymentMethodesOptions);
+    }
+  }, [paymentMethodes]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Logique d'enregistrement de l'entrée
-    console.log("Données de l'entrée ajoutée :", formData);
+    console.log("Données de l'entrée ajoutée :");
   };
 
   return (
@@ -33,95 +37,25 @@ const FormAjoutEntree = () => {
         Ajout d'une Entrée
       </h2>
       <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label className="block text-gray-700 font-bold mb-2" htmlFor="date">
-            Date
-          </label>
-          <input
+        <div>
+          <AppLabel htmlFor="date">Date</AppLabel>
+          <AppInput
             type="date"
             id="date"
             name="date"
-            value={formData.date}
-            onChange={handleChange}
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
             className="w-full px-3 py-2 border rounded"
             required
           />
         </div>
 
-        <div className="mb-4">
-          <label
-            className="block text-gray-700 font-bold mb-2"
-            htmlFor="montant"
-          >
-            Montant (€)
-          </label>
-          <input
-            type="number"
-            id="montant"
-            name="montant"
-            value={formData.montant}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border rounded"
-            required
-          />
-        </div>
-
-        <div className="mb-4">
-          <label
-            className="block text-gray-700 font-bold mb-2"
-            htmlFor="methodePaiement"
-          >
-            Méthode de Paiement
-          </label>
-          <select
+        <div>
+          <AppLabel htmlFor="methodePaiement">Méthode de paiement</AppLabel>
+          <AppSelect
             id="methodePaiement"
             name="methodePaiement"
-            value={formData.methodePaiement}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border rounded"
-            required
-          >
-            <option value="">Sélectionner la méthode de paiement</option>
-            <option value="carte_credit">Carte de Crédit</option>
-            <option value="especes">Espèces</option>
-            <option value="virement">Virement</option>
-            <option value="cheque">Chèque</option>
-          </select>
-        </div>
-
-        <div className="mb-4">
-          <label
-            className="block text-gray-700 font-bold mb-2"
-            htmlFor="quiAPaye"
-          >
-            Qui a payé ?
-          </label>
-          <input
-            type="text"
-            id="quiAPaye"
-            name="quiAPaye"
-            value={formData.quiAPaye}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border rounded"
-            placeholder="Nom de la personne ou de l'entité"
-            required
-          />
-        </div>
-
-        <div className="mb-4">
-          <label
-            className="block text-gray-700 font-bold mb-2"
-            htmlFor="description"
-          >
-            Description
-          </label>
-          <textarea
-            id="description"
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border rounded"
-            placeholder="Détails supplémentaires sur l'entrée"
+            options={methodePaiementOptions}
           />
         </div>
 

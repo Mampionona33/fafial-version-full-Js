@@ -3,6 +3,7 @@ import React from "react";
 interface AppSelectProps {
   options?: { value: string; label: string }[];
   value?: string;
+  name?: string;
   onChange?: (value: string) => void;
   id?: string;
 }
@@ -11,6 +12,7 @@ const AppSelect: React.FC<AppSelectProps> = ({
   options = [],
   value,
   onChange,
+  name,
   id,
 }) => {
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -24,6 +26,7 @@ const AppSelect: React.FC<AppSelectProps> = ({
       id={id}
       value={value} // Manage default value here
       onChange={handleChange}
+      name={name}
       className="px-2 text-sm mt-1 block w-full py-1 bg-transparent border-b-2 border-gray-300 focus:outline-none focus:border-gray-700 transition-all duration-100"
     >
       <option value="" disabled>
