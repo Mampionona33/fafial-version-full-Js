@@ -7,15 +7,11 @@ class RecetteService {
 
   public static async getRecettesReferences(): Promise<AxiosResponse> {
     try {
-      if (this.accessToken === null) {
-        throw new Error("Token is missing");
-      }
-      const response = await api.get("/recettes/references", {
+      return await api.get("/recettes/references", {
         headers: {
           Authorization: `Bearer ${this.accessToken}`,
         },
       });
-      return response
     } catch (error) {
       console.error("Error fetching recettes:", error);
       throw error;

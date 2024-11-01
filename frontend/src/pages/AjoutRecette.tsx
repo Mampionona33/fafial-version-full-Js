@@ -3,7 +3,7 @@ import FormAjoutRecette from "../components/FormAjoutRecette";
 const AjoutEntree = () => {
   return (
     <div>
-      <FormAjoutRecette />
+      <FormAjoutRecette/>
     </div>
   );
 };

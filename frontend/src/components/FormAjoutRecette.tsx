@@ -1,91 +1,30 @@
-import React, {useState, useEffect, useCallback} from "react";
-import {usePaymentMethodes} from "../hooks/usePaymentMethodes";
-import SelectOptionAdapter from "../utils/SelectOptionAdapter";
+import React, {useEffect} from "react";
 import AppLabel from "./AppLabel";
 import AppSelect from "./AppSelect";
 import AppInput from "./AppInput";
-import {usePaymentMethodesFields} from "../hooks/usePaymentMethodesFields";
-import {useLoading} from "../hooks/useLoading";
-import {toast} from "react-toastify";
 import AppTextarea from "./AppTextarea";
 import RecetteService from "../services/RecetteService.ts";
+import {usePaymentMethodes} from "../hooks/usePaymentMethodes.tsx";
+import SelectOptionAdapter from "../utils/SelectOptionAdapter.ts";
+import {useLoading} from "../hooks/useLoading.tsx";
+import PaymentMethodesFieldsService from "../services/PaymentMethodesFieldsService.ts";
+import {toast} from "react-toastify";
+import {AxiosError} from "axios";
+import {PaymentMethodesFieldsInterface} from "../interfaces/PaymentMethodesFieldsContextType.ts";
 
 const FormAjoutRecette = () => {
-  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
-  const {paymentMethodesFields, fetchPaymentFields, setPaymentMethodes} =
-    usePaymentMethodesFields();
-  const {setLoading} = useLoading();
-  const [personnePayeur, setPersonnePayeur] = useState("");
-  const [reference, setReference] = useState<string | null>(null);
-
-  const [methodePaiementOptions, setMethodePaiementOptions] = useState<
-    { label: string; value: string }[]
-  >([]);
+  const [reference, setReference] = React.useState<string>("");
+  const [localPaymentMethodes, setLocalPaymentMethodes] = React.useState<{ label: string, value: string }[]>([]);
+  const [paymentMethodesFields, setPaymentMethodesFields] = React.useState<PaymentMethodesFieldsInterface[]>([]);
   const {paymentMethodes} = usePaymentMethodes();
+  const {setLoading} = useLoading()
 
-  // Fonction pour changer la méthode de paiement
-  const handlePaymentMethodeChange = useCallback(
-    async (id: string) => {
-      setLoading(true);
-      try {
-        await fetchPaymentFields(id);
-      } catch (error) {
-        if (error instanceof Error) {
-          toast.error(
-            error.message || "Erreur lors du chargement des champs de paiement"
-          );
-        }
-      } finally {
-        setLoading(false);
-      }
-    },
-    [fetchPaymentFields, setLoading]
-  );
-
-  // Effet pour initialiser les options de méthode de paiement et charger les champs par défaut
-  useEffect(() => {
-    if (paymentMethodes && paymentMethodes.length > 0) {
-      const paymentMethodesOptions = SelectOptionAdapter.adapt(
-        paymentMethodes
-      ) as { label: string; value: string }[];
-      setMethodePaiementOptions(paymentMethodesOptions);
-
-      // Appel initial de fetchPaymentFields si une option par défaut existe
-      const defaultOption = paymentMethodesOptions[0];
-      if (defaultOption && paymentMethodesFields.length === 0) {
-        handlePaymentMethodeChange(defaultOption.value);
-      }
-    }
-    const fetchReference = async (): Promise<void> => {
-      try {
-        const response = await RecetteService.getRecettesReferences();
-        console.log("response", response);
-        if (response.status === 200) {
-          setReference(response.data.reference);
-        }
-
-      } catch (error) {
-        if (error instanceof Error) {
-          toast.error(
-            error.message || "Erreur lors du chargement des champs de paiement"
-          );
-        }
-      }
-    }
-    console.log("test", reference);
-    if (reference === null) {
-      console.log("fetch reference");
-      fetchReference()
-    }
-
-  }, [paymentMethodes, paymentMethodesFields, handlePaymentMethodeChange, reference]);
 
   // Gestion de la soumission du formulaire
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     const formData = {
-      date,
       paymentFields: paymentMethodesFields,
     };
 
@@ -93,6 +32,59 @@ const FormAjoutRecette = () => {
     console.log("Données de l'entrée ajoutée : ", formData);
     // Vous pourriez vouloir envoyer formData à une API ou à un autre traitement ici
   };
+
+  const handlePaymentMehtodeChange = (paymentMethodeId: string) => {
+    PaymentMethodesFieldsService.getFiledByPaymentsMethodsId(paymentMethodeId).then((resp) => {
+      console.log(resp)
+      const {status, data} = resp
+      if (status === 200 && data.paymentFields) {
+        setPaymentMethodesFields(data.paymentFields)
+      }
+    }).catch((error) => {
+      if (error instanceof AxiosError) {
+        toast.error("error while fetching payment method fields")
+      }
+    })
+  };
+
+  useEffect(() => {
+    const fetchRecetteRef = async () => {
+      try {
+        const response = await RecetteService.getRecettesReferences();
+        if (response.status === 200) {
+          return response.data;
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    if (reference === "") {
+      fetchRecetteRef().then((resp) => {
+        setReference(resp.reference)
+      });
+    }
+
+    if (paymentMethodes) {
+      setLocalPaymentMethodes(SelectOptionAdapter.adapt(paymentMethodes))
+      if (paymentMethodes.length > 0) {
+        const defaultPaymentMethod = paymentMethodes[0]
+        setLoading(true)
+        PaymentMethodesFieldsService.getFiledByPaymentsMethodsId(defaultPaymentMethod.id).then((resp) => {
+          const {paymentFields} = resp.data;
+          if (paymentFields) {
+            setPaymentMethodesFields(paymentFields)
+          }
+        }).catch((error) => {
+          console.error(error)
+          toast.error("error while fetching payment method fields")
+        }).finally(
+          () => setLoading(false)
+        )
+      }
+    }
+
+  }, [reference, paymentMethodes, setLoading]);
 
   return (
     <div className="max-w-md mx-auto mt-8 p-6 bg-white rounded shadow-md">
@@ -104,10 +96,9 @@ const FormAjoutRecette = () => {
         <AppInput
           type="text"
           id="reference"
-          value={reference || ""}
           disabled
-          onChange={(e) => setReference(e.target.value)}
           required
+          value={reference}
         />
 
         <div>
@@ -115,15 +106,14 @@ const FormAjoutRecette = () => {
           <AppInput
             type="text"
             id="personnePayeur"
-            value={personnePayeur}
-            onChange={(e) => setPersonnePayeur(e.target.value)}
             required
+            name="personnePayeur"
           />
         </div>
 
         <div>
           <AppLabel htmlFor="numeroTelephone">
-            Numero telephone du payeur
+            Numéro telephone du payeur
           </AppLabel>
           <AppInput type="tel" id="numeroTelephone" required/>
         </div>
@@ -134,8 +124,6 @@ const FormAjoutRecette = () => {
             type="date"
             id="date"
             name="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
             required
           />
         </div>
@@ -161,8 +149,8 @@ const FormAjoutRecette = () => {
           <AppSelect
             id="methodePaiement"
             name="methodePaiement"
-            options={methodePaiementOptions}
-            onChange={(e) => handlePaymentMethodeChange(e)}
+            options={localPaymentMethodes}
+            onChange={handlePaymentMehtodeChange}
           />
         </div>
 
@@ -183,7 +171,7 @@ const FormAjoutRecette = () => {
                       }
                       return f;
                     });
-                    setPaymentMethodes(updatedFields);
+                    setPaymentMethodesFields(updatedFields);
                   }}
                   required={field.isRequired}
                 />
