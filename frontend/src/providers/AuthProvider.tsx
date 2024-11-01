@@ -1,21 +1,21 @@
-import React, { useState, useEffect, ReactNode, useCallback } from "react";
+import React, {useState, useEffect, ReactNode, useCallback} from "react";
 import Cookies from "js-cookie";
-import { AuthContext } from "../contexts/AuthContext";
-import { LoginData } from "../interfaces/LoginDataInterface";
+import {AuthContext} from "../contexts/AuthContext";
+import {LoginData} from "../interfaces/LoginDataInterface";
 import AuthServices from "../services/AuthServices";
-import { AxiosError } from "axios";
+import {AxiosError} from "axios";
 import UserServices from "../services/UserServices";
-import { UserInterface } from "../interfaces/userInterface";
+import {UserInterface} from "../interfaces/userInterface";
 import {
   ACCESS_TOKEN_NAME,
   REFRESH_TOKEN_NAME,
   EXPIRATION_BUFFER,
 } from "../constants/appContants";
-import { jwtDecode } from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({
-  children,
-}) => {
+                                                                  children,
+                                                                }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<UserInterface | null>(null);
   const [loading, setLoading] = useState(false);
@@ -43,7 +43,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     try {
       const resp = await AuthServices.refreshToken();
       if (resp.status === 200) {
-        const { accessToken } = resp.data;
+        const {accessToken} = resp.data;
         localStorage.setItem(ACCESS_TOKEN_NAME, accessToken); // Mettre à jour le token
         return accessToken; // Retourner le nouveau token
       } else if (resp.status === 401) {
@@ -121,7 +121,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       const response = await AuthServices.login(email, password);
 
       if (response.status === 200) {
-        const { accessToken, refreshToken } = response.data;
+        const {accessToken, refreshToken} = response.data;
 
         // Sauvegarder le token d'accès et le refresh token
         Cookies.set(REFRESH_TOKEN_NAME, refreshToken, {
@@ -172,6 +172,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       }
     } catch (error) {
       console.error("Logout failed:", error);
+      AuthServices.removeAccessToken();
+      window.location.href = "/login";
       throw error;
     }
   };
