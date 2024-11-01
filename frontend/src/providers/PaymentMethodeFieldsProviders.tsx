@@ -6,6 +6,7 @@ import {
 } from "../interfaces/PaymentMethodesFieldsContextType";
 import PaymentMethodesFieldsService from "../services/PaymentMethodesFieldsService";
 import { useLoading } from "../hooks/useLoading";
+import AuthServices from "../services/AuthServices.ts";
 
 export const PaymentMethodeFieldsProviders: React.FC<{
   children: React.ReactNode;
@@ -19,7 +20,9 @@ export const PaymentMethodeFieldsProviders: React.FC<{
 
   const fetchPaymentFields = async (id: string) => {
     setLoading(true);
+  const accesToken:string|null = AuthServices.getTokenAccess();
     try {
+      if(accesToken){
       const response =
         await PaymentMethodesFieldsService.getFiledByPaymentsMethodesId(id);
       if (
@@ -30,6 +33,8 @@ export const PaymentMethodeFieldsProviders: React.FC<{
       } else {
         throw new Error("Invalid data format");
       }
+      }
+
     } catch (error) {
       console.error(
         "Erreur lors du chargement des champs de méthode de paiement :",

@@ -1,25 +1,27 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { usePaymentMethodes } from "../hooks/usePaymentMethodes";
+import React, {useState, useEffect, useCallback} from "react";
+import {usePaymentMethodes} from "../hooks/usePaymentMethodes";
 import SelectOptionAdapter from "../utils/SelectOptionAdapter";
 import AppLabel from "./AppLabel";
 import AppSelect from "./AppSelect";
 import AppInput from "./AppInput";
-import { usePaymentMethodesFields } from "../hooks/usePaymentMethodesFields";
-import { useLoading } from "../hooks/useLoading";
-import { toast } from "react-toastify";
+import {usePaymentMethodesFields} from "../hooks/usePaymentMethodesFields";
+import {useLoading} from "../hooks/useLoading";
+import {toast} from "react-toastify";
 import AppTextarea from "./AppTextarea";
+import RecetteService from "../services/RecetteService.ts";
 
 const FormAjoutRecette = () => {
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
-  const { paymentMethodesFields, fetchPaymentFields, setPaymentMethodes } =
+  const {paymentMethodesFields, fetchPaymentFields, setPaymentMethodes} =
     usePaymentMethodesFields();
-  const { setLoading } = useLoading();
+  const {setLoading} = useLoading();
   const [personnePayeur, setPersonnePayeur] = useState("");
+  const [reference, setReference] = useState<string | null>(null);
 
   const [methodePaiementOptions, setMethodePaiementOptions] = useState<
     { label: string; value: string }[]
   >([]);
-  const { paymentMethodes } = usePaymentMethodes();
+  const {paymentMethodes} = usePaymentMethodes();
 
   // Fonction pour changer la méthode de paiement
   const handlePaymentMethodeChange = useCallback(
@@ -54,7 +56,29 @@ const FormAjoutRecette = () => {
         handlePaymentMethodeChange(defaultOption.value);
       }
     }
-  }, [paymentMethodes, paymentMethodesFields, handlePaymentMethodeChange]);
+    const fetchReference = async (): Promise<void> => {
+      try {
+        const response = await RecetteService.getRecettesReferences();
+        console.log("response", response);
+        if (response.status === 200) {
+          setReference(response.data.reference);
+        }
+
+      } catch (error) {
+        if (error instanceof Error) {
+          toast.error(
+            error.message || "Erreur lors du chargement des champs de paiement"
+          );
+        }
+      }
+    }
+    console.log("test", reference);
+    if (reference === null) {
+      console.log("fetch reference");
+      fetchReference()
+    }
+
+  }, [paymentMethodes, paymentMethodesFields, handlePaymentMethodeChange, reference]);
 
   // Gestion de la soumission du formulaire
   const handleSubmit = (e: React.FormEvent) => {
@@ -76,6 +100,16 @@ const FormAjoutRecette = () => {
         Ajouter une recette
       </h2>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <AppLabel htmlFor="reference">Reference</AppLabel>
+        <AppInput
+          type="text"
+          id="reference"
+          value={reference || ""}
+          disabled
+          onChange={(e) => setReference(e.target.value)}
+          required
+        />
+
         <div>
           <AppLabel htmlFor="personnePayeur">Nom et prenom du payeur</AppLabel>
           <AppInput
@@ -91,7 +125,7 @@ const FormAjoutRecette = () => {
           <AppLabel htmlFor="numeroTelephone">
             Numero telephone du payeur
           </AppLabel>
-          <AppInput type="tel" id="numeroTelephone" required />
+          <AppInput type="tel" id="numeroTelephone" required/>
         </div>
 
         <div>
@@ -108,7 +142,7 @@ const FormAjoutRecette = () => {
 
         <div>
           <AppLabel htmlFor="description">Description</AppLabel>
-          <AppTextarea id="description" name="description" rows={4} />
+          <AppTextarea id="description" name="description" rows={4}/>
         </div>
 
         <div>
@@ -145,7 +179,7 @@ const FormAjoutRecette = () => {
                   onChange={(e) => {
                     const updatedFields = paymentMethodesFields.map((f) => {
                       if (f.id === field.id) {
-                        return { ...f, value: e.target.value };
+                        return {...f, value: e.target.value};
                       }
                       return f;
                     });
