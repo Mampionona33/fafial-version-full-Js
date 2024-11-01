@@ -111,7 +111,8 @@ model Recette {
   reference      String   @unique
   description    String?
   personnePayeur String
-  moyenPaiement  String
+  contactPayeur  String
+  paymentMethode String
   date           DateTime @default(now())
   createdAt      DateTime @default(now())
   updatedAt      DateTime @default(now())

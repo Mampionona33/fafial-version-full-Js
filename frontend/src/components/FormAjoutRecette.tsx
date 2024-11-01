@@ -24,14 +24,27 @@ const FormAjoutRecette = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Créer un objet pour stocker les données du formulaire
     const formData = {
-      paymentFields: paymentMethodesFields,
+      reference,
+      personnePayeur: (e.target as HTMLFormElement).personnePayeur.value,
+      contactPayeur: (e.target as HTMLFormElement).contactPayeur.value,
+      date: (e.target as HTMLFormElement).date.value,
+      description: (e.target as HTMLFormElement).description.value,
+      montant: (e.target as HTMLFormElement).montant.value,
+      paymentMethode: (e.target as HTMLFormElement).paymentMethode.value,
+      // Ajoute les champs supplémentaires si nécessaire
+      paymentFields: paymentMethodesFields.map(field => ({
+        fieldName: field.fieldName,
+        value: field.value,
+      })),
     };
 
     // Logique pour soumettre les données
     console.log("Données de l'entrée ajoutée : ", formData);
     // Vous pourriez vouloir envoyer formData à une API ou à un autre traitement ici
   };
+
 
   const handlePaymentMehtodeChange = (paymentMethodeId: string) => {
     PaymentMethodesFieldsService.getFiledByPaymentsMethodsId(paymentMethodeId).then((resp) => {
@@ -112,10 +125,10 @@ const FormAjoutRecette = () => {
         </div>
 
         <div>
-          <AppLabel htmlFor="numeroTelephone">
+          <AppLabel htmlFor="contactPayeur">
             Numéro telephone du payeur
           </AppLabel>
-          <AppInput type="tel" id="numeroTelephone" required/>
+          <AppInput type="tel" id="contactPayeur" required/>
         </div>
 
         <div>
@@ -145,10 +158,10 @@ const FormAjoutRecette = () => {
         </div>
 
         <div>
-          <AppLabel htmlFor="methodePaiement">Méthode de paiement</AppLabel>
+          <AppLabel htmlFor="paymentMethode">Méthode de paiement</AppLabel>
           <AppSelect
-            id="methodePaiement"
-            name="methodePaiement"
+            id="paymentMethode"
+            name="paymentMethode"
             options={localPaymentMethodes}
             onChange={handlePaymentMehtodeChange}
           />
