@@ -1,0 +1,178 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Role {
+  id          Int          @id @default(autoincrement())
+  name        String       @unique
+  permissions Permission[]
+  users       User[]       @relation("RoleUsers")
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  status      Boolean      @default(true)
+}
+
+model Permission {
+  id       Int    @id @default(autoincrement())
+  action   String
+  resource String
+  roleId   Int
+  role     Role   @relation(fields: [roleId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  status    Boolean  @default(true)
+}
+
+model User {
+  id       Int    @id @default(autoincrement())
+  email    String @unique
+  password String
+  name     String
+  lastName String
+
+  roles     Role[]   @relation("RoleUsers")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  status    Boolean  @default(true)
+
+  createdReservations Reservation[]  @relation("CreatedByUser")
+  updatedReservations Reservation[]  @relation("UpdatedByUser")
+  RefreshToken        RefreshToken[]
+}
+
+model Salle {
+  id           String        @id @default(cuid())
+  name         String
+  capacite     Int
+  montantLoyer Float
+  reservations Reservation[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Reservation {
+  id               String    @id @default(cuid())
+  reference        String    @unique
+  nomOrganisation  String
+  nomPrenomContact String
+  email            String
+  telephone        String
+  nombrePersonnes  Int
+  dateDebut        DateTime
+  heureDebut       DateTime
+  dateFin          DateTime
+  heureFin         DateTime
+  salleId          String
+  salle            Salle     @relation(fields: [salleId], references: [id])
+  acomptes         Acompte[]
+  activite         String?
+  remarques        String?
+
+  statut           String @default("OUVERT") // Possible values: OUVERT, ANNULE
+  validationStatus String @default("EN_ATTENTE") // Possible values: EN_ATTENTE, VALIDE, REFUSE
+
+  utilisateurType String // Staff ou FrontDesk pour identifier qui a créé/modifié
+  createdBy       User   @relation("CreatedByUser", fields: [createdById], references: [id])
+  createdById     Int
+
+  updatedBy   User? @relation("UpdatedByUser", fields: [updatedById], references: [id])
+  updatedById Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Acompte {
+  id            String      @id @default(cuid())
+  montant       Float
+  datePrevue    DateTime
+  modePaiement  String
+  reservationId String
+  reservation   Reservation @relation(fields: [reservationId], references: [id])
+  statut        String      @default("EN_ATTENTE") // Possible values: EN_ATTENTE, PAYE
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model Recette {
+  id             String   @id @default(cuid())
+  montant        Float
+  reference      String   @unique
+  description    String?
+  personnePayeur String
+  moyenPaiement  String
+  date           DateTime @default(now())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @default(now())
+}
+
+model Depense {
+  id                String   @id @default(cuid())
+  montant           Float
+  description       String?
+  personneRecepteur String
+  moyenPaiement     String
+  justification     String?
+  date              DateTime @default(now())
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model PaymentMethod {
+  id            String         @id @default(cuid())
+  name          String
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @default(now())
+  paymentFields PaymentField[] // Relation vers les champs requis
+  Payment       Payment[]
+}
+
+model PaymentField {
+  id                String              @id @default(cuid())
+  fieldName         String // Nom du champ (ex : numéro de l'expéditeur, référence)
+  isRequired        Boolean // Indique si le champ est obligatoire
+  paymentMethodId   String
+  label             String // Label du champ
+  type              String // Type de champ (ex: texte, nombre, date)
+  paymentMethod     PaymentMethod       @relation(fields: [paymentMethodId], references: [id])
+  PaymentFieldValue PaymentFieldValue[]
+}
+
+model Payment {
+  id            String              @id @default(cuid())
+  amount        Float // Montant de la transaction
+  methodId      String // ID de la méthode de paiement utilisée
+  paymentMethod PaymentMethod       @relation(fields: [methodId], references: [id])
+  fields        PaymentFieldValue[] // Relation vers les valeurs des champs
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @default(now())
+}
+
+model PaymentFieldValue {
+  id             String       @id @default(cuid())
+  value          String // Valeur du champ (ex: numéro de transaction, numéro de chèque)
+  paymentId      String
+  payment        Payment      @relation(fields: [paymentId], references: [id])
+  paymentFieldId String
+  paymentField   PaymentField @relation(fields: [paymentFieldId], references: [id])
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
