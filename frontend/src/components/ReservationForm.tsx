@@ -2,8 +2,8 @@ import AppLabel from "./AppLabel";
 import AppInput from "./AppInput";
 import AppTextarea from "./AppTextarea";
 import AppSelect from "./AppSelect";
-import React, { useReducer } from "react";
-import { v4 as uuidv4 } from "uuid";
+import React, {useReducer} from "react";
+import {v4 as uuidv4} from "uuid";
 import ReservationService from "../services/ReservationService";
 import {
   PayementStatut,
@@ -14,30 +14,30 @@ import {
   ReservationFormulaireInterface,
   Acompte,
 } from "../interfaces/ReservationInterface";
-import { nanoid } from "nanoid";
-import { useAuth } from "../hooks/useAuth";
-import { useSalles } from "../hooks/useSalles";
+import {nanoid} from "nanoid";
+import {useAuth} from "../hooks/useAuth";
+import {useSalles} from "../hooks/useSalles";
 import SelectOptionAdapter from "../utils/SelectOptionAdapter";
-import { toast, ToastContainer } from "react-toastify";
-import { usePaymentMethodes } from "../hooks/usePaymentMethodes";
+import {toast, ToastContainer} from "react-toastify";
+import {usePaymentMethodes} from "../hooks/usePaymentMethodes";
 import reservationReducer, {
   initialState,
 } from "../reducers/reservationReducer";
-import { resetReservation, setReservation } from "../actions/reservationAction";
+import {resetReservation, setReservation} from "../actions/reservationAction";
 import acomptesReducer from "../reducers/acomptReducer";
 import {
   addAcompte,
   deleteAcompte,
   resetAcompte,
 } from "../actions/AcomptesAction";
-import { useNavigate, useParams } from "react-router-dom";
-import { useLoading } from "../hooks/useLoading";
+import {useNavigate, useParams} from "react-router-dom";
+import {useLoading} from "../hooks/useLoading";
 
 const ReservationForm = ({
-  reservationData,
-  acomptes_,
-  idReservationEdit,
-}: {
+                           reservationData,
+                           acomptes_,
+                           idReservationEdit,
+                         }: {
   reservationData?: ReservationFormulaireInterface;
   acomptes_?: Acompte[];
   idReservationEdit?: string;
@@ -52,10 +52,10 @@ const ReservationForm = ({
     return `RES-${formattedDate}-${randomString}`;
   };
 
-  const { user } = useAuth();
-  const { salles } = useSalles();
-  const { paymentMethodes } = usePaymentMethodes();
-  const { idReservation } = useParams();
+  const {user} = useAuth();
+  const {salles} = useSalles();
+  const {paymentMethodes} = usePaymentMethodes();
+  const {idReservation} = useParams();
 
   const navigate = useNavigate();
 
@@ -69,7 +69,7 @@ const ReservationForm = ({
   const [state, dispatch] = useReducer(reservationReducer, initialState);
   const [acomptes, AcomptesDispatch] = useReducer(acomptesReducer, []);
   const [acomptesEmpty, setAcomptesEmpty] = React.useState<boolean>(false);
-  const { setLoading } = useLoading();
+  const {setLoading} = useLoading();
 
   const handleClickDeleteAcompte = (acompteId: string) => {
     AcomptesDispatch(deleteAcompte(acompteId));
@@ -85,7 +85,7 @@ const ReservationForm = ({
     if (mount) {
       if (!state.reservation.reference) {
         dispatch(
-          setReservation({ ...state.reservation, reference: generateRef() })
+          setReservation({...state.reservation, reference: generateRef()})
         );
       }
 
@@ -102,7 +102,7 @@ const ReservationForm = ({
         idReservation &&
         state.reservation.reference !== reservationData.reference
       ) {
-        dispatch(setReservation({ ...reservationData }));
+        dispatch(setReservation({...reservationData}));
       }
 
       if (
@@ -269,7 +269,7 @@ const ReservationForm = ({
           <h1 className="text-3xl font-semibold text-gray-700 text-center mb-6">
             {`${idReservation ? "Modifier" : "Ajouter"} Réservation`}
           </h1>
-          <hr className="mb-6" />
+          <hr className="mb-6"/>
           <form
             onSubmit={handleSubmit}
             className="grid grid-cols-1 md:grid-cols-2 gap-4"
@@ -474,7 +474,7 @@ const ReservationForm = ({
                   dispatch(
                     setReservation({
                       ...state.reservation,
-                      salleId: e,
+                      salleId: e.target.value,
                     })
                   )
                 }
@@ -576,8 +576,8 @@ const ReservationForm = ({
                   <AppSelect
                     id="mode_paiement"
                     options={methodePaiement}
-                    onChange={(value) => {
-                      const idModePayemen = value;
+                    onChange={(e) => {
+                      const idModePayemen = e.target.value;
                       console.log(idModePayemen);
                       dispatch(
                         setReservation({
@@ -679,7 +679,7 @@ const ReservationForm = ({
             </div>
           </form>
         </div>
-        <ToastContainer />
+        <ToastContainer/>
       </div>
     </>
   );

@@ -9,8 +9,8 @@ import SelectOptionAdapter from "../utils/SelectOptionAdapter.ts";
 import {useLoading} from "../hooks/useLoading.tsx";
 import PaymentMethodesFieldsService from "../services/PaymentMethodesFieldsService.ts";
 import {toast} from "react-toastify";
-import {AxiosError} from "axios";
 import {PaymentMethodesFieldsInterface} from "../interfaces/PaymentMethodesFieldsContextType.ts";
+import {AxiosError} from "axios";
 
 const FormAjoutRecette = () => {
   const [reference, setReference] = React.useState<string>("");
@@ -46,7 +46,10 @@ const FormAjoutRecette = () => {
   };
 
 
-  const handlePaymentMehtodeChange = (paymentMethodeId: string) => {
+  const handlePaymentMehtodeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    event.preventDefault();
+    console.log(event.target.value)
+    const paymentMethodeId = event.target.value
     PaymentMethodesFieldsService.getFiledByPaymentsMethodsId(paymentMethodeId).then((resp) => {
       console.log(resp)
       const {status, data} = resp
