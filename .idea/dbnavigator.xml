@@ -1,55 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="DBNavigator.Project.DDLFileAttachmentManager">
-    <mappings />
-    <preferences />
-  </component>
-  <component name="DBNavigator.Project.DataEditorManager">
-    <record-view-column-sorting-type value="BY_INDEX" />
-    <value-preview-text-wrapping value="true" />
-    <value-preview-pinned value="false" />
-  </component>
-  <component name="DBNavigator.Project.DatabaseBrowserManager">
-    <autoscroll-to-editor value="false" />
-    <autoscroll-from-editor value="true" />
-    <show-object-properties value="false" />
-    <loaded-nodes />
-  </component>
   <component name="DBNavigator.Project.DatabaseConsoleManager">
     <connection id="fe7572b4-ff7d-4670-a895-907209b1abbf">
       <console name="Connection" type="STANDARD" schema="main" session="Main"><![CDATA[select * from db]]></console>
     </connection>
   </component>
-  <component name="DBNavigator.Project.DatabaseEditorStateManager">
-    <last-used-providers />
-  </component>
   <component name="DBNavigator.Project.DatabaseFileManager">
     <open-files />
-  </component>
-  <component name="DBNavigator.Project.DatabaseSessionManager">
-    <connection id="fe7572b4-ff7d-4670-a895-907209b1abbf" />
-  </component>
-  <component name="DBNavigator.Project.DatasetFilterManager">
-    <filter-actions connection-id="fe7572b4-ff7d-4670-a895-907209b1abbf" dataset="dev.Salle" active-filter-id="">
-      <filter id="adf99fc7-c495-4288-b0fe-588e01d1971a" name="Filter 1" temporary="false" custom-name="false" type="basic" join-type="AND">
-        <condition column="id" operator="=" value="" active="true" />
-      </filter>
-    </filter-actions>
-    <filter-actions connection-id="fe7572b4-ff7d-4670-a895-907209b1abbf" dataset="dev.RefreshToken" active-filter-id="EMPTY_FILTER" />
-    <filter-actions connection-id="fe7572b4-ff7d-4670-a895-907209b1abbf" dataset="dev.Role" active-filter-id="EMPTY_FILTER" />
-    <filter-actions connection-id="fe7572b4-ff7d-4670-a895-907209b1abbf" dataset="dev.Recette" active-filter-id="" />
-    <filter-actions connection-id="fe7572b4-ff7d-4670-a895-907209b1abbf" dataset="dev.PaymentFieldValue" active-filter-id="EMPTY_FILTER" />
-  </component>
-  <component name="DBNavigator.Project.ExecutionManager">
-    <retain-sticky-names value="false" />
-  </component>
-  <component name="DBNavigator.Project.MethodExecutionManager">
-    <method-browser />
-    <execution-history>
-      <group-entries value="true" />
-      <execution-inputs />
-    </execution-history>
-    <argument-values-cache />
   </component>
   <component name="DBNavigator.Project.ObjectQuickFilterManager">
     <last-used-operator value="EQUAL" />
@@ -547,9 +504,5 @@
         </visibility-settings>
       </environment>
     </general-settings>
-  </component>
-  <component name="DBNavigator.Project.StatementExecutionManager">
-    <execution-variables />
-    <execution-variable-types />
   </component>
 </project>
