@@ -17,6 +17,19 @@ class RecetteService {
       throw error;
     }
   }
+
+  public static async createRecette(recetteData: any): Promise<AxiosResponse> {
+    try {
+      return await api.post("/recettes", recetteData, {
+        headers: {
+          Authorization: `Bearer ${this.accessToken}`,
+        },
+      });
+    } catch (error) {
+      console.error("Error creating recette:", error);
+      throw error;
+    }
+  }
 }
 
 export default RecetteService

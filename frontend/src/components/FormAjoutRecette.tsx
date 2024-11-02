@@ -8,7 +8,7 @@ import {usePaymentMethodes} from "../hooks/usePaymentMethodes.tsx";
 import SelectOptionAdapter from "../utils/SelectOptionAdapter.ts";
 import {useLoading} from "../hooks/useLoading.tsx";
 import PaymentMethodesFieldsService from "../services/PaymentMethodesFieldsService.ts";
-import {toast} from "react-toastify";
+import {toast, ToastContainer} from "react-toastify";
 import {PaymentMethodesFieldsInterface} from "../interfaces/PaymentMethodesFieldsContextType.ts";
 import {AxiosError} from "axios";
 
@@ -21,7 +21,7 @@ const FormAjoutRecette = () => {
 
 
   // Gestion de la soumission du formulaire
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     // Créer un objet pour stocker les données du formulaire
@@ -42,7 +42,23 @@ const FormAjoutRecette = () => {
 
     // Logique pour soumettre les données
     console.log("Données de l'entrée ajoutée : ", formData);
-    // Vous pourriez vouloir envoyer formData à une API ou à un autre traitement ici
+    try {
+      const resp = await RecetteService.createRecette(formData);
+      if (resp.status === 201) {
+        toast.success(resp.data.message, {
+          position: "bottom-right",
+          autoClose: 5000,
+          toastId: "success-recette",
+        });
+      }
+    } catch (error) {
+      toast.error("Une erreur s'est produite lors de la création de la recette.", {
+        position: "bottom-right",
+        autoClose: 5000,
+        toastId: "error-recette",
+      });
+      console.error("Erreur lors de la soumission de la recette : ", error);
+    }
   };
 
 
@@ -205,6 +221,7 @@ const FormAjoutRecette = () => {
           Ajouter l'Entrée
         </button>
       </form>
+      <ToastContainer/>
     </div>
   );
 };
