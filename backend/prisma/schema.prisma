@@ -105,19 +105,6 @@ model Acompte {
   updatedAt     DateTime    @updatedAt
 }
 
-model Recette {
-  id             String   @id @default(cuid())
-  montant        Float
-  reference      String   @unique
-  description    String?
-  personnePayeur String
-  contactPayeur  String
-  paymentMethode String
-  date           DateTime @default(now())
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @default(now())
-}
-
 model Depense {
   id                String   @id @default(cuid())
   montant           Float
@@ -137,6 +124,7 @@ model PaymentMethod {
   updatedAt     DateTime       @default(now())
   paymentFields PaymentField[] // Relation vers les champs requis
   Payment       Payment[]
+  Recette       Recette[]
 }
 
 model PaymentField {
@@ -150,14 +138,31 @@ model PaymentField {
   PaymentFieldValue PaymentFieldValue[]
 }
 
+model Recette {
+  id               String        @id @default(cuid())
+  montant          Float
+  reference        String        @unique
+  description      String?
+  personnePayeur   String
+  contactPayeur    String
+  paymentMethodeId String // L'ID de la méthode de paiement
+  paymentMethode   PaymentMethod @relation(fields: [paymentMethodeId], references: [id]) // Relation vers PaymentMethod
+  date             DateTime      @default(now())
+  payments         Payment[] // Relation avec les paiements associés à la recette
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+}
+
 model Payment {
   id            String              @id @default(cuid())
   amount        Float // Montant de la transaction
   methodId      String // ID de la méthode de paiement utilisée
-  paymentMethod PaymentMethod       @relation(fields: [methodId], references: [id])
+  paymentMethod PaymentMethod       @relation(fields: [methodId], references: [id]) // Relation vers PaymentMethod
   fields        PaymentFieldValue[] // Relation vers les valeurs des champs
   createdAt     DateTime            @default(now())
-  updatedAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+  recetteId     String? // ID de la recette associée
+  recette       Recette?            @relation(fields: [recetteId], references: [id]) // Relation vers Recette
 }
 
 model PaymentFieldValue {

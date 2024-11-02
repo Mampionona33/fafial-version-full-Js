@@ -35,6 +35,7 @@ const FormAjoutRecette = () => {
       paymentMethode: (e.target as HTMLFormElement).paymentMethode.value,
       // Ajoute les champs supplémentaires si nécessaire
       paymentFields: paymentMethodesFields.map(field => ({
+        id: field.id,
         fieldName: field.fieldName,
         value: field.value,
       })),
@@ -45,11 +46,20 @@ const FormAjoutRecette = () => {
     try {
       const resp = await RecetteService.createRecette(formData);
       if (resp.status === 201) {
+
         toast.success(resp.data.message, {
           position: "bottom-right",
           autoClose: 5000,
           toastId: "success-recette",
         });
+        // Rsset form
+        (e.target as HTMLFormElement).reset();
+        setLocalPaymentMethodes(SelectOptionAdapter.adapt(paymentMethodes))
+        await RecetteService.getRecettesReferences().then((resp) => {
+          if (resp.status === 200) {
+            setReference(resp.data.reference)
+          }
+        })
       }
     } catch (error) {
       toast.error("Une erreur s'est produite lors de la création de la recette.", {

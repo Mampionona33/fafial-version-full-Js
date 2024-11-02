@@ -1,7 +1,7 @@
 import prisma from "../../prisma/prisma";
-import {Request, Response} from "express";
+import {NextFunction, Request, Response} from "express";
 
-export const getRecetteReferences = async (req: Request, res: Response) => {
+export const getRecetteReferences = async (_req: Request, res: Response) => {
   try {
     // Importation dynamique de nanoid pour les modules ES
     const {nanoid} = require('fix-esm').require('nanoid');
@@ -44,3 +44,78 @@ export const getRecetteReferences = async (req: Request, res: Response) => {
     return;
   }
 }
+
+export const createRecette = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const {
+      reference,
+      personnePayeur,
+      contactPayeur,
+      date,
+      description,
+      montant,
+      paymentMethode,
+      paymentFields,
+    } = req.body;
+
+    // 1. Création de la recette principale
+    const recette = await prisma.recette.create({
+      data: {
+        reference,
+        personnePayeur,
+        contactPayeur,
+        date: new Date(date),
+        description,
+        montant: parseFloat(montant),
+        paymentMethode: {connect: {id: paymentMethode}},
+      },
+    });
+
+
+    // 2. Création du paiement associé à la recette
+    const payment = await prisma.payment.create({
+      data: {
+        amount: parseFloat(montant),
+        fields: {},
+        recette: {connect: {id: recette.id}},
+        paymentMethod: {connect: {id: paymentMethode}},
+      },
+    })
+
+    // 3. Enregistrer les champs dynamiques pour le paiement
+    if (paymentFields && paymentFields.length > 0) {
+      for (const field of paymentFields) {
+        const paymentField = await prisma.paymentField.findFirst({
+          where: {
+            id: field.id,
+          },
+        });
+
+        if (paymentField) {
+          await prisma.paymentFieldValue.create({
+            data: {
+              value: field.value,
+              payment: {connect: {id: payment.id}},
+              paymentField: {connect: {id: paymentField.id}},
+            },
+          });
+        } else {
+          console.error(`Champ ${field.fieldName} non trouvé pour la méthode ${paymentMethode}`);
+        }
+      }
+    }
+
+    // Réponse de succès
+    res.status(201).json({
+      message: "Recette créée avec succès",
+      data: {
+        recette,
+        payment,
+      },
+    });
+  } catch (error) {
+    console.error("Erreur lors de la création de la recette:", error);
+    next(error);
+  }
+};
+
