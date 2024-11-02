@@ -138,7 +138,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
         if (userResponse.status === 200) {
           const user = userResponse.data.user;
-          console.log("user", user);
           setUser(user);
           setIsAuthenticated(true);
           localStorage.setItem("user", JSON.stringify(user));
