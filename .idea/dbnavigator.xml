@@ -454,8 +454,8 @@
     <execution-engine-settings>
       <statement-execution>
         <fetch-block-size value="100" />
-        <execution-timeout value="20" />
-        <debug-execution-timeout value="600" />
+        <execution-timeout value="0" />
+        <debug-execution-timeout value="0" />
         <focus-result value="false" />
         <prompt-execution value="false" />
       </statement-execution>
@@ -464,8 +464,8 @@
         <execution-timeout value="300" />
       </script-execution>
       <method-execution>
-        <execution-timeout value="30" />
-        <debug-execution-timeout value="600" />
+        <execution-timeout value="0" />
+        <debug-execution-timeout value="0" />
         <parameter-history-size value="10" />
       </method-execution>
     </execution-engine-settings>

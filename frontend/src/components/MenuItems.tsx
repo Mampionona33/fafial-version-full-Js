@@ -1,10 +1,10 @@
-import { Link } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
+import {Link} from "react-router-dom";
+import {useAuth} from "../hooks/useAuth";
 import RoleChecker from "../utils/RoleChecker";
-import { menuItemsByRole } from "../constants/menuItemsByRole";
+import {menuItemsByRole} from "../constants/menuItemsByRole";
 
 const MenuItems = () => {
-  const { user } = useAuth();
+  const {user} = useAuth();
 
   // Fonction pour générer les items de menu en fonction des rôles
   const getMenuItems = () => {
@@ -23,6 +23,7 @@ const MenuItems = () => {
       });
     }
 
+    // Ajout des items de menu en fonction des rôles
     for (const role of roles) {
       const roleName = role.name;
       if (menuItemsByRole[roleName]) {
@@ -46,7 +47,7 @@ const MenuItems = () => {
           >
             <span
               className="material-symbols-outlined"
-              style={{ fontSize: "15px" }}
+              style={{fontSize: "15px"}}
               aria-hidden="true"
             >
               {item.icon}
