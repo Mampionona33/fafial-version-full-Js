@@ -2,8 +2,8 @@ import AppLabel from "./AppLabel";
 import AppInput from "./AppInput";
 import AppTextarea from "./AppTextarea";
 import AppSelect from "./AppSelect";
-import React, {useReducer} from "react";
-import {v4 as uuidv4} from "uuid";
+import React, { useReducer } from "react";
+import { v4 as uuidv4 } from "uuid";
 import ReservationService from "../services/ReservationService";
 import {
   PayementStatut,
@@ -14,30 +14,30 @@ import {
   ReservationFormulaireInterface,
   Acompte,
 } from "../interfaces/ReservationInterface";
-import {nanoid} from "nanoid";
-import {useAuth} from "../hooks/useAuth";
-import {useSalles} from "../hooks/useSalles";
+import { nanoid } from "nanoid";
+import { useAuth } from "../hooks/useAuth";
+import { useSalles } from "../hooks/useSalles";
 import SelectOptionAdapter from "../utils/SelectOptionAdapter";
-import {toast, ToastContainer} from "react-toastify";
-import {usePaymentMethodes} from "../hooks/usePaymentMethodes";
+import { toast, ToastContainer } from "react-toastify";
+import { usePaymentMethodes } from "../hooks/usePaymentMethodes";
 import reservationReducer, {
   initialState,
 } from "../reducers/reservationReducer";
-import {resetReservation, setReservation} from "../actions/reservationAction";
+import { resetReservation, setReservation } from "../actions/reservationAction";
 import acomptesReducer from "../reducers/acomptReducer";
 import {
   addAcompte,
   deleteAcompte,
   resetAcompte,
 } from "../actions/AcomptesAction";
-import {useNavigate, useParams} from "react-router-dom";
-import {useLoading} from "../hooks/useLoading";
+import { useNavigate, useParams } from "react-router-dom";
+import { useLoading } from "../hooks/useLoading";
 
 const ReservationForm = ({
-                           reservationData,
-                           acomptes_,
-                           idReservationEdit,
-                         }: {
+  reservationData,
+  acomptes_,
+  idReservationEdit,
+}: {
   reservationData?: ReservationFormulaireInterface;
   acomptes_?: Acompte[];
   idReservationEdit?: string;
@@ -52,10 +52,10 @@ const ReservationForm = ({
     return `RES-${formattedDate}-${randomString}`;
   };
 
-  const {user} = useAuth();
-  const {salles} = useSalles();
-  const {paymentMethodes} = usePaymentMethodes();
-  const {idReservation} = useParams();
+  const { user } = useAuth();
+  const { salles } = useSalles();
+  const { paymentMethodes } = usePaymentMethodes();
+  const { idReservation } = useParams();
 
   const navigate = useNavigate();
 
@@ -69,7 +69,7 @@ const ReservationForm = ({
   const [state, dispatch] = useReducer(reservationReducer, initialState);
   const [acomptes, AcomptesDispatch] = useReducer(acomptesReducer, []);
   const [acomptesEmpty, setAcomptesEmpty] = React.useState<boolean>(false);
-  const {setLoading} = useLoading();
+  const { setLoading } = useLoading();
 
   const handleClickDeleteAcompte = (acompteId: string) => {
     AcomptesDispatch(deleteAcompte(acompteId));
@@ -80,12 +80,46 @@ const ReservationForm = ({
     }
   };
 
+  const handleClickAddAcompte = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Sélection du mode de paiement ou choix par défaut
+    const selectedPaymentMethod =
+      paymentMethodes.find(
+        (method) => method.id === state.reservation.acomptes.modePaiement
+      )?.name || paymentMethodes[0].name;
+
+    // Ajout d’un acompte
+    AcomptesDispatch(
+      addAcompte({
+        id: uuidv4(),
+        montant: state.reservation.acomptes.montant,
+        datePrevue: state.reservation.acomptes.datePrevue,
+        modePaiement: selectedPaymentMethod,
+        statut: PayementStatut.EN_ATTENTE,
+      })
+    );
+
+    // Mise à jour de la réservation dans le state global
+    dispatch(
+      setReservation({
+        ...state.reservation,
+        acomptes: {
+          montant: 0,
+          datePrevue: "",
+          modePaiement: "",
+          statut: PayementStatut.EN_ATTENTE,
+        },
+      })
+    );
+  };
+
   React.useEffect(() => {
     let mount = true;
     if (mount) {
       if (!state.reservation.reference) {
         dispatch(
-          setReservation({...state.reservation, reference: generateRef()})
+          setReservation({ ...state.reservation, reference: generateRef() })
         );
       }
 
@@ -102,7 +136,7 @@ const ReservationForm = ({
         idReservation &&
         state.reservation.reference !== reservationData.reference
       ) {
-        dispatch(setReservation({...reservationData}));
+        dispatch(setReservation({ ...reservationData }));
       }
 
       if (
@@ -269,7 +303,7 @@ const ReservationForm = ({
           <h1 className="text-3xl font-semibold text-gray-700 text-center mb-6">
             {`${idReservation ? "Modifier" : "Ajouter"} Réservation`}
           </h1>
-          <hr className="mb-6"/>
+          <hr className="mb-6" />
           <form
             onSubmit={handleSubmit}
             className="grid grid-cols-1 md:grid-cols-2 gap-4"
@@ -597,37 +631,7 @@ const ReservationForm = ({
               <div className="col-span-1 md:col-span-2 flex justify-center items-center mt-4">
                 <input
                   type="button"
-                  onClick={(e: React.FormEvent) => {
-                    e.preventDefault();
-
-                    const selectedPaymentMethod =
-                      paymentMethodes.find(
-                        (method) =>
-                          method.id === state.reservation.acomptes.modePaiement
-                      )?.name || "";
-
-                    AcomptesDispatch(
-                      addAcompte({
-                        id: uuidv4(),
-                        montant: state.reservation.acomptes.montant,
-                        datePrevue: state.reservation.acomptes.datePrevue,
-                        modePaiement: selectedPaymentMethod,
-                        statut: PayementStatut.EN_ATTENTE,
-                      })
-                    );
-
-                    dispatch(
-                      setReservation({
-                        ...state.reservation,
-                        acomptes: {
-                          montant: 0,
-                          datePrevue: "",
-                          modePaiement: "",
-                          statut: PayementStatut.EN_ATTENTE,
-                        },
-                      })
-                    );
-                  }}
+                  onClick={handleClickAddAcompte}
                   value="Ajouter un acompte"
                   className="py-2 px-8 rounded cursor-pointer border border-gray-600 hover:bg-gray-600 hover:text-white"
                 />
@@ -679,7 +683,7 @@ const ReservationForm = ({
             </div>
           </form>
         </div>
-        <ToastContainer/>
+        <ToastContainer />
       </div>
     </>
   );
