@@ -1,4 +1,4 @@
-import {MenuItemPorps} from "../interfaces/MenuInterface";
+import { MenuItemPorps } from "../interfaces/MenuInterface";
 
 export const menuItemsByRole: { [key: string]: MenuItemPorps[] } = {
   superAdmin: [
@@ -7,10 +7,10 @@ export const menuItemsByRole: { [key: string]: MenuItemPorps[] } = {
       to: "/super-admin/dashboard",
       icon: "dashboard_customize",
     },
-    {label: "Users", to: "/super-admin/users", icon: "people"},
+    { label: "Users", to: "/super-admin/users", icon: "people" },
   ],
   staf: [
-    {label: "Dashboard", to: "/staf/dashboard", icon: "dashboard_customize"},
+    { label: "Dashboard", to: "/staf/dashboard", icon: "dashboard_customize" },
     {
       label: "Calendrier",
       to: "/staf/calendar",
@@ -23,7 +23,9 @@ export const menuItemsByRole: { [key: string]: MenuItemPorps[] } = {
     },
     {
       label: "Acompte",
-      to: "/staf/acompte",
+      to: `/staf/acompte/annee/${new Date().getFullYear()}/mois/${
+        new Date().getMonth() + 1
+      }/page/1`,
       icon: "paid",
     },
     {
