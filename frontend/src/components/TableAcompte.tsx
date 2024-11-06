@@ -3,7 +3,7 @@ import AcompteService from "../services/AcompteService";
 import { useParams } from "react-router-dom";
 
 const TableAcompte = () => {
-  const [listeAcompte, setListAcompte] = useState([]);
+  const [listeAcompte, setListAcompte] = useState<[] | null>(null);
   const { annee, mois, page } = useParams();
 
   useEffect(() => {
@@ -13,12 +13,11 @@ const TableAcompte = () => {
         mois: Number(mois),
         page: Number(page),
       });
-      console.log(data);
       if (status === 200) {
         setListAcompte(data.acomptes);
       }
     };
-    if (listeAcompte.length === 0) {
+    if (listeAcompte === null) {
       fetchData();
     }
   }, [listeAcompte, annee, mois, page]);

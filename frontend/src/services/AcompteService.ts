@@ -18,7 +18,7 @@ class AcompteService {
   }): Promise<AxiosResponse> {
     try {
       // Construire l'URL avec les paramètres dynamiques
-      const url = `${this.ACOMPTE_API_PATH}/annee/${annee}/mois/${mois}/page/${page}`;
+      const url = `${this.ACOMPTE_API_PATH}/annee/${annee}/mois/${mois}/page/${page}/itemPage/10`;
 
       const resp = await api.get(url, {
         headers: {
