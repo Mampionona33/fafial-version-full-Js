@@ -7,13 +7,28 @@ class AcompteService {
 
   private static accessToken: string | null = AuthServices.getTokenAccess();
 
-  public static async getAll(): Promise<AxiosResponse> {
+  public static async getAll({
+    annee,
+    mois,
+    page,
+  }: {
+    annee: number;
+    mois: number;
+    page: number;
+  }): Promise<AxiosResponse> {
     try {
-      return await api.get(this.ACOMPTE_API_PATH, {
+      // Construire l'URL avec les paramètres dynamiques
+      const url = `${this.ACOMPTE_API_PATH}/annee/${annee}/mois/${mois}/page/${page}`;
+
+      const resp = await api.get(url, {
         headers: {
           Authorization: `Bearer ${this.accessToken}`,
         },
       });
+
+      console.log(resp);
+
+      return resp;
     } catch (error) {
       console.error("Erreur lors de la récupération des acomptes", error);
       throw error;

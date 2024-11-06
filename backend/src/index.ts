@@ -1,19 +1,20 @@
 import dotenv from "dotenv";
 
 dotenv.config();
-import express, {Request, Response, NextFunction} from "express";
+import express, { Request, Response, NextFunction } from "express";
 import loginRouter from "./routes/authRoutes";
 import reservationRouter from "./routes/reservationRouters";
 import salleRouter from "./routes/salleRouter";
 import paymentMethodesRouter from "./routes/paymentMethodesRouter";
 import paymentMethodesFieldsRouter from "./routes/paymentMethodesFieldsRouter";
 import recetteRouter from "./routes/RecetteRouter";
+import acompteRouter from "./routes/acompteRouter";
 import http from "http";
 import cors from "cors";
 import path from "path";
 import morgan from "morgan";
 import handleError from "./middlewares/ErrorHandler";
-import {authenticateToken, verifyToken} from "./middlewares/AuthMiddleware";
+import { authenticateToken, verifyToken } from "./middlewares/AuthMiddleware";
 
 const app = express();
 const server = http.createServer(app);
@@ -52,7 +53,8 @@ app.use("/api/v1", authenticateToken, reservationRouter);
 app.use("/api/v1", authenticateToken, salleRouter);
 app.use("/api/v1", authenticateToken, paymentMethodesRouter);
 app.use("/api/v1", authenticateToken, paymentMethodesFieldsRouter);
-app.use("/api/v1", authenticateToken, recetteRouter)
+app.use("/api/v1", authenticateToken, recetteRouter);
+app.use("/api/v1", acompteRouter);
 
 // Error handling middleware
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
