@@ -1,8 +1,5 @@
 import React from "react";
-
-interface TableAcompteProps {
-  listeAcompte: [] | null;
-}
+import { TableAcompteProps } from "../interfaces/TableAcompteProps";
 
 const TableAcompte: React.FC<TableAcompteProps> = ({ listeAcompte }) => {
   return (
