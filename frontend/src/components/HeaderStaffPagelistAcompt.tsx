@@ -4,7 +4,9 @@ import React from "react";
 
 function HeaderStaffPageListAcompt() {
   // Initialize the state with the current month in the format 'YYYY-MM'
-  const [month, setMonth] = React.useState<string>(new Date().toISOString().slice(0, 7));
+  const [month, setMonth] = React.useState<string>(
+    new Date().toISOString().slice(0, 7)
+  );
 
   const handleMonthChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
@@ -13,7 +15,7 @@ function HeaderStaffPageListAcompt() {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 items-center justify-center bg-slate-50 p-8 rounded-sm">
+    <div className="grid grid-cols-1 md:grid-cols-3 items-center justify-center bg-slate-50 p-8 rounded-sm w-full">
       <h2 className="text-3xl font-semibold text-gray-950 py-0 col-span-1">
         Liste des acomptes
       </h2>

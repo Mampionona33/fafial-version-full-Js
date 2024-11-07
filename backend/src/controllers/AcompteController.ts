@@ -53,6 +53,9 @@ export const getAcompteByYearMonthPage = async (
           lte: endDate,
         },
       },
+      include: {
+        reservation: true,
+      },
     });
 
     // Count total acomptes for pagination info
