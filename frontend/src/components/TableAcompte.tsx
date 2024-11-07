@@ -18,7 +18,7 @@ const TableAcompte: React.FC<TableAcompteProps> = ({ table }) => {
                 {headerGroup.headers.map((header) => (
                   <th
                     key={header.id}
-                    className="text-left bg-slate-100 px-4 py-2"
+                    className="text-left bg-slate-100 px-4 py-2 text-slate-800"
                   >
                     {header.isPlaceholder
                       ? null

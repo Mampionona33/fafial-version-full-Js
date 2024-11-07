@@ -35,7 +35,7 @@ const StaffPageListAcompt: React.FC = () => {
       },
     }),
     columnHelper.accessor("datePrevue", {
-      header: () => "Date prevue",
+      header: () => "Date prevue de paiement",
       cell: (info) => {
         const value = format(new Date(info.getValue()), "dd/MM/yyyy");
         return <div>{value}</div>;
@@ -45,8 +45,18 @@ const StaffPageListAcompt: React.FC = () => {
       header: () => "Statut",
       cell: (info) => {
         const value = info.getValue();
+        const datePrevue = info.row.original.datePrevue;
+        const enRetard = new Date(datePrevue) < new Date();
         if (value === "EN_ATTENTE") {
-          return <div className="text-red-500">En attente</div>;
+          return (
+            <div
+              className={`${
+                enRetard ? "text-red-500 bg-red-100" : "text-green-500"
+              } text-center font-bold py-1 px-4 rounded-full`}
+            >
+              {enRetard ? "En retard" : "En cours"}
+            </div>
+          );
         }
         return <div>{value}</div>;
       },
@@ -63,6 +73,7 @@ const StaffPageListAcompt: React.FC = () => {
       cell: (info) => {
         const value = info.getValue();
         const status = info.row.original.statut;
+
         if (status === "EN_ATTENTE") {
           return (
             <div>
