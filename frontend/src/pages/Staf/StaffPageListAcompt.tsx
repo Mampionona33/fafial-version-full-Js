@@ -162,7 +162,7 @@ const StaffPageListAcompt: React.FC = () => {
   );
 
   return (
-    <div className="flex flex-col py-10 px-20 items-center justify-center gap-4">
+    <div className="flex flex-col py-10 px-20 items-center justify-center gap-4 overflow-auto">
       <HeaderStaffPagelistAcompt />
       <TableAcompte table={table} />
       <AppPagination
