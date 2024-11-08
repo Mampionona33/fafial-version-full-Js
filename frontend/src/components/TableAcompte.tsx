@@ -8,10 +8,10 @@ interface TableAcompteProps {
 
 const TableAcompte: React.FC<TableAcompteProps> = ({ table }) => {
   return (
-    <div className="flex flex-col py-10 px-20 items-center justify-center bg-slate-50 w-full">
+    <div className="flex flex-col p-10 items-center justify-center bg-slate-50 w-full">
       {/* Affichage de la table avec les entêtes et les données */}
       {table.getRowModel().rows.length > 0 ? (
-        <table className="min-w-full">
+        <table className="min-w-full text-sm">
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>

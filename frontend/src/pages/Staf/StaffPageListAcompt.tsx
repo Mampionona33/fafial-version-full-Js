@@ -51,7 +51,9 @@ const StaffPageListAcompt: React.FC = () => {
           return (
             <div
               className={`${
-                enRetard ? "text-red-500 bg-red-100" : "text-green-500"
+                enRetard
+                  ? "text-red-500 bg-red-100"
+                  : "text-green-500 bg-green-100"
               } text-center font-bold py-1 px-4 rounded-full`}
             >
               {enRetard ? "En retard" : "En cours"}
@@ -79,7 +81,7 @@ const StaffPageListAcompt: React.FC = () => {
             <div>
               <Link
                 to={`/staf/acompte/${value}`}
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                className="bg-slate-800 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded"
               >
                 Payer
               </Link>
