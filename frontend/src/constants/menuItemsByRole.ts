@@ -23,9 +23,9 @@ export const menuItemsByRole: { [key: string]: MenuItemPorps[] } = {
     },
     {
       label: "Acompte",
-      to: `/staf/acompte/annee/${new Date().getFullYear()}/mois/${
+      to: `/staf/acompte?annee=${new Date().getFullYear()}&mois=${
         new Date().getMonth() + 1
-      }/page/1`,
+      }&page=1&pageSize=5`,
       icon: "paid",
     },
     {

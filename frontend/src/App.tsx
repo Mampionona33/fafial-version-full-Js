@@ -1,11 +1,11 @@
 import { Outlet } from "react-router-dom";
 import NavBar from "./components/NavBar";
-
 import { PrimeReactProvider } from "primereact/api";
 import "primereact/resources/themes/lara-light-indigo/theme.css";
-import "primereact/resources/primereact.min.css";
 import { useAuth } from "./hooks/useAuth";
 import IndeterminateProgressBar from "./components/IndeterminateProgressBar";
+import "primereact/resources/themes/saga-blue/theme.css";
+import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
 import "material-symbols";
 import { useLoading } from "./hooks/useLoading";

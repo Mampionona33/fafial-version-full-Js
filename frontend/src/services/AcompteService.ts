@@ -11,15 +11,30 @@ class AcompteService {
     annee,
     mois,
     page,
+    pageSize,
   }: {
     annee: number;
     mois: number;
     page: number;
+    pageSize: number;
   }): Promise<AxiosResponse> {
-    try {
-      // Construire l'URL avec les paramètres dynamiques
-      const url = `${this.ACOMPTE_API_PATH}/annee/${annee}/mois/${mois}/page/${page}/itemPage/2`;
+    if (!this.accessToken) {
+      throw new Error("Access token is missing");
+    }
 
+    try {
+      // Construire les search params (paramètres de la requête) dynamiquement
+      const searchParams = new URLSearchParams({
+        annee: String(annee),
+        mois: String(mois),
+        page: String(page),
+        pageSize: String(pageSize),
+      });
+
+      // Construire l'URL avec les search params
+      const url = `${this.ACOMPTE_API_PATH}?${searchParams.toString()}`;
+
+      // Faire la requête API avec le header d'Authorization
       const resp = await api.get(url, {
         headers: {
           Authorization: `Bearer ${this.accessToken}`,

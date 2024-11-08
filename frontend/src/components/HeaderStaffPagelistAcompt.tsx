@@ -13,11 +13,17 @@ function HeaderStaffPageListAcompt() {
 
   const handleMonthChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
-    setMonth(e.target.value);
-    console.log(e.target.value);
-    const month = e.target.value.slice(5, 7);
-    const year = e.target.value.slice(0, 4);
-    navigate(`/staf/acompte/annee/${year}/mois/${month}/page/1`);
+    const selectedMonth = e.target.value;
+    setMonth(selectedMonth);
+
+    const month = selectedMonth.slice(5, 7);
+    const year = selectedMonth.slice(0, 4);
+
+    // Navigate with search params
+    navigate({
+      pathname: "/staf/acompte",
+      search: `?annee=${year}&mois=${month}&page=1`,
+    });
   };
 
   return (
