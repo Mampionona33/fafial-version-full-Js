@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import AppInput from "./AppInput.tsx";
 import AppLabel from "./AppLabel.tsx";
 import React from "react";
@@ -8,10 +9,15 @@ function HeaderStaffPageListAcompt() {
     new Date().toISOString().slice(0, 7)
   );
 
+  const navigate = useNavigate();
+
   const handleMonthChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
-    setMonth(e.target.value); // Update the month state with the selected month
-    console.log(e.target.value); // Log the selected month
+    setMonth(e.target.value);
+    console.log(e.target.value);
+    const month = e.target.value.slice(5, 7);
+    const year = e.target.value.slice(0, 4);
+    navigate(`/staf/acompte/annee/${year}/mois/${month}/page/1`);
   };
 
   return (
@@ -23,11 +29,7 @@ function HeaderStaffPageListAcompt() {
       <div className="flex gap-4 justify-end w-full items-center md:col-span-2">
         <div>
           <AppLabel htmlFor="date">Sélectionner un mois</AppLabel>
-          <AppInput
-            type="month"
-            value={month} // Set the value of the input to the state
-            onChange={handleMonthChange}
-          />
+          <AppInput type="month" value={month} onChange={handleMonthChange} />
         </div>
       </div>
     </div>
