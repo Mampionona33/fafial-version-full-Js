@@ -1,6 +1,6 @@
-import { useNavigate } from "react-router-dom";
-import AppInput from "./AppInput.tsx";
-import AppLabel from "./AppLabel.tsx";
+import { useSearchParams } from "react-router-dom";
+import AppInput from "./AppInput";
+import AppLabel from "./AppLabel";
 import React from "react";
 
 function HeaderStaffPageListAcompt() {
@@ -9,21 +9,24 @@ function HeaderStaffPageListAcompt() {
     new Date().toISOString().slice(0, 7)
   );
 
-  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const handleMonthChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     const selectedMonth = e.target.value;
     setMonth(selectedMonth);
 
-    const month = selectedMonth.slice(5, 7);
+    // Extract year and month from the selected month value
     const year = selectedMonth.slice(0, 4);
+    const month = selectedMonth.slice(5, 7);
 
-    // Navigate with search params
-    navigate({
-      pathname: "/staf/acompte",
-      search: `?annee=${year}&mois=${month}&page=1`,
-    });
+    // Preserve existing search params and update 'annee' and 'mois'
+    const updatedParams = new URLSearchParams(searchParams);
+    updatedParams.set("annee", year);
+    updatedParams.set("mois", month);
+
+    // Update search params in the URL
+    setSearchParams(updatedParams);
   };
 
   return (

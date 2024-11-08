@@ -41,8 +41,6 @@ class AcompteService {
         },
       });
 
-      console.log(resp);
-
       return resp;
     } catch (error) {
       console.error("Erreur lors de la récupération des acomptes", error);

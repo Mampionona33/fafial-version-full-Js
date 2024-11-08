@@ -22,10 +22,11 @@ const StaffPageListAcompt: React.FC = () => {
     pageSize: Number(searchParams.get("pageSize")) || 5,
     pageCount: 0,
   });
+
   const annee = Number(searchParams.get("annee")) || new Date().getFullYear();
   const mois = Number(searchParams.get("mois")) || new Date().getMonth() + 1;
-  const pageSize = Number(searchParams.get("pageSize")) || 5;
   const page = Number(searchParams.get("page")) || 1;
+  const pageSize = Number(searchParams.get("pageSize")) || 5;
 
   const columnHelper = createColumnHelper<Acompte>();
 
@@ -99,6 +100,31 @@ const StaffPageListAcompt: React.FC = () => {
     manualPagination: true,
   });
 
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const { status, data } = await AcompteService.getAll({
+        annee,
+        mois,
+        page: page,
+        pageSize: pageSize,
+      });
+      if (status === 200) {
+        setListAcompte(data.acomptes);
+        setPagination((prev) => ({
+          ...prev,
+          page: data.pagination.currentPage,
+          pageSize: data.pagination.pageSize,
+          pageCount: data.pagination.totalPages,
+        }));
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  }, [annee, mois, page, pageSize, setLoading]);
+
   const updateSearchParams = useCallback(
     (page: number, pageSize: number) => {
       setSearchParams({
@@ -111,60 +137,28 @@ const StaffPageListAcompt: React.FC = () => {
     [setSearchParams, annee, mois]
   );
 
-  const fetchData = useCallback(
-    async (page: number, pageSize: number) => {
-      setLoading(true);
-      try {
-        if (pageSize && page) {
-          const { status, data } = await AcompteService.getAll({
-            annee,
-            mois,
-            page,
-            pageSize,
-          });
-          if (status === 200) {
-            setListAcompte(data.acomptes);
-            setPagination((prev) => ({
-              ...prev,
-              page: data.pagination.currentPage,
-              pageSize: data.pagination.pageSize,
-              pageCount: data.pagination.totalPages,
-            }));
-          }
-        }
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [annee, mois, setLoading]
-  );
-
   useEffect(() => {
-    fetchData(pagination.page, pagination.pageSize);
-  }, [fetchData, pagination.page, pagination.pageSize]);
-
-  const handlePageChange = useCallback(
-    (newPage: number) => {
-      setPagination((prev) => ({ ...prev, page: newPage }));
-      updateSearchParams(newPage, pageSize);
-      fetchData(newPage, pageSize);
-    },
-    [fetchData, pageSize, updateSearchParams]
-  );
+    fetchData();
+  }, [fetchData, annee, mois]);
 
   const handleRowsPerPageChange = useCallback(
-    (newPageSize: number) => {
+    async (newPageSize: number) => {
       setPagination({
         page: 1,
         pageSize: newPageSize,
         pageCount: pagination.pageCount,
       });
       updateSearchParams(1, newPageSize);
-      fetchData(page, newPageSize);
     },
-    [fetchData, pagination.pageCount, updateSearchParams, page]
+    [pagination.pageCount, updateSearchParams]
+  );
+
+  const handlePageChange = useCallback(
+    async (newPage: number) => {
+      setPagination((prev) => ({ ...prev, page: newPage }));
+      updateSearchParams(newPage, pageSize);
+    },
+    [pageSize, updateSearchParams]
   );
 
   return (
