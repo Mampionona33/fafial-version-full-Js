@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import HeaderStaffPagelistAcompt from "../../components/HeaderStaffPagelistAcompt";
 import TableAcompte from "../../components/TableAcompte";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import AcompteService from "../../services/AcompteService";
 import { useLoading } from "../../hooks/useLoading";
 import {
@@ -11,13 +11,21 @@ import {
 } from "@tanstack/react-table";
 import { Acompte } from "../../interfaces/AcompteInterface";
 import { format } from "date-fns";
+import AppPagination from "../../components/AppPagination";
 
 const StaffPageListAcompt: React.FC = () => {
   const { setLoading } = useLoading();
   const [listeAcompte, setListAcompte] = useState<Acompte[] | null>(null);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    pageSize: 2,
+    pageCount: 0,
+  });
   const { annee, mois, page } = useParams();
 
   const columnHelper = createColumnHelper<Acompte>();
+
+  const navigate = useNavigate();
 
   const columns = [
     columnHelper.accessor("reservation.reference", {
@@ -106,6 +114,7 @@ const StaffPageListAcompt: React.FC = () => {
     data: listeAcompte || [],
     columns: columns,
     getCoreRowModel: getCoreRowModel(),
+    manualPagination: true,
   });
 
   useEffect(() => {
@@ -119,6 +128,11 @@ const StaffPageListAcompt: React.FC = () => {
         });
         if (status === 200) {
           setListAcompte(data.acomptes);
+          setPagination({
+            page: data.pagination.currentPage,
+            pageSize: data.pagination.pageSize,
+            pageCount: data.pagination.totalPages,
+          });
         }
       } catch (error) {
         console.error(error);
@@ -129,10 +143,19 @@ const StaffPageListAcompt: React.FC = () => {
     fetchData();
   }, [annee, mois, page, setLoading]);
 
+  const handlePageChange = (newPage: number) => {
+    navigate(`/staf/liste-acomptes/${annee}/${mois}/${newPage}`);
+  };
+
   return (
     <div className="flex flex-col py-10 px-20 items-center justify-center gap-4">
       <HeaderStaffPagelistAcompt />
       <TableAcompte table={table} />
+      <AppPagination
+        currentPage={pagination.page}
+        pageCount={pagination.pageCount}
+        onPageChange={handlePageChange}
+      />
     </div>
   );
 };
