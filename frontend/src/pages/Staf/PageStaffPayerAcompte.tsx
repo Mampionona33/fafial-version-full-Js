@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import AcompteService from "../../services/AcompteService";
 
-const PageStaffPayerAcompte = () => {
+const PageStafAjoutAcompte = () => {
   const { idAcompte } = useParams();
 
   const fetchData = async (idAcompte: string) => {
@@ -31,4 +31,4 @@ const PageStaffPayerAcompte = () => {
   );
 };
 
-export default PageStaffPayerAcompte;
+export default PageStafAjoutAcompte;

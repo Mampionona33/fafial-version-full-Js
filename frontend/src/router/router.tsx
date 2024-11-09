@@ -18,7 +18,7 @@ import StafDetailsReservation from "../pages/Staf/StafDetailsReservation";
 import JournalCaisse from "../pages/JournalCaisse";
 import AjoutEntree from "../pages/AjoutRecette";
 import StaffPageListAcompt from "../pages/Staf/StaffPageListAcompt.tsx";
-import PageStafAjoutAcompte from "../pages/Staf/PageStafAjoutAcompte.tsx";
+import PageStaffPayerAcompte from "../pages/Staf/PageStaffPayerAcompte.tsx";
 
 // Créer les routes
 const router = createBrowserRouter(
@@ -49,7 +49,7 @@ const router = createBrowserRouter(
             </Route>
             <Route path="acompte">
               <Route path="" element={<StaffPageListAcompt />} />
-              <Route path=":idAcompte" element={<PageStafAjoutAcompte />} />
+              <Route path=":idAcompte" element={<PageStaffPayerAcompte />} />
             </Route>
             <Route
               path="ajout-reservation"
