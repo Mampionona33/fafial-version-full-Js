@@ -1,11 +1,9 @@
 import { AxiosResponse } from "axios";
-import AuthServices from "./AuthServices";
 import api from "./axiosConfig";
+import { ACCESS_TOKEN_NAME } from "../constants/appContants";
 
 class AcompteService {
   static ACOMPTE_API_PATH = "/acomptes";
-
-  private static accessToken: string | null = AuthServices.getTokenAccess();
 
   public static async getAll({
     annee,
@@ -27,13 +25,15 @@ class AcompteService {
         pageSize: String(pageSize),
       });
 
+      const accessToken = localStorage.getItem(ACCESS_TOKEN_NAME);
+
       // Construire l'URL avec les search params
       const url = `${this.ACOMPTE_API_PATH}?${searchParams.toString()}`;
 
       // Faire la requête API avec le header d'Authorization
       const resp = await api.get(url, {
         headers: {
-          Authorization: `Bearer ${this.accessToken}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       });
 
