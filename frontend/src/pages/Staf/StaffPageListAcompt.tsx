@@ -132,6 +132,7 @@ const StaffPageListAcompt: React.FC = () => {
       columnHelper.accessor("montant", {
         header: () => "Montant",
         cell: (info) => <div>{info.getValue()}</div>,
+        enableColumnFilter: false,
       }),
       columnHelper.accessor("id", {
         header: () => "Action",
