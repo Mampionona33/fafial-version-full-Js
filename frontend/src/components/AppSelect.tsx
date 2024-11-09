@@ -3,30 +3,33 @@ import React from "react";
 interface AppSelectProps {
   options?: { value: string; label: string }[];
   value?: string;
+  defaultValue?: string; // Ajout de defaultValue
   name?: string;
-  onChange?: (event: React.ChangeEvent<HTMLSelectElement>) => void; // Modifier ici
+  onChange?: (event: React.ChangeEvent<HTMLSelectElement>) => void;
   id?: string;
 }
 
 const AppSelect: React.FC<AppSelectProps> = ({
-                                               options = [],
-                                               value,
-                                               onChange,
-                                               name,
-                                               id,
-                                             }) => {
+  options = [],
+  value,
+  defaultValue, // Ajout de defaultValue ici
+  onChange,
+  name,
+  id,
+}) => {
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     if (onChange) {
-      onChange(event); // Passer l'événement complet
+      onChange(event);
     }
   };
 
   return (
     <select
       id={id}
-      value={value} // Gérer la valeur par défaut ici
-      onChange={handleChange}
       name={name}
+      value={value} // Utilisé si un contrôle externe est défini
+      defaultValue={defaultValue} // Utilisé si value n'est pas défini
+      onChange={handleChange}
       className="px-2 text-sm mt-1 block w-full py-1 bg-transparent border-b-2 border-gray-300 focus:outline-none focus:border-gray-700 transition-all duration-100"
     >
       <option value="" disabled>
