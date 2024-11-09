@@ -12,6 +12,7 @@ import {
 import { Acompte } from "../../interfaces/AcompteInterface";
 import { format } from "date-fns";
 import AppPagination from "../../components/AppPagination";
+import { useAuth } from "../../hooks/useAuth";
 
 const StaffPageListAcompt: React.FC = () => {
   const { setLoading } = useLoading();
@@ -22,6 +23,7 @@ const StaffPageListAcompt: React.FC = () => {
     pageSize: Number(searchParams.get("pageSize")) || 5,
     pageCount: 0,
   });
+  const { isAuthenticated } = useAuth();
 
   const annee = Number(searchParams.get("annee")) || new Date().getFullYear();
   const mois = Number(searchParams.get("mois")) || new Date().getMonth() + 1;
@@ -102,6 +104,9 @@ const StaffPageListAcompt: React.FC = () => {
 
   const fetchData = useCallback(async () => {
     setLoading(true);
+    if (!isAuthenticated) {
+      return;
+    }
     try {
       const { status, data } = await AcompteService.getAll({
         annee,
@@ -123,7 +128,7 @@ const StaffPageListAcompt: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [annee, mois, page, pageSize, setLoading]);
+  }, [annee, mois, page, pageSize, setLoading, isAuthenticated]);
 
   const updateSearchParams = useCallback(
     (page: number, pageSize: number) => {

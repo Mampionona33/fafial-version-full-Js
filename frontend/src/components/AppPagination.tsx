@@ -23,7 +23,10 @@ const AppPagination: React.FC<AppPaginationProps> = ({
         onClick={() => onPageChange(currentPage - 1)}
         className="bg-gray-300 text-gray-800 p-2 rounded disabled:opacity-50 flex items-center justify-center"
       >
-        <span className="material-symbols-outlined leading-none text-center">
+        <span
+          className="material-symbols-outlined leading-none text-center "
+          style={{ fontSize: "12px" }}
+        >
           arrow_back_ios_new
         </span>
       </button>
@@ -39,7 +42,10 @@ const AppPagination: React.FC<AppPaginationProps> = ({
         onClick={() => onPageChange(currentPage + 1)}
         className="bg-gray-300 text-gray-800 p-2 rounded disabled:opacity-50 flex items-center justify-center"
       >
-        <span className="material-symbols-outlined leading-none text-center">
+        <span
+          className="material-symbols-outlined leading-none text-center"
+          style={{ fontSize: "12px" }}
+        >
           arrow_forward_ios
         </span>
       </button>

@@ -18,10 +18,6 @@ class AcompteService {
     page: number;
     pageSize: number;
   }): Promise<AxiosResponse> {
-    if (!this.accessToken) {
-      throw new Error("Access token is missing");
-    }
-
     try {
       // Construire les search params (paramètres de la requête) dynamiquement
       const searchParams = new URLSearchParams({
