@@ -9,9 +9,9 @@ import {
   useReactTable,
   getCoreRowModel,
   FilterFn,
+  ColumnFiltersState,
   SortingFn,
   sortingFns,
-  ColumnFiltersState,
 } from "@tanstack/react-table";
 import { Acompte } from "../../interfaces/AcompteInterface";
 import { format } from "date-fns";
@@ -48,6 +48,7 @@ const fuzzyFilter: FilterFn<unknown> = (row, columnId, value, addMeta) => {
   return itemRank.passed;
 };
 
+// function pour trier la liste des acomptes
 const fuzzySort: SortingFn<Acompte> = (rowA, rowB, columnId) => {
   let dir = 0;
 
@@ -89,7 +90,7 @@ const StaffPageListAcompt: React.FC = () => {
       columnHelper.accessor("reservation.reference", {
         header: () => "Reference de la réservation",
         cell: (info) => <div className="text-left">{info.getValue()}</div>,
-        filterFn: "equalsString",
+        filterFn: "includesString",
       }),
       columnHelper.accessor("reservation.nomOrganisation", {
         header: () => "Nom du client",
