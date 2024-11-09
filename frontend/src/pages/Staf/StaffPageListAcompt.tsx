@@ -172,8 +172,8 @@ const StaffPageListAcompt: React.FC = () => {
     state: {
       columnFilters,
     },
-    debugTable: true,
-    debugHeaders: true,
+    // debugTable: true,
+    // debugHeaders: true,
   });
 
   const fetchData = useCallback(async () => {

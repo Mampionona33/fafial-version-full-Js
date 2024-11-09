@@ -87,3 +87,30 @@ export const getAcompteByYearMonthPage = async (
     next(error);
   }
 };
+
+export const getAcompteById = async (req: Request, res: Response) => {
+  try {
+    const acompte = await prisma.acompte.findUnique({
+      where: {
+        id: req.params.id,
+      },
+      include: {
+        reservation: true,
+      },
+    });
+
+    if (!acompte) {
+      res.status(404).json({ message: "Acompte non disponible" });
+      return;
+    }
+    res.status(200).json({
+      message: "Acompte disponible",
+      acompte: acompte,
+    });
+    return;
+  } catch (error) {
+    console.error("getAcompteById", error);
+    res.status(500).json({ error: "Une erreur s'est produite" });
+    return;
+  }
+};

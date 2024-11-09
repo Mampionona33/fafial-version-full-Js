@@ -25,15 +25,13 @@ class AcompteService {
         pageSize: String(pageSize),
       });
 
-      const accessToken = localStorage.getItem(ACCESS_TOKEN_NAME);
-
       // Construire l'URL avec les search params
       const url = `${this.ACOMPTE_API_PATH}?${searchParams.toString()}`;
 
       // Faire la requête API avec le header d'Authorization
       const resp = await api.get(url, {
         headers: {
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${this.getToken()}`,
         },
       });
 
@@ -42,6 +40,25 @@ class AcompteService {
       console.error("Erreur lors de la récupération des acomptes", error);
       throw error;
     }
+  }
+
+  public static async getById(id: string): Promise<AxiosResponse> {
+    try {
+      const response = await api.get(`${this.ACOMPTE_API_PATH}/${id}`, {
+        // Utilisez api ici
+        headers: {
+          Authorization: `Bearer ${this.getToken()}`,
+        },
+      });
+      return response;
+    } catch (error) {
+      console.error("Erreur lors de la récupération de l'acompte", error);
+      throw error;
+    }
+  }
+
+  private static getToken() {
+    return localStorage.getItem(ACCESS_TOKEN_NAME);
   }
 }
 
