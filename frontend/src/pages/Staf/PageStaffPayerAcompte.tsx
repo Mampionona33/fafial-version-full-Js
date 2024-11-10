@@ -49,7 +49,7 @@ const PageStafAjoutAcompte = () => {
     const form = event.currentTarget as HTMLFormElement;
     const formData = new FormData(form);
 
-    console.log(formData.get("modePaiement"));
+    console.log(acompte);
   };
 
   useEffect(() => {
