@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import AcompteService from "../../services/AcompteService";
 import { Acompte } from "../../interfaces/AcompteInterface";
@@ -19,6 +19,7 @@ const PageStafAjoutAcompte = () => {
   const [paymentMethodFields, setPaymentMethodFields] = useState<
     PaymentMethodesFieldsInterface[] | null
   >(null);
+  const refForm = React.useRef(null);
 
   const fetchData = async (idAcompte: string) => {
     try {
@@ -43,6 +44,14 @@ const PageStafAjoutAcompte = () => {
     }
   };
 
+  const handleSubmit = (event: React.SyntheticEvent) => {
+    event.preventDefault();
+    const form = event.currentTarget as HTMLFormElement;
+    const formData = new FormData(form);
+
+    console.log(formData.get("modePaiement"));
+  };
+
   useEffect(() => {
     if (!idAcompte) return;
     fetchData(idAcompte).then((resp) => {
@@ -65,7 +74,11 @@ const PageStafAjoutAcompte = () => {
 
   return (
     <div className="flex items-center justify-center p-10">
-      <div className="bg-slate-50 p-10 text-sm text-slate-700 rounded-sm">
+      <form
+        ref={refForm}
+        onSubmit={handleSubmit}
+        className="bg-slate-50 p-10 text-sm text-slate-700 rounded-sm"
+      >
         {acompte ? (
           <div className="flex flex-col gap-4">
             <h1 className="text-3xl font-bold text-center">Payer l'acompte</h1>
@@ -120,11 +133,18 @@ const PageStafAjoutAcompte = () => {
                   </div>
                 );
               })}
+            <div className="flex justify-center items-center">
+              <input
+                type="submit"
+                value={"Valider le paiement"}
+                className="bg-slate-800 text-slate-50 py-2 px-8 rounded-sm cursor-pointer hover:bg-slate-600"
+              />
+            </div>
           </div>
         ) : (
           <p>Loading...</p>
         )}
-      </div>
+      </form>
     </div>
   );
 };
