@@ -114,3 +114,28 @@ export const getAcompteById = async (req: Request, res: Response) => {
     return;
   }
 };
+
+export const updateAcompte = async (req: Request, res: Response) => {
+  try {
+    const acompte = await prisma.acompte.update({
+      where: {
+        id: req.params.id,
+      },
+      data: req.body,
+    });
+
+    if (!acompte) {
+      res.status(404).json({ message: "Acompte non disponible" });
+      return;
+    }
+    res.status(200).json({
+      message: "Acompte mis à jour",
+      acompte: acompte,
+    });
+    return;
+  } catch (error) {
+    console.error("updateAcompte", error);
+    res.status(500).json({ error: "Une erreur s'est produite" });
+    return;
+  }
+};
