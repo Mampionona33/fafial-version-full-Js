@@ -11,6 +11,7 @@ import { PaymentMethodesFieldsInterface } from "../../interfaces/PaymentMethodes
 import { format } from "date-fns";
 import RecetteService from "../../services/RecetteService";
 import { toast, ToastContainer } from "react-toastify";
+import { updateAcompte } from "../../../../backend/src/controllers/AcompteController";
 
 const PageStafAjoutAcompte = () => {
   const { idAcompte } = useParams();
@@ -81,9 +82,7 @@ const PageStafAjoutAcompte = () => {
       description: `Acompte pour la réservation ${
         acompte!.reservation.reference
       }`,
-      // Ajoute les champs supplémentaires si nécessaire
       paymentFields: paymentMethodFields!.map((field) => {
-        // Assertion de type ici
         const inputElement = (event.target as HTMLFormElement).elements[
           field.id as keyof HTMLFormElement["elements"]
         ] as HTMLInputElement | undefined;
@@ -98,29 +97,23 @@ const PageStafAjoutAcompte = () => {
     console.log("Données de l'entrée ajoutée : ", formData);
 
     try {
-      // créer recette
-      const resp = await RecetteService.createRecette(formData);
-      if (resp.status === 201) {
-        toast.success(resp.data.message, {
-          position: "bottom-right",
-        });
-      }
       if (acompte === null) {
         return;
       }
-      const respAcompte = await AcompteService.updateAcompte({
-        ...acompte,
-        statut: "PAYE",
-      });
 
-      if (respAcompte.status === 200) {
-        toast.success(respAcompte.data.message, {
-          position: "bottom-right",
-        });
-      }
-      if (resp.status === 201 && respAcompte.status === 200) {
-        navigate("/staff/acompte");
-      }
+      await Promise.all([
+        RecetteService.createRecette(formData),
+        AcompteService.updateAcompte({
+          ...acompte,
+          statut: "PAYE",
+        }),
+      ]);
+
+      // Afficher un message de succès ou effectuer d'autres actions nécessaires
+      toast.success("Acompte payé", {
+        position: "bottom-right",
+        toastId: "success-acompte",
+      });
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error.message, {
