@@ -33,3 +33,8 @@ export interface AcompteReservation {
   createdAt?: string;
   updatedAt?: string;
 }
+
+// UpdateAcompteProps avec des valeurs optionnelles
+export interface UpdateAcompteProps extends Omit<Acompte, "reservation"> {
+  reservation?: Partial<AcompteReservation>;
+}

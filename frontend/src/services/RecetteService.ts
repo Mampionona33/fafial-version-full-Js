@@ -1,15 +1,15 @@
 import AuthServices from "./AuthServices";
-import {AxiosResponse} from "axios";
+import { AxiosResponse } from "axios";
 import api from "./axiosConfig.ts";
+import { ACCESS_TOKEN_NAME } from "../constants/appContants.ts";
 
 class RecetteService {
-  private static accessToken: string | null = AuthServices.getTokenAccess()
 
   public static async getRecettesReferences(): Promise<AxiosResponse> {
     try {
       return await api.get("/recettes/references", {
         headers: {
-          Authorization: `Bearer ${this.accessToken}`,
+          Authorization: `Bearer ${localStorage.getItem(ACCESS_TOKEN_NAME)}`,
         },
       });
     } catch (error) {
@@ -22,7 +22,7 @@ class RecetteService {
     try {
       return await api.post("/recettes", recetteData, {
         headers: {
-          Authorization: `Bearer ${this.accessToken}`,
+          Authorization: `Bearer ${localStorage.getItem(ACCESS_TOKEN_NAME)}`,
         },
       });
     } catch (error) {
@@ -32,4 +32,4 @@ class RecetteService {
   }
 }
 
-export default RecetteService
+export default RecetteService;

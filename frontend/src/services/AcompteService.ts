@@ -1,6 +1,7 @@
 import { AxiosResponse } from "axios";
 import api from "./axiosConfig";
 import { ACCESS_TOKEN_NAME } from "../constants/appContants";
+import { Acompte } from "../interfaces/AcompteInterface";
 
 class AcompteService {
   static ACOMPTE_API_PATH = "/acomptes";
@@ -59,6 +60,19 @@ class AcompteService {
 
   private static getToken() {
     return localStorage.getItem(ACCESS_TOKEN_NAME);
+  }
+
+  public static updateAcompte(acompte: Acompte): Promise<AxiosResponse> {
+    try {
+      return api.put(`${this.ACOMPTE_API_PATH}/${acompte.id}`, acompte, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem(ACCESS_TOKEN_NAME)}`,
+        },
+      });
+    } catch (error) {
+      console.error("Error updating acompte:", error);
+      throw error;
+    }
   }
 }
 
