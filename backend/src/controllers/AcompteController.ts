@@ -116,12 +116,26 @@ export const getAcompteById = async (req: Request, res: Response) => {
 };
 
 export const updateAcompte = async (req: Request, res: Response) => {
+  console.log(req.body);
+
   try {
+    const data = {
+      montant: req.body.montant,
+      datePrevue: req.body.datePrevue,
+      modePaiement: req.body.modePaiement,
+      statut: req.body.statut,
+      reservation: req.body.reservationId
+        ? {
+            connect: { id: req.body.reservationId },
+          }
+        : undefined,
+    };
+
     const acompte = await prisma.acompte.update({
       where: {
         id: req.params.id,
       },
-      data: req.body,
+      data,
     });
 
     if (!acompte) {
@@ -130,7 +144,7 @@ export const updateAcompte = async (req: Request, res: Response) => {
     }
     res.status(200).json({
       message: "Acompte mis à jour",
-      acompte: acompte,
+      acompte,
     });
     return;
   } catch (error) {

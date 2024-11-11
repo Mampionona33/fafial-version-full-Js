@@ -11,7 +11,6 @@ import { PaymentMethodesFieldsInterface } from "../../interfaces/PaymentMethodes
 import { format } from "date-fns";
 import RecetteService from "../../services/RecetteService";
 import { toast, ToastContainer } from "react-toastify";
-import { updateAcompte } from "../../../../backend/src/controllers/AcompteController";
 
 const PageStafAjoutAcompte = () => {
   const { idAcompte } = useParams();
@@ -70,9 +69,7 @@ const PageStafAjoutAcompte = () => {
 
     const formData = {
       ...acompte,
-      acompte: {
-        statut: "PAYE",
-      },
+      statut: "PAYE",
       reference,
       personnePayeur: (event.target as HTMLFormElement).personnePayeur.value,
       contactPayeur: (event.target as HTMLFormElement).contactPayeur.value,
@@ -114,6 +111,7 @@ const PageStafAjoutAcompte = () => {
         position: "bottom-right",
         toastId: "success-acompte",
       });
+      navigate("/staf/acomptes");
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error.message, {

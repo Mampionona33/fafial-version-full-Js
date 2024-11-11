@@ -136,12 +136,12 @@ const StaffPageListAcompt: React.FC = () => {
         enableColumnFilter: false,
       }),
       columnHelper.accessor("id", {
-        header: () => "Action",
+        header: () => "Actions",
         cell: (info) => {
           const { id, statut } = info.row.original;
           return (
             <Link
-              to={`/staf/acompte/${id}`}
+              to={`/staf/acomptes/${id}`}
               className={`text-white font-bold py-2 px-4 rounded ${
                 statut === "EN_ATTENTE"
                   ? "bg-slate-800 hover:bg-slate-700"

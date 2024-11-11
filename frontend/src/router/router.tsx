@@ -47,7 +47,7 @@ const router = createBrowserRouter(
                 element={<StafDetailsReservation />}
               />
             </Route>
-            <Route path="acompte">
+            <Route path="acomptes">
               <Route path="" element={<StaffPageListAcompt />} />
               <Route path=":idAcompte" element={<PageStaffPayerAcompte />} />
             </Route>
