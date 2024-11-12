@@ -49,7 +49,10 @@ const router = createBrowserRouter(
             </Route>
             <Route path="acomptes">
               <Route path="" element={<StaffPageListAcompt />} />
-              <Route path=":idAcompte" element={<PageStaffPayerAcompte />} />
+              <Route
+                path="payer/:idAcompte"
+                element={<PageStaffPayerAcompte />}
+              />
             </Route>
             <Route
               path="ajout-reservation"
