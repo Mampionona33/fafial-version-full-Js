@@ -25,20 +25,6 @@ const PageStafAjoutAcompte = () => {
   const refForm = React.useRef(null);
   const navigate = useNavigate();
 
-  // const fetchData = async (idAcompte: string) => {
-  //   try {
-  //     const resp = await AcompteService.getById(idAcompte);
-  //     if (resp.status === 404) {
-  //       throw new Error("Acompte not found");
-  //     }
-  //     return resp;
-  //   } catch (error) {
-  //     if (error instanceof Error) {
-  //       throw error;
-  //     }
-  //   }
-  // };
-
   const onChangePaymentMethod = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
@@ -111,7 +97,7 @@ const PageStafAjoutAcompte = () => {
         position: "bottom-right",
         toastId: "success-acompte",
       });
-      navigate("/staf/acomptes");
+      navigate("/staf/acomptes/details/" + idAcompte);
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error.message, {
@@ -120,42 +106,6 @@ const PageStafAjoutAcompte = () => {
       }
     }
   };
-
-  // useEffect(() => {
-  //   const fetchRecetteRef = async () => {
-  //     try {
-  //       const response = await RecetteService.getRecettesReferences();
-  //       if (response.status === 200) {
-  //         return response.data;
-  //       }
-  //     } catch (error) {
-  //       console.error(error);
-  //     }
-  //   };
-  //   if (!idAcompte) return;
-  //   fetchData(idAcompte).then((resp) => {
-  //     const { acompte } = resp!.data;
-  //     // console.log(acompte);
-  //     setAcompte(acompte);
-  //     if (paymentMethodFields === null && acompte.modePaiement) {
-  //       fetchPaymentFields(acompte.modePaiement);
-  //     }
-  //   });
-  //   if (paymentMethodesFields && paymentMethodesFields.length > 0) {
-  //     setPaymentMethodFields(paymentMethodesFields);
-  //   }
-  //   if (reference === "") {
-  //     fetchRecetteRef().then((resp) => {
-  //       setReference(resp.reference);
-  //     });
-  //   }
-  // }, [
-  //   idAcompte,
-  //   reference,
-  //   fetchPaymentFields,
-  //   paymentMethodFields,
-  //   paymentMethodesFields,
-  // ]);
 
   useEffect(() => {
     let mounted = true;
