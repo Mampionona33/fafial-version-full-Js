@@ -11,40 +11,45 @@ import { PaymentMethodesFieldsInterface } from "../../interfaces/PaymentMethodes
 import { format } from "date-fns";
 import RecetteService from "../../services/RecetteService";
 import { toast, ToastContainer } from "react-toastify";
+import PaymentMethodesFieldsService from "../../services/PaymentMethodesFieldsService";
+import { useLoading } from "../../hooks/useLoading";
 
 const PageStafAjoutAcompte = () => {
   const { idAcompte } = useParams();
   const [reference, setReference] = React.useState<string>("");
   const [acompte, setAcompte] = useState<Acompte | null>(null);
   const { paymentMethodes } = usePaymentMethodes();
-  const { fetchPaymentFields, paymentMethodesFields } =
+  const { paymentMethodesFields } =
     usePaymentMethodesFields();
   const [paymentMethodFields, setPaymentMethodFields] = useState<
     PaymentMethodesFieldsInterface[] | null
   >(null);
   const refForm = React.useRef(null);
   const navigate = useNavigate();
+  const { loading, setLoading } = useLoading();
 
-  const fetchData = async (idAcompte: string) => {
-    try {
-      const resp = await AcompteService.getById(idAcompte);
-      if (resp.status === 404) {
-        throw new Error("Acompte not found");
-      }
-      return resp;
-    } catch (error) {
-      if (error instanceof Error) {
-        throw error;
-      }
-    }
-  };
-
-  const onChangePaymentMethod = (
+  const onChangePaymentMethod = async (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
     const selectedPaymentMethod = event.target.value;
     if (selectedPaymentMethod) {
-      fetchPaymentFields(selectedPaymentMethod);
+      try {
+        setLoading(true);
+        const resp =
+          await PaymentMethodesFieldsService.getFiledByPaymentsMethodsId(
+            selectedPaymentMethod
+          );
+        if (resp.status === 200) {
+          const { data } = resp;
+          setPaymentMethodFields(data.paymentFields);
+        }
+      } catch (error) {
+        if (error instanceof Error) {
+          toast.error(error.message);
+        }
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -122,40 +127,121 @@ const PageStafAjoutAcompte = () => {
   };
 
   useEffect(() => {
-    const fetchRecetteRef = async () => {
-      try {
-        const response = await RecetteService.getRecettesReferences();
-        if (response.status === 200) {
-          return response.data;
+    const fetchPaymentFieldsIfNeeded = async (modePaiement: string) => {
+      // Only fetch if paymentMethodFields are not set and paymentMethodesFields is empty
+      if (paymentMethodFields === null && paymentMethodesFields.length === 0) {
+        try {
+          setLoading(true);
+          const response =
+            await PaymentMethodesFieldsService.getFiledByPaymentsMethodsId(
+              modePaiement
+            );
+          if (response.status === 200) {
+            setPaymentMethodFields(response.data.paymentFields);
+          }
+        } catch (error) {
+          console.error("Error fetching payment method fields:", error);
+        } finally {
+          setLoading(false);
         }
-      } catch (error) {
-        console.error(error);
       }
     };
-    if (!idAcompte) return;
-    fetchData(idAcompte).then(async (resp) => {
-      const { acompte } = resp!.data;
-      // console.log(acompte);
-      setAcompte(acompte);
-      if (paymentMethodFields === null && acompte.modePaiement) {
-        await fetchPaymentFields(acompte.modePaiement);
+
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [refResponse, acompteResponse] = await Promise.all([
+          reference.length === 0
+            ? RecetteService.getRecettesReferences()
+            : null,
+          idAcompte ? AcompteService.getById(idAcompte) : null,
+        ]);
+
+        // Set reference and acompte if both responses are successful
+        if (refResponse?.status === 200) {
+          setReference(refResponse.data.reference);
+        }
+        if (acompteResponse?.status === 200) {
+          const acompteData = acompteResponse.data.acompte;
+          setAcompte(acompteData);
+
+          // Fetch payment fields if modePaiement exists in acompte data
+          if (acompteData.modePaiement) {
+            fetchPaymentFieldsIfNeeded(acompteData.modePaiement);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
       }
-    });
-    if (paymentMethodesFields && paymentMethodesFields.length > 0) {
-      setPaymentMethodFields(paymentMethodesFields);
-    }
-    if (reference === "") {
-      fetchRecetteRef().then((resp) => {
-        setReference(resp.reference);
-      });
+    };
+
+    // Only call fetchData if reference or acompte needs fetching
+    if ((reference === "" || !acompte) && idAcompte) {
+      fetchData();
     }
   }, [
     idAcompte,
     reference,
-    fetchPaymentFields,
+    acompte,
     paymentMethodFields,
     paymentMethodesFields,
+    setLoading,
   ]);
+
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const [refResponse, acompteResponse] = await Promise.all([
+  //         // Only fetch if reference is empty
+  //         reference.length === 0
+  //           ? RecetteService.getRecettesReferences()
+  //           : null,
+  //         idAcompte ? AcompteService.getById(idAcompte) : null,
+  //       ]);
+
+  //       // Set reference if fetched and response is successful
+  //       if (refResponse?.status === 200 && acompteResponse?.status === 200) {
+  //         setReference(refResponse.data.reference);
+  //         setAcompte(acompteResponse.data.acompte);
+  //         if (
+  //           paymentMethodesFields.length === 0 &&
+  //           acompteResponse.data.acompte.modePaiement &&
+  //           paymentMethodFields === null
+  //         ) {
+  //           try {
+  //             const paymentMethodesFieldResp =
+  //               await PaymentMethodesFieldsService.getFiledByPaymentsMethodsId(
+  //                 acompteResponse.data.acompte.modePaiement
+  //               );
+  //             if (paymentMethodesFieldResp.status === 200) {
+  //               setPaymentMethodFields(
+  //                 paymentMethodesFieldResp.data.paymentFields
+  //               );
+  //             }
+  //           } catch (error) {
+  //             console.error("Error fetching data:", error);
+  //           }
+  //         }
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching data:", error);
+  //     }
+  //   };
+
+  //   // Call fetchData only if needed
+  //   if ((reference === "" || !acompte) && idAcompte) {
+  //     fetchData();
+  //   }
+  // }, [
+  //   idAcompte,
+  //   reference,
+  //   acompte,
+  //   fetchPaymentFields,
+  //   paymentMethodFields,
+  //   paymentMethodesFields,
+  // ]);
 
   return (
     <div className="flex items-center justify-center p-10">
@@ -164,7 +250,7 @@ const PageStafAjoutAcompte = () => {
         onSubmit={handleSubmit}
         className="bg-slate-50 p-10 text-sm text-slate-700 rounded-sm"
       >
-        {acompte ? (
+        {acompte && !loading ? (
           <div className="flex flex-col gap-4">
             <h1 className="text-3xl font-bold text-center">Payer l'acompte</h1>
             <div className="flex gap-4 flex-col">
