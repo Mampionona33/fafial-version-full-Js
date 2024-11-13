@@ -116,7 +116,7 @@ const PageStafAjoutAcompte = () => {
         position: "bottom-right",
         toastId: "success-acompte",
       });
-      navigate("/staf/acomptes");
+      navigate("/staf/acomptes/details/" + idAcompte);
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error.message, {

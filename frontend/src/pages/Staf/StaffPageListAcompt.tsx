@@ -117,7 +117,7 @@ const StaffPageListAcompt: React.FC = () => {
                   ? isLate
                     ? "text-red-500 bg-red-100"
                     : "text-green-500 bg-green-100"
-                  : ""
+                  : "text-blue-500 bg-blue-100"
               }`}
             >
               {statut === "EN_ATTENTE"
@@ -139,16 +139,23 @@ const StaffPageListAcompt: React.FC = () => {
         header: () => "Actions",
         cell: (info) => {
           const { id, statut } = info.row.original;
+
+          const isPaid = statut === "PAYE";
+          const isPending = statut === "EN_ATTENTE";
+          const linkTo = isPaid
+            ? `/staf/acomptes/details/${id}`
+            : `/staf/acomptes/payer/${id}`;
+          const buttonText = isPending ? "Payer" : "Consulter";
+          const buttonColor = isPending
+            ? "bg-slate-800 hover:bg-slate-700"
+            : "bg-blue-500 hover:bg-blue-700";
+
           return (
             <Link
-              to={`/staf/acomptes/payer/${id}`}
-              className={`text-white font-bold py-2 px-4 rounded ${
-                statut === "EN_ATTENTE"
-                  ? "bg-slate-800 hover:bg-slate-700"
-                  : "bg-blue-500 hover:bg-blue-700"
-              }`}
+              to={linkTo}
+              className={`text-white font-bold py-2 px-4 rounded ${buttonColor}`}
             >
-              {statut === "EN_ATTENTE" ? "Payer" : "Consulter"}
+              {buttonText}
             </Link>
           );
         },
