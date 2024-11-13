@@ -112,8 +112,10 @@ export interface Recette {
   id: string;
   montant: number;
   description?: string;
+  contactPayeur?: string;
   personnePayeur: string;
   moyenPaiement: string;
+  acompteId?: string;
   date: string; // Format ISO
   createdAt?: string; // Format ISO
   updatedAt?: string; // Format ISO

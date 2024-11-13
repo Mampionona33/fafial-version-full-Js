@@ -137,8 +137,14 @@ export const getRecetteByAcompteId = async (
       where: {
         acompteId: idAcompte,
       },
+      include: {
+        paymentMethode: true,
+      }
     });
-    res.status(200).json(recettes);
+    res.status(200).json({
+      message: "Recettes trouvées",
+      recettes ,
+    });
   } catch (error) {
     console.error("Error fetching recettes:", error);
     next(error);
