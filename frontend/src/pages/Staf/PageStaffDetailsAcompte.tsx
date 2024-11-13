@@ -10,7 +10,7 @@ const PageStaffDetailsAcompte = () => {
   const { loading, setLoading } = useLoading();
   const navigate = useNavigate();
   useEffect(() => {
-    const fetchAcompte = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
         const [acompteResponse] = await Promise.all([
@@ -27,7 +27,7 @@ const PageStaffDetailsAcompte = () => {
       }
     };
     if (idAcompte && !acompte) {
-      fetchAcompte();
+      fetchData();
     }
     console.log(acompte);
   }, [idAcompte, acompte, setLoading]);

@@ -1,6 +1,7 @@
-import api from "./axiosConfig"; 
-import { BACKEND_URL } from "../constants/appContants";
+import api from "./axiosConfig";
+import { ACCESS_TOKEN_NAME, BACKEND_URL } from "../constants/appContants";
 import AuthServices from "./AuthServices";
+import { AxiosResponse } from "axios";
 
 class PaymentMethodesServices {
   static API_URL = `${BACKEND_URL}/payment-methodes`;
@@ -15,8 +16,21 @@ class PaymentMethodesServices {
       });
       return response;
     } catch (error) {
-      console.error(error); 
-      throw error; 
+      console.error(error);
+      throw error;
+    }
+  }
+
+  public static async getById(id: string): Promise<AxiosResponse> {
+    try {
+      return await api.get(`${this.API_URL}/${id}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem(ACCESS_TOKEN_NAME)}`,
+        },
+      });
+    } catch (error) {
+      console.error(error);
+      throw error;
     }
   }
 }

@@ -26,3 +26,22 @@ export const getAllPaymentMethodes = async (
     next(error);
   }
 };
+
+export const getPaymentMethodeById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const id = req.params.id;
+    const paymentMethode = await prisma.paymentMethod.findUnique({
+      where: {
+        id: id,
+      },
+    });
+    res.status(200).json(paymentMethode);
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+};

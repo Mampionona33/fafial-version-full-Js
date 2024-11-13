@@ -103,6 +103,7 @@ model Acompte {
   statut        String      @default("EN_ATTENTE") // Possible values: EN_ATTENTE, PAYE
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
+  Recette       Recette[]
 }
 
 model Depense {
@@ -151,6 +152,9 @@ model Recette {
   payments         Payment[] // Relation avec les paiements associés à la recette
   createdAt        DateTime      @default(now())
   updatedAt        DateTime      @updatedAt
+
+  acompteId String? // Nouvelle colonne optionnelle pour associer un acompte
+  acompte   Acompte? @relation(fields: [acompteId], references: [id]) // Relation avec Acompte
 }
 
 model Payment {

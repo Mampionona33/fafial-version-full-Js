@@ -1,10 +1,10 @@
 import prisma from "../../prisma/prisma";
-import {NextFunction, Request, Response} from "express";
+import { NextFunction, Request, Response } from "express";
 
 export const getRecetteReferences = async (_req: Request, res: Response) => {
   try {
     // Importation dynamique de nanoid pour les modules ES
-    const {nanoid} = require('fix-esm').require('nanoid');
+    const { nanoid } = require("fix-esm").require("nanoid");
 
     // Créer une référence pour le nouveau recette
     const date = new Date();
@@ -43,9 +43,13 @@ export const getRecetteReferences = async (_req: Request, res: Response) => {
     });
     return;
   }
-}
+};
 
-export const createRecette = async (req: Request, res: Response, next: NextFunction) => {
+export const createRecette = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const {
       reference,
@@ -67,20 +71,19 @@ export const createRecette = async (req: Request, res: Response, next: NextFunct
         date: new Date(date),
         description,
         montant: parseFloat(montant),
-        paymentMethode: {connect: {id: paymentMethode}},
+        paymentMethode: { connect: { id: paymentMethode } },
       },
     });
-
 
     // 2. Création du paiement associé à la recette
     const payment = await prisma.payment.create({
       data: {
         amount: parseFloat(montant),
         fields: {},
-        recette: {connect: {id: recette.id}},
-        paymentMethod: {connect: {id: paymentMethode}},
+        recette: { connect: { id: recette.id } },
+        paymentMethod: { connect: { id: paymentMethode } },
       },
-    })
+    });
 
     // 3. Enregistrer les champs dynamiques pour le paiement
     if (paymentFields && paymentFields.length > 0) {
@@ -95,12 +98,14 @@ export const createRecette = async (req: Request, res: Response, next: NextFunct
           await prisma.paymentFieldValue.create({
             data: {
               value: field.value,
-              payment: {connect: {id: payment.id}},
-              paymentField: {connect: {id: paymentField.id}},
+              payment: { connect: { id: payment.id } },
+              paymentField: { connect: { id: paymentField.id } },
             },
           });
         } else {
-          console.error(`Champ ${field.fieldName} non trouvé pour la méthode ${paymentMethode}`);
+          console.error(
+            `Champ ${field.fieldName} non trouvé pour la méthode ${paymentMethode}`
+          );
         }
       }
     }
@@ -119,3 +124,21 @@ export const createRecette = async (req: Request, res: Response, next: NextFunct
   }
 };
 
+export const getRecetteByAcompteId = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const idAcompte = req.params.idAcompte;
+    const recettes = await prisma.recette.findMany({
+      where: {
+        acompteId: idAcompte,
+      },
+    });
+    res.status(200).json(recettes);
+  } catch (error) {
+    console.error("Error fetching recettes:", error);
+    next(error);
+  }
+};
