@@ -59,6 +59,7 @@ export const createRecette = async (
       description,
       montant,
       paymentMethode,
+      acompteId,
       paymentFields,
     } = req.body;
 
@@ -72,6 +73,7 @@ export const createRecette = async (
         description,
         montant: parseFloat(montant),
         paymentMethode: { connect: { id: paymentMethode } },
+        acompte: { connect: { id: acompteId } },
       },
     });
 
