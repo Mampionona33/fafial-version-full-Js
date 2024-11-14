@@ -2,20 +2,43 @@ import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import "moment/locale/fr"; // Importer la localisation française
 import "react-big-calendar/lib/css/react-big-calendar.css"; // Importer les styles du calendrier
-import { useReservations } from "../hooks/useReservations";
-import { useSalles } from "../hooks/useSalles";
 import { useEffect, useState } from "react";
 import CalendarDataAdapter from "../utils/CalendarDataAdapter";
 import { CalendarEvent } from "../interfaces/CalendarEventInterface";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import ReservationService from "../services/ReservationService";
+import { useLoading } from "../hooks/useLoading";
+import SalleServices from "../services/SalleServices";
 
 const localizer = momentLocalizer(moment);
 
 moment.locale("fr");
 
 const AppCalendar = () => {
-  const { reservations } = useReservations();
-  const { salles } = useSalles();
+  const { setLoading } = useLoading();
+  // Utilisation de React Query pour les réservations
+  const {
+    data: reservationsData,
+    isLoading: loadingReservation,
+    isSuccess: isSuccesReservation,
+  } = useQuery({
+    queryKey: ["reservations"],
+    queryFn: () => ReservationService.getAll(),
+  });
+
+  const {
+    data: salleData,
+    isLoading: salleLoading,
+    isSuccess: salleSuccess,
+  } = useQuery({
+    queryKey: ["salles"],
+    queryFn: () => SalleServices.getAll(),
+  });
+
+  const reservations = reservationsData?.data.reservations;
+  const salles = salleData?.data.salles;
+
   const [resources, setRessources] = useState<
     { id: string | number; title: string }[]
   >([]);
@@ -32,7 +55,22 @@ const AppCalendar = () => {
       const adaptedEvents = CalendarDataAdapter.adaptEvents(reservations);
       setEventList(adaptedEvents);
     }
-  }, [salles, reservations]);
+    if (loadingReservation || salleLoading) {
+      setLoading(true);
+    }
+    if (isSuccesReservation && salleSuccess) {
+      setLoading(false);
+    }
+  }, [
+    salles,
+    reservations,
+    loadingReservation,
+    salleSuccess,
+    salleLoading,
+    setLoading,
+    reservationsData,
+    isSuccesReservation,
+  ]);
 
   return (
     <div>
@@ -65,7 +103,7 @@ const AppCalendar = () => {
         resources={resources} // Passer la liste des ressources au calendrier
         resourceIdAccessor="id" // Identifier la ressource par "id"
         resourceTitleAccessor="title" // Le titre de la ressource est défini par "title"
-        defaultView="month" // Afficher une vue par defaut sur le mois
+        defaultView="month" // Afficher une vue par défaut sur le mois
       />
     </div>
   );
