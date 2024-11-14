@@ -5,7 +5,6 @@ import { Acompte } from "../../interfaces/AcompteInterface";
 import { usePaymentMethodes } from "../../hooks/usePaymentMethodes";
 import AppLabel from "../../components/AppLabel";
 import AppSelect from "../../components/AppSelect";
-import { usePaymentMethodesFields } from "../../hooks/usePaymentMethodesFields";
 import AppInput from "../../components/AppInput";
 import { PaymentMethodesFieldsInterface } from "../../interfaces/PaymentMethodesFieldsContextType";
 import { format } from "date-fns";
@@ -13,72 +12,73 @@ import RecetteService from "../../services/RecetteService";
 import { toast, ToastContainer } from "react-toastify";
 import PaymentMethodesFieldsService from "../../services/PaymentMethodesFieldsService";
 import { useLoading } from "../../hooks/useLoading";
+import { useQuery } from "@tanstack/react-query";
 
 const PageStafAjoutAcompte = () => {
   const { idAcompte } = useParams();
   const [reference, setReference] = React.useState<string>("");
   const [acompte, setAcompte] = useState<Acompte | null>(null);
-  const { paymentMethodes  } = usePaymentMethodes();
-  const { paymentMethodesFields } = usePaymentMethodesFields();
+  const { paymentMethodes } = usePaymentMethodes();
   const [paymentMethodFields, setPaymentMethodFields] = useState<
     PaymentMethodesFieldsInterface[] | null
   >(null);
   const refForm = React.useRef(null);
   const navigate = useNavigate();
-  const { loading, setLoading } = useLoading();
+  const { setLoading } = useLoading();
+  const previousAcompteRef = React.useRef<Acompte | null>(null);
 
-  const onChangePaymentMethod = async (
+
+  const {
+    data: referenceData,
+    isLoading: isLoadingReference,
+    isSuccess: isSuccessReference,
+  } = useQuery({
+    queryKey: ["reference"],
+    queryFn: RecetteService.getRecettesReferences,
+  });
+
+  const {
+    data: acompteData,
+    isLoading: isLoadingAcompte,
+    isSuccess: isSuccessAcompte,
+  } = useQuery({
+    queryKey: ["acompte", idAcompte],
+    queryFn: () => AcompteService.getById(idAcompte!),
+    enabled: !!idAcompte,
+  });
+
+  const {
+    data: paymentMethodesFieldsData,
+    isLoading: isLoadingPaymentMethodesFields,
+    isSuccess: isSuccessPaymentMethodesFields,
+  } = useQuery({
+    queryKey: ["paymentMethodesFields", acompte?.modePaiement],
+    queryFn: () =>
+      PaymentMethodesFieldsService.getFiledByPaymentsMethodsId(
+        acompte?.modePaiement
+      ),
+    enabled: !!acompte?.modePaiement, // La requête est activée seulement si modePaiement est défini
+  });
+
+  const onChangePaymentMethod = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
     const selectedPaymentMethod = event.target.value;
-    console.log(selectedPaymentMethod);
 
     if (selectedPaymentMethod) {
-      try {
-        setLoading(true);
+      // Mettre à jour previousAcompteRef avec la valeur actuelle de acompte
+      previousAcompteRef.current = acompte;
 
-        const [respPaymentMethodeFields] = await Promise.all([
-          PaymentMethodesFieldsService.getFiledByPaymentsMethodsId(
-            selectedPaymentMethod
-          ),
-        ]);
-
-        if (respPaymentMethodeFields.status === 200) {
-          // Extraction sécurisée des données pour éviter les erreurs d'accès
-          const dataPaymentMethode = respPaymentMethodeFields.data;
-
-          if (dataPaymentMethode && dataPaymentMethode.paymentFields) {
-            setPaymentMethodFields(dataPaymentMethode.paymentFields);
-
-            // Mettre à jour l'acompte avec la méthode de paiement sélectionnée
-            setAcompte((prevAcompte) => {
-              if (prevAcompte) {
-                return {
-                  ...prevAcompte,
-                  modePaiement: selectedPaymentMethod, // Mettez à jour modePaiement
-                };
-              }
-              return prevAcompte;
-            });
-          } else {
-            toast.error(
-              "Les champs de la méthode de paiement ne sont pas disponibles."
-            );
-          }
-        } else {
-          toast.error(
-            "Erreur lors de la récupération des données de la méthode de paiement."
-          );
+      // Mettre à jour l'acompte avec le nouveau mode de paiement
+      setAcompte((prevAcompte) => {
+        if (prevAcompte) {
+          return {
+            ...prevAcompte,
+            modePaiement: selectedPaymentMethod,
+          };
         }
-      } catch (error) {
-        if (error instanceof Error) {
-          toast.error(`Erreur : ${error.message}`);
-        } else {
-          toast.error("Une erreur inattendue est survenue.");
-        }
-      } finally {
-        setLoading(false);
-      }
+        return prevAcompte;
+      });
     }
   };
 
@@ -157,66 +157,51 @@ const PageStafAjoutAcompte = () => {
   };
 
   useEffect(() => {
-    const fetchPaymentFieldsIfNeeded = async (modePaiement: string) => {
-      // Only fetch if paymentMethodFields are not set and paymentMethodesFields is empty
-      if (paymentMethodFields === null && paymentMethodesFields.length === 0) {
-        try {
-          setLoading(true);
-          const response =
-            await PaymentMethodesFieldsService.getFiledByPaymentsMethodsId(
-              modePaiement
-            );
-          if (response.status === 200) {
-            setPaymentMethodFields(response.data.paymentFields);
-          }
-        } catch (error) {
-          console.error("Error fetching payment method fields:", error);
-        } finally {
-          setLoading(false);
-        }
+    // Mettre à jour la référence
+    if (referenceData) {
+      setReference(referenceData.data.reference);
+    }
+
+    // Si les données de l'acompte sont disponibles et pas en train de charger les champs de paiement
+    if (acompteData && acompteData.data.acompte) {
+      const newAcompte = acompteData.data.acompte;
+
+      // Si l'acompte actuel n'est pas défini ou si l'ID de l'acompte a changé, on met à jour l'acompte
+      if (!acompte || acompte.id !== newAcompte.id) {
+        setAcompte(newAcompte);
       }
-    };
+    }
 
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const [refResponse, acompteResponse] = await Promise.all([
-          reference.length === 0
-            ? RecetteService.getRecettesReferences()
-            : null,
-          idAcompte ? AcompteService.getById(idAcompte) : null,
-        ]);
+    // Mettre à jour les champs de paiement si les données sont disponibles
+    if (paymentMethodesFieldsData) {
+      setPaymentMethodFields(paymentMethodesFieldsData.data.paymentFields);
+    }
 
-        // Set reference and acompte if both responses are successful
-        if (refResponse?.status === 200) {
-          setReference(refResponse.data.reference);
-        }
-        if (acompteResponse?.status === 200) {
-          const acompteData = acompteResponse.data.acompte;
-          setAcompte(acompteData);
-
-          // Fetch payment fields if modePaiement exists in acompte data
-          if (acompteData.modePaiement) {
-            fetchPaymentFieldsIfNeeded(acompteData.modePaiement);
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    // Only call fetchData if reference or acompte needs fetching
-    if ((reference === "" || !acompte) && idAcompte) {
-      fetchData();
+    // Gérer l'état de chargement
+    if (
+      isLoadingAcompte ||
+      isLoadingReference ||
+      isLoadingPaymentMethodesFields
+    ) {
+      setLoading(true);
+    } else if (
+      isSuccessAcompte &&
+      isSuccessReference &&
+      isSuccessPaymentMethodesFields
+    ) {
+      setLoading(false);
     }
   }, [
-    idAcompte,
-    reference,
+    referenceData,
+    acompteData,
     acompte,
-    paymentMethodFields,
-    paymentMethodesFields,
+    isLoadingAcompte,
+    isLoadingReference,
+    isLoadingPaymentMethodesFields,
+    isSuccessAcompte,
+    isSuccessReference,
+    isSuccessPaymentMethodesFields,
+    paymentMethodesFieldsData,
     setLoading,
   ]);
 
@@ -227,7 +212,7 @@ const PageStafAjoutAcompte = () => {
         onSubmit={handleSubmit}
         className="bg-slate-50 p-10 text-sm text-slate-700 rounded-sm"
       >
-        {acompte && !loading ? (
+        {acompte ? (
           <div className="flex flex-col gap-4">
             <h1 className="text-3xl font-bold text-center">Payer l'acompte</h1>
             <div className="flex gap-4 flex-col">
@@ -291,10 +276,10 @@ const PageStafAjoutAcompte = () => {
                       }))
                     : []
                 }
-                value={acompte?.modePaiement} // Utilisez `value` pour un composant contrôlé
+                value={acompte?.modePaiement} // Cela doit être lié à modePaiement
                 name="paymentMethode"
                 id="paymentMethode"
-                onChange={onChangePaymentMethod}
+                onChange={onChangePaymentMethod} // L'événement change qui met à jour modePaiement
               />
             </div>
             {paymentMethodFields &&
