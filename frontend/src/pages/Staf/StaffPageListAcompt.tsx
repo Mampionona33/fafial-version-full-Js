@@ -16,13 +16,13 @@ import {
 import { Acompte } from "../../interfaces/AcompteInterface";
 import { format } from "date-fns";
 import AppPagination from "../../components/AppPagination";
-import { useAuth } from "../../hooks/useAuth";
 import {
   RankingInfo,
   rankItem,
   compareItems,
 } from "@tanstack/match-sorter-utils";
 import { getFilteredRowModel } from "@tanstack/react-table";
+import { useQuery } from "@tanstack/react-query";
 
 declare module "@tanstack/react-table" {
   //add fuzzy filter to the filterFns
@@ -73,7 +73,6 @@ const StaffPageListAcompt: React.FC = () => {
     pageSize: Number(searchParams.get("pageSize")) || 5,
     pageCount: 0,
   });
-  const { isAuthenticated } = useAuth();
 
   const annee = Number(searchParams.get("annee")) || new Date().getFullYear();
   const mois = Number(searchParams.get("mois")) || new Date().getMonth() + 1;
@@ -183,33 +182,14 @@ const StaffPageListAcompt: React.FC = () => {
     // debugHeaders: true,
   });
 
-  const fetchData = useCallback(async () => {
-    setLoading(true);
-    if (!isAuthenticated) {
-      return;
-    }
-    try {
-      const { status, data } = await AcompteService.getAll({
-        annee,
-        mois,
-        page: page,
-        pageSize: pageSize,
-      });
-      if (status === 200) {
-        setListAcompte(data.acomptes);
-        setPagination((prev) => ({
-          ...prev,
-          page: data.pagination.currentPage,
-          pageSize: data.pagination.pageSize,
-          pageCount: data.pagination.totalPages,
-        }));
-      }
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  }, [annee, mois, page, pageSize, setLoading, isAuthenticated]);
+  const {
+    data: listeAcompteData,
+    isLoading: isLoadingAcompte,
+    isSuccess: isSuccesAcompte,
+  } = useQuery({
+    queryKey: ["acomptes", annee, mois, page, pageSize],
+    queryFn: () => AcompteService.getAll({ annee, mois, page, pageSize }),
+  });
 
   const updateSearchParams = useCallback(
     (page: number, pageSize: number) => {
@@ -224,8 +204,22 @@ const StaffPageListAcompt: React.FC = () => {
   );
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData, annee, mois]);
+    if (listeAcompteData) {
+      setListAcompte(listeAcompteData.data.acomptes);
+      setPagination((prev) => ({
+        ...prev,
+        page: listeAcompteData.data.pagination.currentPage,
+        pageSize: listeAcompteData.data.pagination.pageSize,
+        pageCount: listeAcompteData.data.pagination.totalPages,
+      }));
+    }
+    if (isLoadingAcompte) {
+      setLoading(true);
+    }
+    if (isSuccesAcompte) {
+      setLoading(false);
+    }
+  }, [listeAcompteData, isLoadingAcompte, isSuccesAcompte, setLoading]);
 
   const handleRowsPerPageChange = useCallback(
     async (newPageSize: number) => {
