@@ -62,9 +62,10 @@ export const createAcompteInvoice = async (req: Request, res: Response) => {
 
 export const getAcompteInvoice = async (req: Request, res: Response) => {
   try {
-    const invoice = await prisma.invoice.findUnique({
+    console.log(req.params.id);
+    const invoice = await prisma.invoice.findFirst({
       where: {
-        id: req.params.id,
+        acompteId: req.params.id,
       },
     });
 
