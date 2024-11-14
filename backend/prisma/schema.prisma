@@ -104,6 +104,7 @@ model Acompte {
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
   Recette       Recette[]
+  Invoice       Invoice[]
 }
 
 model Depense {
@@ -154,7 +155,8 @@ model Recette {
   updatedAt        DateTime      @updatedAt
 
   acompteId String? // Nouvelle colonne optionnelle pour associer un acompte
-  acompte   Acompte? @relation(fields: [acompteId], references: [id]) // Relation avec Acompte
+  acompte   Acompte?  @relation(fields: [acompteId], references: [id]) // Relation avec Acompte
+  Invoice   Invoice[]
 }
 
 model Payment {
@@ -185,4 +187,36 @@ model RefreshToken {
   user      User     @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
+}
+
+model Invoice {
+  id            String        @id @default(cuid())
+  reference     String        @unique
+  clientName    String // Nom du client
+  clientContact String // Contact du client (email ou téléphone)
+  totalAmount   Float // Montant total de la facture
+  paymentStatus String        @default("PENDING") // Statut de paiement (PENDING, PAID, CANCELLED)
+  paymentDate   DateTime? // Date de paiement si payée
+  invoiceType   String        @default("STANDARD") // Type de facture : STANDARD ou ACOMPTE
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  items         InvoiceItem[] // Liste des éléments de la facture
+
+  recetteId String? // Optionnel : ID de la recette associée pour les paiements
+  recette   Recette? @relation(fields: [recetteId], references: [id])
+
+  acompteId String? // Optionnel : ID de l'acompte associé si c'est une facture d'acompte
+  acompte   Acompte? @relation(fields: [acompteId], references: [id])
+}
+
+model InvoiceItem {
+  id          String   @id @default(cuid())
+  description String // Description de l'article ou du service
+  quantity    Int // Quantité
+  unitPrice   Float // Prix unitaire
+  total       Float // Prix total pour cet article (quantity * unitPrice)
+  invoiceId   String // ID de la facture associée
+  invoice     Invoice  @relation(fields: [invoiceId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

@@ -13,6 +13,7 @@ import { toast, ToastContainer } from "react-toastify";
 import PaymentMethodesFieldsService from "../../services/PaymentMethodesFieldsService";
 import { useLoading } from "../../hooks/useLoading";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import InvoiceService from "../../services/InvoiceService";
 
 const PageStafAjoutAcompte = () => {
   const { idAcompte } = useParams();
@@ -59,13 +60,24 @@ const PageStafAjoutAcompte = () => {
     enabled: !!acompte?.modePaiement, // La requête est activée seulement si modePaiement est défini
   });
 
+  const createInvoice = useMutation({
+    mutationKey: ["createInvoice", acompte?.id],
+    mutationFn: (acompte: Acompte) =>
+      InvoiceService.creatAcomptInvoice(acompte.id!),
+    onSuccess: () => {
+      toast.success("Acompte mis à jour");
+      navigate("/staf/acomptes/details/" + idAcompte);
+    },
+  });
+
   // Définition des mutations
   const updateAcompte = useMutation({
     mutationKey: ["updateAcompte", acompte?.id],
     mutationFn: (acompte: Acompte) => AcompteService.updateAcompte(acompte), // Modification ici
     onSuccess: () => {
-      toast.success("Acompte mis à jour");
-      navigate("/staf/acomptes/details/" + idAcompte);
+      if (acompte) {
+        createInvoice.mutate(acompte);
+      }
     },
   });
 

@@ -1,19 +1,11 @@
+import { ReferenceGenerator } from "../utils/ReferenceGenerator";
 import prisma from "../../prisma/prisma";
 import { NextFunction, Request, Response } from "express";
 
 export const getRecetteReferences = async (_req: Request, res: Response) => {
   try {
-    // Importation dynamique de nanoid pour les modules ES
-    const { nanoid } = require("fix-esm").require("nanoid");
-
-    // Créer une référence pour le nouveau recette
-    const date = new Date();
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    const formattedDate = `${year}${month}${day}`;
-    const randomString = nanoid(10);
-    const recetteRef: string = `REC-${formattedDate}-${randomString}`;
+    // Générer une nouvellegetReference
+    const recetteRef = ReferenceGenerator.generateReference("REC");
     console.log("recetteRef", recetteRef);
 
     // Vérifier si la référence existe dans la base de données
@@ -139,11 +131,11 @@ export const getRecetteByAcompteId = async (
       },
       include: {
         paymentMethode: true,
-      }
+      },
     });
     res.status(200).json({
       message: "Recettes trouvées",
-      recettes ,
+      recettes,
     });
   } catch (error) {
     console.error("Error fetching recettes:", error);

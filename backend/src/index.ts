@@ -9,6 +9,7 @@ import paymentMethodesRouter from "./routes/paymentMethodesRouter";
 import paymentMethodesFieldsRouter from "./routes/paymentMethodesFieldsRouter";
 import recetteRouter from "./routes/RecetteRouter";
 import acompteRouter from "./routes/acompteRouter";
+import invoiceRouter from "./routes/invoiceRouter";
 import http from "http";
 import cors from "cors";
 import path from "path";
@@ -55,6 +56,7 @@ app.use("/api/v1", authenticateToken, paymentMethodesRouter);
 app.use("/api/v1", authenticateToken, paymentMethodesFieldsRouter);
 app.use("/api/v1", authenticateToken, recetteRouter);
 app.use("/api/v1", acompteRouter);
+app.use("/api/v1", invoiceRouter);
 
 // Error handling middleware
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
