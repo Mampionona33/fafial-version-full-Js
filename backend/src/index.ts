@@ -55,8 +55,8 @@ app.use("/api/v1", authenticateToken, salleRouter);
 app.use("/api/v1", authenticateToken, paymentMethodesRouter);
 app.use("/api/v1", authenticateToken, paymentMethodesFieldsRouter);
 app.use("/api/v1", authenticateToken, recetteRouter);
-app.use("/api/v1", acompteRouter);
-app.use("/api/v1", invoiceRouter);
+app.use("/api/v1", authenticateToken, acompteRouter);
+app.use("/api/v1", authenticateToken, invoiceRouter);
 
 // Error handling middleware
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
