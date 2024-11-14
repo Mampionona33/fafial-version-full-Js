@@ -12,7 +12,7 @@ import RecetteService from "../../services/RecetteService";
 import { toast, ToastContainer } from "react-toastify";
 import PaymentMethodesFieldsService from "../../services/PaymentMethodesFieldsService";
 import { useLoading } from "../../hooks/useLoading";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 const PageStafAjoutAcompte = () => {
   const { idAcompte } = useParams();
@@ -26,7 +26,6 @@ const PageStafAjoutAcompte = () => {
   const navigate = useNavigate();
   const { setLoading } = useLoading();
   const previousAcompteRef = React.useRef<Acompte | null>(null);
-
 
   const {
     data: referenceData,
@@ -58,6 +57,30 @@ const PageStafAjoutAcompte = () => {
         acompte?.modePaiement
       ),
     enabled: !!acompte?.modePaiement, // La requête est activée seulement si modePaiement est défini
+  });
+
+  // Définition des mutations
+  const updateAcompte = useMutation({
+    mutationKey: ["updateAcompte", acompte?.id],
+    mutationFn: (acompte: Acompte) => AcompteService.updateAcompte(acompte), // Modification ici
+    onSuccess: () => {
+      toast.success("Acompte mis à jour");
+      navigate("/staf/acomptes/details/" + idAcompte);
+    },
+  });
+
+  const createRecette = useMutation({
+    mutationKey: ["createRecette"],
+    mutationFn: RecetteService.createRecette,
+    onSuccess: () => {
+      if (acompte) {
+        // Exécuter la mutation de mise à jour de l'acompte avec les données modifiées
+        updateAcompte.mutate({
+          ...acompte,
+          statut: "PAYE",
+        });
+      }
+    },
   });
 
   const onChangePaymentMethod = (
@@ -97,9 +120,9 @@ const PageStafAjoutAcompte = () => {
     setPaymentMethodFields(updatedFields || []);
   };
 
-  const handleSubmit = async (event: React.SyntheticEvent) => {
+  // Soumission du formulaire avec useMutation
+  const handleSubmit = (event: React.SyntheticEvent) => {
     event.preventDefault();
-    console.log(paymentMethodFields);
 
     const formData = {
       ...acompte,
@@ -118,42 +141,14 @@ const PageStafAjoutAcompte = () => {
         const inputElement = (event.target as HTMLFormElement).elements[
           field.id as keyof HTMLFormElement["elements"]
         ] as HTMLInputElement | undefined;
-
-        return {
-          ...field,
-          value: inputElement ? inputElement.value : "",
-        };
+        return { ...field, value: inputElement ? inputElement.value : "" };
       }),
     };
 
-    console.log("Données de l'entrée ajoutée : ", formData);
+    if (!acompte) return; // Si acompte est null, on ne fait rien
 
-    try {
-      if (acompte === null) {
-        return;
-      }
-
-      await Promise.all([
-        RecetteService.createRecette(formData),
-        AcompteService.updateAcompte({
-          ...acompte,
-          statut: "PAYE",
-        }),
-      ]);
-
-      // Afficher un message de succès ou effectuer d'autres actions nécessaires
-      toast.success("Acompte payé", {
-        position: "bottom-right",
-        toastId: "success-acompte",
-      });
-      navigate("/staf/acomptes/details/" + idAcompte);
-    } catch (error) {
-      if (error instanceof Error) {
-        toast.error(error.message, {
-          position: "bottom-right",
-        });
-      }
-    }
+    // Appeler la mutation createRecette pour créer la recette
+    createRecette.mutate(formData);
   };
 
   useEffect(() => {
