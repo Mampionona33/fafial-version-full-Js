@@ -29,6 +29,19 @@ class InvoiceService {
       throw error;
     }
   }
+
+  public static async getAcompteInvoice(id: string): Promise<AxiosResponse> {
+    try {
+      return await api.get(`/invoices/acompte/${id}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem(ACCESS_TOKEN_NAME)}`,
+        },
+      });
+    } catch (error) {
+      console.error("Error fetching invoice:", error);
+      throw error;
+    }
+  }
 }
 
 export default InvoiceService;
