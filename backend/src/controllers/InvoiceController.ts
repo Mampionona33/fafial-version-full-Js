@@ -46,7 +46,10 @@ export const createAcompteInvoice = async (req: Request, res: Response) => {
     });
 
     // Réponse de succès avec la facture créée
-    res.status(201).json(invoice);
+    res.status(201).json({
+      message: "Facture d'acompte crée avec successe",
+      invoice,
+    });
   } catch (error) {
     console.error(
       "Erreur lors de la création de la facture d'acompte :",
