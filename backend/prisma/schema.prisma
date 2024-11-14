@@ -205,8 +205,10 @@ model Invoice {
   recetteId String? // Optionnel : ID de la recette associée pour les paiements
   recette   Recette? @relation(fields: [recetteId], references: [id])
 
-  acompteId String? // Optionnel : ID de l'acompte associé si c'est une facture d'acompte
-  acompte   Acompte? @relation(fields: [acompteId], references: [id])
+  acompteId    String? // Optionnel : ID de l'acompte associé si c'est une facture d'acompte
+  acompte      Acompte?    @relation(fields: [acompteId], references: [id])
+  AppCompany   AppCompany? @relation(fields: [appCompanyId], references: [id])
+  appCompanyId String?
 }
 
 model InvoiceItem {
@@ -219,4 +221,17 @@ model InvoiceItem {
   invoice     Invoice  @relation(fields: [invoiceId], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model AppCompany {
+  id        String    @id @default(cuid())
+  name      String
+  address   String
+  phone     String
+  email     String
+  logoUrl   String?
+  website   String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  Invoice   Invoice[]
 }

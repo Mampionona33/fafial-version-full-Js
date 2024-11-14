@@ -58,3 +58,26 @@ export const createAcompteInvoice = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Erreur interne du serveur" });
   }
 };
+
+export const getAcompteInvoice = async (req: Request, res: Response) => {
+  try {
+    const invoice = await prisma.invoice.findUnique({
+      where: {
+        id: req.params.id,
+      },
+    });
+    if (!invoice) {
+      res.status(404).json({ message: "Facture non disponible" });
+      return;
+    }
+    res.status(200).json({
+      message: "Facture disponible",
+      invoice,
+    });
+    return;
+  } catch (error) {
+    console.error("getAcompteInvoice", error);
+    res.status(500).json({ error: "Une erreur s'est produite" });
+    return;
+  }
+};

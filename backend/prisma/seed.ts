@@ -241,6 +241,18 @@ async function main() {
     ],
   });
 
+  // Création de l'information sur l'entreprise
+  await client.appCompany.create({
+    data: {
+      name: "Fafial",
+      email: "fafial@example.com",
+      phone: "1234567890",
+      address: "123 Main Street, City, Country",
+      logoUrl: "https://example.com/logo.png",
+      website: "https://mycompany.com",
+    },
+  });
+
   console.log("Seeding completed.");
 }
 
