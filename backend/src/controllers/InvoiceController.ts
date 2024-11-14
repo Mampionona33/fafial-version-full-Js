@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import prisma from "../../prisma/prisma";
 import { ReferenceGenerator } from "../utils/ReferenceGenerator";
+const PDFDocument = require("pdfkit");
 
 export const createAcompteInvoice = async (req: Request, res: Response) => {
   try {
@@ -66,15 +67,37 @@ export const getAcompteInvoice = async (req: Request, res: Response) => {
         id: req.params.id,
       },
     });
+
     if (!invoice) {
       res.status(404).json({ message: "Facture non disponible" });
       return;
     }
-    res.status(200).json({
-      message: "Facture disponible",
-      invoice,
+
+    // Créer un nouveau document PDF
+    const doc = new PDFDocument();
+
+    // Définir l'en-tête de réponse pour indiquer qu'un PDF est envoyé
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader(
+      "Content-Disposition",
+      `inline; filename=facture-${invoice.id}.pdf`
+    );
+
+    // Écrire le PDF directement dans la réponse
+    doc.pipe(res);
+
+    // Ajouter du contenu au PDF
+    doc.fontSize(20).text(`Facture Acompte #${invoice.id}`, {
+      align: "center",
     });
-    return;
+
+    doc.moveDown();
+    doc.text(`Montant: ${invoice.totalAmount} Ar`);
+    doc.text(`Client: ${invoice.clientName}`);
+    doc.text(`Contact : ${invoice.clientContact}`);
+
+    // Terminer et fermer le document
+    doc.end();
   } catch (error) {
     console.error("getAcompteInvoice", error);
     res.status(500).json({ error: "Une erreur s'est produite" });

@@ -26,7 +26,8 @@
     "fix-esm": "^1.0.1",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
-    "nanoid": "^5.0.8"
+    "nanoid": "^5.0.8",
+    "pdfkit": "^0.15.1"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",

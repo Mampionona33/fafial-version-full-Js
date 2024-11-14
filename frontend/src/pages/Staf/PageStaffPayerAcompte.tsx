@@ -66,7 +66,7 @@ const PageStafAjoutAcompte = () => {
       InvoiceService.creatAcomptInvoice(acompte.id!),
     onSuccess: () => {
       toast.success("Acompte mis à jour");
-      navigate("/staf/acomptes/details/" + idAcompte);
+      navigate("/staf/acomptes/facture/" + idAcompte);
     },
   });
 

@@ -30,12 +30,15 @@ class InvoiceService {
     }
   }
 
-  public static async getAcompteInvoice(id: string): Promise<AxiosResponse> {
+  public static async getAcompteInvoice(
+    id: string
+  ): Promise<AxiosResponse<Blob>> {
     try {
       return await api.get(`/invoices/acompte/${id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem(ACCESS_TOKEN_NAME)}`,
         },
+        responseType: "blob", // Indiquez que vous souhaitez obtenir le contenu comme Blob
       });
     } catch (error) {
       console.error("Error fetching invoice:", error);

@@ -142,7 +142,7 @@ const StaffPageListAcompt: React.FC = () => {
           const isPaid = statut === "PAYE";
           const isPending = statut === "EN_ATTENTE";
           const linkTo = isPaid
-            ? `/staf/acomptes/details/${id}`
+            ? `/staf/acomptes/facture/${id}`
             : `/staf/acomptes/payer/${id}`;
           const buttonText = isPending ? "Payer" : "Consulter";
           const buttonColor = isPending
