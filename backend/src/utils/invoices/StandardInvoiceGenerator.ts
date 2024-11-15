@@ -7,24 +7,36 @@ export class StandardInvoiceGenerator extends BaseInvoiceGenerator {
   myCompanyLogo: string;
 
   constructor({
-    clientName,
-    clientContact,
-    invoiceReference,
-    date,
-    myCompanyLogo = "", // Nom du fichier contenant le logo de l'entreprise
-  }: {
+    clientName = "",
+    clientContact = "",
+    invoiceReference = "",
+    date = "",
+    myCompanyLogo = "",
+    myCompanyName = "",
+    myCompanyAddress = "",
+    myCompanyLogoPath = "",
+    myCompanyPhone = "",
+    myCompanyEmail = "",
+  }: Partial<{
     clientName: string;
     clientContact: string;
     invoiceReference: string;
     date: string;
     myCompanyLogo: string;
-  }) {
+    myCompanyName: string;
+    myCompanyAddress: string;
+    myCompanyLogoPath: string;
+    myCompanyPhone: string;
+    myCompanyEmail: string;
+  }> = {}) {
+    // Utilisation de Partial pour rendre toutes les propriétés optionnelles
+
     super(clientName, clientContact, invoiceReference, date, [], 0, {
-      name: "",
-      address: "",
+      name: myCompanyName || "",
+      address: myCompanyAddress || "",
       myCompanyLogo: myCompanyLogo || "",
-      phone: "",
-      email: "",
+      phone: myCompanyPhone || "",
+      email: myCompanyEmail || "",
     });
 
     console.log("Constructor myCompanyLogo value: ", myCompanyLogo);
@@ -59,7 +71,7 @@ export class StandardInvoiceGenerator extends BaseInvoiceGenerator {
           if (imageData.length > 0) {
             console.log("Logo found and loaded successfully.");
             doc.image(imageData, 20, 15, {
-              fit:[80,80],
+              fit: [80, 80],
             });
           } else {
             console.error("The logo image is empty.");
@@ -77,6 +89,7 @@ export class StandardInvoiceGenerator extends BaseInvoiceGenerator {
     // Ajouter les informations de la facture
     doc
       .fontSize(14)
+      .text("Facture de recettes", { align: "center" })
       .text(`Facture N°: ${this.invoiceReference}`, { align: "left" })
       .text(`Date: ${this.date}`, { align: "left" })
       .text(`Client: ${this.clientName}`, { align: "left" })

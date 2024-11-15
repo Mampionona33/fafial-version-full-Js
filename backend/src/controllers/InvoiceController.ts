@@ -115,9 +115,13 @@ export const getAcompteInvoice = async (req: Request, res: Response) => {
         acompteId: req.params.id,
       },
     });
+
+    const myCompanies = await prisma.appCompany.findMany({
+      take: 1,
+    });
     const myCompanyLogo = getLogoFile("myCompanyLogo");
 
-    console.log("myCompanyLogo_1",myCompanyLogo);
+    console.log("myCompanies", myCompanies);
 
     if (!invoice) {
       res.status(404).json({ message: "Facture non disponible" });
