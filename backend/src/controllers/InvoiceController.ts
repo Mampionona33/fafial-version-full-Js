@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import prisma from "../../prisma/prisma";
 import { ReferenceGenerator } from "../utils/ReferenceGenerator";
+import { StandardInvoiceGenerator } from "../utils/invoices/StandardInvoiceGenerator";
+import getLogoFile from "../utils/getLogoFile";
 const PDFDocument = require("pdfkit");
 
 export const createAcompteInvoice = async (req: Request, res: Response) => {
@@ -60,48 +62,90 @@ export const createAcompteInvoice = async (req: Request, res: Response) => {
   }
 };
 
+// export const getAcompteInvoice = async (req: Request, res: Response) => {
+//   try {
+//     console.log(req.params.id);
+//     const invoice = await prisma.invoice.findFirst({
+//       where: {
+//         acompteId: req.params.id,
+//       },
+//     });
+
+//     if (!invoice) {
+//       res.status(404).json({ message: "Facture non disponible" });
+//       return;
+//     }
+
+//     // Créer un nouveau document PDF
+//     const doc = new PDFDocument();
+
+//     // Définir l'en-tête de réponse pour indiquer qu'un PDF est envoyé
+//     res.setHeader("Content-Type", "application/pdf");
+//     res.setHeader(
+//       "Content-Disposition",
+//       `inline; filename=facture-${invoice.id}.pdf`
+//     );
+
+//     // Écrire le PDF directement dans la réponse
+//     doc.pipe(res);
+
+//     // Ajouter du contenu au PDF
+//     doc.fontSize(20).text(`Facture Acompte #${invoice.id}`, {
+//       align: "center",
+//     });
+
+//     doc.moveDown();
+//     doc.text(`Montant: ${invoice.totalAmount} Ar`);
+//     doc.text(`Client: ${invoice.clientName}`);
+//     doc.text(`Contact : ${invoice.clientContact}`);
+
+//     // Terminer et fermer le document
+//     doc.end();
+//   } catch (error) {
+//     console.error("getAcompteInvoice", error);
+//     res.status(500).json({ error: "Une erreur s'est produite" });
+//     return;
+//   }
+// };
+
 export const getAcompteInvoice = async (req: Request, res: Response) => {
   try {
-    console.log(req.params.id);
     const invoice = await prisma.invoice.findFirst({
       where: {
         acompteId: req.params.id,
       },
     });
+    const myCompanyLogo = getLogoFile("myCompanyLogo");
+
+    console.log("myCompanyLogo_1",myCompanyLogo);
 
     if (!invoice) {
       res.status(404).json({ message: "Facture non disponible" });
       return;
     }
 
-    // Créer un nouveau document PDF
-    const doc = new PDFDocument();
-
-    // Définir l'en-tête de réponse pour indiquer qu'un PDF est envoyé
-    res.setHeader("Content-Type", "application/pdf");
-    res.setHeader(
-      "Content-Disposition",
-      `inline; filename=facture-${invoice.id}.pdf`
-    );
-
-    // Écrire le PDF directement dans la réponse
-    doc.pipe(res);
-
-    // Ajouter du contenu au PDF
-    doc.fontSize(20).text(`Facture Acompte #${invoice.id}`, {
-      align: "center",
+    // Créer une instance de la classe pour générer le PDF
+    const invoiceGenerator = new StandardInvoiceGenerator({
+      invoiceReference: invoice.reference,
+      clientName: invoice.clientName,
+      clientContact: invoice.clientContact,
+      date: invoice.createdAt.toISOString().slice(0, 10),
+      myCompanyLogo: myCompanyLogo!,
     });
 
-    doc.moveDown();
-    doc.text(`Montant: ${invoice.totalAmount} Ar`);
-    doc.text(`Client: ${invoice.clientName}`);
-    doc.text(`Contact : ${invoice.clientContact}`);
+    const pdfFilePath = invoiceGenerator.generatePDF();
 
-    // Terminer et fermer le document
-    doc.end();
+    // Utiliser la méthode statique pour envoyer le PDF dans la réponse
+    StandardInvoiceGenerator.sendPDFToResponse(pdfFilePath, res);
+
+    // Utiliser la méthode statique pour envoyer le PDF dans la réponse
   } catch (error) {
-    console.error("getAcompteInvoice", error);
-    res.status(500).json({ error: "Une erreur s'est produite" });
-    return;
+    console.error(
+      "Erreur lors de la génération ou de l'envoi de la facture :",
+      error
+    );
+    res.status(500).json({
+      error: "Une erreur s'est produite lors de la génération de la facture.",
+    });
   }
 };
