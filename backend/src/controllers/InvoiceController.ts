@@ -162,14 +162,43 @@ export const getAcompteInvoice = async (req: Request, res: Response) => {
     });
     const myCompanyLogo = getLogoFile("myCompanyLogo");
 
+    const invoice = await prisma.invoice.findFirst({
+      where: {
+        acompteId: req.params.id,
+      },
+    });
+
+    const recette = await prisma.recette.findFirst({
+      where: {
+        acompteId: req.params.id,
+      },
+    });
+
+    const reservation = await prisma.reservation.findFirst({
+      where: {
+        acomptes: {
+          some: {
+            id: req.params.id,
+          },
+        },
+      },
+    });
+
+    console.log("reservation", reservation);
+
     const depositeInvoice = new DepositInvoiceGenerator();
-    depositeInvoice.setTitle("Facture d'acompte");
+    depositeInvoice.setTitle(`Reservation : ${reservation!.reference}`);
     depositeInvoice.setCompanyInfo({
       address: myCompanies[0].address,
       name: myCompanies[0].name,
       contact: myCompanies[0].phone,
     });
     depositeInvoice.setLogo(myCompanyLogo!);
+    depositeInvoice.setClientInfo({
+      contactName: "test",
+      contact: "test",
+      name: "test",
+    });
 
     const pdfFilePath = await depositeInvoice.generatePdf();
 

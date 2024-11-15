@@ -41,10 +41,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   const refreshToken = useCallback(async () => {
     try {
+      console.log("Refreshing token...");
       const resp = await AuthServices.refreshToken();
       if (resp.status === 200) {
         const { accessToken } = resp.data;
         localStorage.setItem(ACCESS_TOKEN_NAME, accessToken);
+        console.log("Token refreshed:", accessToken); // Log pour vérifier le token rafraîchi
         return accessToken;
       } else if (resp.status === 401) {
         setIsAuthenticated(false);
@@ -92,6 +94,28 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   useEffect(() => {
     let tokenRefreshInterval: NodeJS.Timeout;
 
+    if (isAuthenticated && accessToken) {
+      const decodedToken: { exp: number } = jwtDecode(accessToken);
+      const expirationTime = decodedToken.exp * 1000;
+      const currentTime = Date.now();
+      const anticipatedTime = expirationTime - EXPIRATION_BUFFER;
+
+      console.log(anticipatedTime, currentTime);
+
+      tokenRefreshInterval = setInterval(async () => {
+        console.log("Refreshing token...");
+        await refreshToken();
+      }, Math.max(0, anticipatedTime - currentTime));
+    }
+
+    if (userResponse?.status === 200) {
+      const user = userResponse.data.user;
+      setUser(user);
+      localStorage.setItem("user", JSON.stringify(user));
+      setIsAuthenticated(true);
+      setLoading(false);
+    }
+
     const checkAuthStatus = async () => {
       const accessToken = localStorage.getItem(ACCESS_TOKEN_NAME);
       const refreshTokenCookie = Cookies.get(REFRESH_TOKEN_NAME);
@@ -125,26 +149,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     };
 
     checkAuthStatus();
-
-    if (isAuthenticated && accessToken) {
-      const decodedToken: { exp: number } = jwtDecode(accessToken);
-      const expirationTime = decodedToken.exp * 1000;
-      const currentTime = Date.now();
-      const anticipatedTime = expirationTime - EXPIRATION_BUFFER;
-
-      tokenRefreshInterval = setInterval(async () => {
-        console.log("Refreshing token...");
-        await refreshToken();
-      }, Math.max(0, anticipatedTime - currentTime));
-    }
-
-    if (userResponse?.status === 200) {
-      const user = userResponse.data.user;
-      setUser(user);
-      localStorage.setItem("user", JSON.stringify(user));
-      setIsAuthenticated(true);
-      setLoading(false);
-    }
 
     if (userLoading) {
       setLoading(true);

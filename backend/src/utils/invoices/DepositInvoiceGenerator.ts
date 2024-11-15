@@ -4,8 +4,8 @@ const PDFDocument = require("pdfkit");
 
 interface ClientInfo {
   name: string;
-  address: string;
-  email: string;
+  contact: string;
+  contactName: string;
 }
 
 interface CompanyInfo {
@@ -51,22 +51,48 @@ class DepositInvoiceGenerator {
 
   private setHeaders(doc: InstanceType<typeof PDFDocument>) {
     // Add Title and Company Info to the PDF
-    doc.fontSize(18).text(this.title, { align: "center" });
-
+    doc.moveDown(2);
     if (this.companyInfo) {
-      doc.fontSize(12).text(this.companyInfo.name, { align: "center" });
-      doc.text(this.companyInfo.address, { align: "center" });
-      doc.text(this.companyInfo.contact, { align: "center" });
+      doc.fontSize(12).text(this.companyInfo.name, { align: "left" });
+      doc.text(this.companyInfo.address, { align: "left" });
+      doc.text(this.companyInfo.contact, { align: "left" });
+      doc.rect(doc.x, 0, 500, doc.y).stroke();
     }
   }
 
   private setClientDetails(doc: InstanceType<typeof PDFDocument>) {
     if (this.clientInfo) {
-      doc.moveDown(1);
-      doc.text(`Client: ${this.clientInfo.name}`);
-      doc.text(`Address: ${this.clientInfo.address}`);
-      doc.text(`Email: ${this.clientInfo.email}`);
+      doc.moveDown(2);
+
+      const rightAlignX = 400; // Adjust this X position to place the text to the right side
+
+      // Information aligned to the right
+      doc.text(`Client: ${this.clientInfo.name}`, rightAlignX, doc.y, {
+        align: "left",
+      });
+      doc.text(`Contact: ${this.clientInfo.contact}`, rightAlignX, doc.y, {
+        align: "left",
+      });
+      doc.text(
+        `Contact Name: ${this.clientInfo.contactName}`,
+        rightAlignX,
+        doc.y,
+        {
+          align: "left",
+        }
+      );
+
+      doc.moveDown(2);
+
+      doc.rect(doc.x, 0, 500, doc.y).stroke();
     }
+  }
+
+  private addTitle(doc: InstanceType<typeof PDFDocument>) {
+    doc.fontSize(16).text(this.title, -(doc.x - 400), doc.y, {
+      align: "center",
+    });
+    doc.rect(doc.x, 0, 500, doc.y).stroke();
   }
 
   private setFooter(doc: InstanceType<typeof PDFDocument>) {
@@ -89,6 +115,7 @@ class DepositInvoiceGenerator {
 
     this.setHeaders(doc);
     this.setClientDetails(doc);
+    this.addTitle(doc);
     doc.text(this.bodyContent);
     this.setFooter(doc);
 
