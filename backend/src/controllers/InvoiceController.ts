@@ -3,6 +3,7 @@ import prisma from "../../prisma/prisma";
 import { ReferenceGenerator } from "../utils/ReferenceGenerator";
 import { StandardInvoiceGenerator } from "../utils/invoices/StandardInvoiceGenerator";
 import getLogoFile from "../utils/getLogoFile";
+import DepositInvoiceGenerator from "../utils/invoices/DepositInvoiceGenerator";
 const PDFDocument = require("pdfkit");
 
 export const createAcompteInvoice = async (req: Request, res: Response) => {
@@ -108,48 +109,72 @@ export const createAcompteInvoice = async (req: Request, res: Response) => {
 //   }
 // };
 
+// export const getAcompteInvoice = async (req: Request, res: Response) => {
+//   try {
+//     const invoice = await prisma.invoice.findFirst({
+//       where: {
+//         acompteId: req.params.id,
+//       },
+//     });
+
+//     const myCompanies = await prisma.appCompany.findMany({
+//       take: 1,
+//     });
+//     const myCompanyLogo = getLogoFile("myCompanyLogo");
+
+//     console.log("myCompanies", myCompanies);
+
+//     if (!invoice) {
+//       res.status(404).json({ message: "Facture non disponible" });
+//       return;
+//     }
+
+//     // Créer une instance de la classe pour générer le PDF
+//     const invoiceGenerator = new StandardInvoiceGenerator({
+//       invoiceReference: invoice.reference,
+//       clientName: invoice.clientName,
+//       clientContact: invoice.clientContact,
+//       date: invoice.createdAt.toISOString().slice(0, 10),
+//       myCompanyLogo: myCompanyLogo!,
+//     });
+
+//     const pdfFilePath = invoiceGenerator.generatePDF();
+
+//     // Utiliser la méthode statique pour envoyer le PDF dans la réponse
+//     StandardInvoiceGenerator.sendPDFToResponse(pdfFilePath, res);
+
+//     // Utiliser la méthode statique pour envoyer le PDF dans la réponse
+//   } catch (error) {
+//     console.error(
+//       "Erreur lors de la génération ou de l'envoi de la facture :",
+//       error
+//     );
+//     res.status(500).json({
+//       error: "Une erreur s'est produite lors de la génération de la facture.",
+//     });
+//   }
+// };
+
 export const getAcompteInvoice = async (req: Request, res: Response) => {
   try {
-    const invoice = await prisma.invoice.findFirst({
-      where: {
-        acompteId: req.params.id,
-      },
-    });
-
     const myCompanies = await prisma.appCompany.findMany({
       take: 1,
     });
     const myCompanyLogo = getLogoFile("myCompanyLogo");
 
-    console.log("myCompanies", myCompanies);
-
-    if (!invoice) {
-      res.status(404).json({ message: "Facture non disponible" });
-      return;
-    }
-
-    // Créer une instance de la classe pour générer le PDF
-    const invoiceGenerator = new StandardInvoiceGenerator({
-      invoiceReference: invoice.reference,
-      clientName: invoice.clientName,
-      clientContact: invoice.clientContact,
-      date: invoice.createdAt.toISOString().slice(0, 10),
-      myCompanyLogo: myCompanyLogo!,
+    const depositeInvoice = new DepositInvoiceGenerator();
+    depositeInvoice.setTitle("Facture d'acompte");
+    depositeInvoice.setCompanyInfo({
+      address: myCompanies[0].address,
+      name: myCompanies[0].name,
+      contact: myCompanies[0].phone,
     });
+    depositeInvoice.setLogo(myCompanyLogo!);
 
-    const pdfFilePath = invoiceGenerator.generatePDF();
+    const pdfFilePath = await depositeInvoice.generatePdf();
 
-    // Utiliser la méthode statique pour envoyer le PDF dans la réponse
-    StandardInvoiceGenerator.sendPDFToResponse(pdfFilePath, res);
-
-    // Utiliser la méthode statique pour envoyer le PDF dans la réponse
+    DepositInvoiceGenerator.sendPDFToResponse(pdfFilePath, res);
   } catch (error) {
-    console.error(
-      "Erreur lors de la génération ou de l'envoi de la facture :",
-      error
-    );
-    res.status(500).json({
-      error: "Une erreur s'est produite lors de la génération de la facture.",
-    });
+    res.status(500).json({ error: "Une erreur s'est produite" });
   }
 };
