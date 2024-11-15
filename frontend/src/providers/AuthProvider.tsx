@@ -1,54 +1,55 @@
-import React, {useState, useEffect, ReactNode, useCallback} from "react";
+import React, { useState, useEffect, ReactNode, useCallback } from "react";
 import Cookies from "js-cookie";
-import {AuthContext} from "../contexts/AuthContext";
-import {LoginData} from "../interfaces/LoginDataInterface";
+import { AuthContext } from "../contexts/AuthContext";
+import { LoginData } from "../interfaces/LoginDataInterface";
 import AuthServices from "../services/AuthServices";
-import {AxiosError} from "axios";
+import { AxiosError } from "axios";
 import UserServices from "../services/UserServices";
-import {UserInterface} from "../interfaces/userInterface";
+import { UserInterface } from "../interfaces/userInterface";
 import {
   ACCESS_TOKEN_NAME,
   REFRESH_TOKEN_NAME,
   EXPIRATION_BUFFER,
 } from "../constants/appContants";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({
-                                                                  children,
-                                                                }) => {
+  children,
+}) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<UserInterface | null>(null);
   const [loading, setLoading] = useState(false);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
 
-  // Fonction pour vérifier si le token d'accès est expiré
   const isAccessTokenExpired = useCallback(() => {
     const accessToken = localStorage.getItem(ACCESS_TOKEN_NAME);
     if (accessToken) {
       try {
         const decodedToken: { exp: number } = jwtDecode(accessToken);
-        const expirationTime = decodedToken.exp * 1000; // Convertir l'expiration en ms
+        const expirationTime = decodedToken.exp * 1000;
         const currentTime = Date.now();
-        const anticipatingTime = expirationTime - EXPIRATION_BUFFER; // Anticipation
-        return currentTime > anticipatingTime; // Si le token a expiré
+        const anticipatingTime = expirationTime - EXPIRATION_BUFFER;
+        return currentTime > anticipatingTime;
       } catch (error) {
         console.error("Failed to decode token", error);
-        return true; // Considérer comme expiré en cas d'échec
+        return true;
       }
     }
-    return true; // Si pas de token, considérer comme expiré
+    return true;
   }, []);
 
-  // Fonction pour rafraîchir le token
   const refreshToken = useCallback(async () => {
     try {
       const resp = await AuthServices.refreshToken();
       if (resp.status === 200) {
-        const {accessToken} = resp.data;
-        localStorage.setItem(ACCESS_TOKEN_NAME, accessToken); // Mettre à jour le token
-        return accessToken; // Retourner le nouveau token
+        const { accessToken } = resp.data;
+        localStorage.setItem(ACCESS_TOKEN_NAME, accessToken);
+        return accessToken;
       } else if (resp.status === 401) {
         setIsAuthenticated(false);
-        localStorage.removeItem(ACCESS_TOKEN_NAME); // Retirer le token si non autorisé
+        localStorage.removeItem(ACCESS_TOKEN_NAME);
+        Cookies.remove(REFRESH_TOKEN_NAME);
       }
     } catch (error) {
       console.error("Token refresh failed:", error);
@@ -56,7 +57,38 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     return null;
   }, []);
 
-  // Vérification de l'authentification lors du montage du composant
+  const loginMutation = useMutation({
+    mutationFn: ({ email, password }: { email: string; password: string }) =>
+      AuthServices.login(email, password),
+    onSuccess: (response) => {
+      if (response?.status === 200) {
+        const { accessToken, refreshToken } = response.data;
+        Cookies.set(REFRESH_TOKEN_NAME, refreshToken, {
+          expires: 7,
+          sameSite: "Strict",
+          secure: true,
+          path: "/",
+        });
+
+        setAccessToken(accessToken);
+        localStorage.setItem(ACCESS_TOKEN_NAME, accessToken);
+      }
+    },
+    onError: (error) => {
+      console.error("Login failed:", error);
+    },
+  });
+
+  const { data: userResponse, isLoading: userLoading } = useQuery({
+    queryKey: ["user", accessToken],
+    queryFn: async () => {
+      if (accessToken) {
+        return UserServices.getAuthenticatedUser(accessToken);
+      }
+    },
+    enabled: !!accessToken,
+  });
+
   useEffect(() => {
     let tokenRefreshInterval: NodeJS.Timeout;
 
@@ -94,57 +126,57 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
     checkAuthStatus();
 
-    if (isAuthenticated) {
-      const accessToken = AuthServices.getTokenAccess();
-      if (accessToken) {
-        const decodedToken: { exp: number } = jwtDecode(accessToken);
-        const expirationTime = decodedToken.exp * 1000;
-        const currentTime = Date.now();
-        const anticipatedTime = expirationTime - EXPIRATION_BUFFER;
-        tokenRefreshInterval = setInterval(async () => {
-          console.log("Refreshing token...");
-          await refreshToken();
-        }, anticipatedTime - currentTime);
-      }
+    if (isAuthenticated && accessToken) {
+      const decodedToken: { exp: number } = jwtDecode(accessToken);
+      const expirationTime = decodedToken.exp * 1000;
+      const currentTime = Date.now();
+      const anticipatedTime = expirationTime - EXPIRATION_BUFFER;
+
+      tokenRefreshInterval = setInterval(async () => {
+        console.log("Refreshing token...");
+        await refreshToken();
+      }, Math.max(0, anticipatedTime - currentTime));
+    }
+
+    if (userResponse?.status === 200) {
+      const user = userResponse.data.user;
+      setUser(user);
+      localStorage.setItem("user", JSON.stringify(user));
+      setIsAuthenticated(true);
+      setLoading(false);
+    }
+
+    if (userLoading) {
+      setLoading(true);
     }
 
     return () => clearInterval(tokenRefreshInterval);
-  }, [isAccessTokenExpired, refreshToken, isAuthenticated]);
+  }, [
+    isAccessTokenExpired,
+    refreshToken,
+    isAuthenticated,
+    userResponse,
+    userLoading,
+    accessToken,
+  ]);
 
-  // Fonction de connexion
   const login = async (
     email: string,
     password: string
   ): Promise<{ status: number; data: LoginData } | undefined> => {
     setLoading(true);
     try {
-      const response = await AuthServices.login(email, password);
+      loginMutation.mutate({ email, password });
 
-      if (response.status === 200) {
-        const {accessToken, refreshToken} = response.data;
-
-        // Sauvegarder le token d'accès et le refresh token
-        Cookies.set(REFRESH_TOKEN_NAME, refreshToken, {
-          expires: 7,
-          sameSite: "Strict",
-          secure: true,
-          path: "/",
-        });
-
-        // Récupérer les informations de l'utilisateur
-        const userResponse = await UserServices.getAuthenticatedUser(
-          accessToken
-        );
-
-        if (userResponse.status === 200) {
-          const user = userResponse.data.user;
-          setUser(user);
-          setIsAuthenticated(true);
-          localStorage.setItem("user", JSON.stringify(user));
+      if (loginMutation.isSuccess && loginMutation.data?.data?.status === 200) {
+        const { accessToken } = loginMutation.data.data;
+        if (accessToken) {
+          setAccessToken(accessToken);
+          localStorage.setItem(ACCESS_TOKEN_NAME, accessToken);
         }
       }
 
-      return response;
+      return loginMutation.data;
     } catch (error) {
       if (error instanceof AxiosError && error.response?.status === 401) {
         console.log("Unauthorized:", error);
@@ -158,7 +190,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
-  // Fonction de déconnexion
   const logout = async () => {
     try {
       const response = await AuthServices.logout();

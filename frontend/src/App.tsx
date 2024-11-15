@@ -13,36 +13,32 @@ import { SalleProvider } from "./providers/SalleProvider";
 import { PaymentMethodesProvider } from "./providers/PaymentMethodesProvider";
 import { ReservationProvider } from "./providers/ReservationProvider";
 import { PaymentMethodeFieldsProviders } from "./providers/PaymentMethodeFieldsProviders";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const App = () => {
   const { loading: authLoading } = useAuth();
   const { loading: globalLoading } = useLoading();
   // Create a client
-  const queryClient = new QueryClient();
 
   return (
     <SalleProvider>
-      <QueryClientProvider client={queryClient}>
-        <PaymentMethodesProvider>
-          <ReservationProvider>
-            <PrimeReactProvider>
-              {authLoading && <IndeterminateProgressBar />}
-              <PaymentMethodeFieldsProviders>
-                <div className="bg-gradient-to-t from-gradient-start to-gradient-end h-full w-full">
-                  {/* Header, navbar, or other shared components */}
-                  <NavBar />
-                  <div className="min-h-screen pt-14">
-                    {globalLoading && <IndeterminateProgressBar />}
-                    {/* Ajuster en fonction de la hauteur de la NavBar */}
-                    <Outlet />
-                  </div>
+      <PaymentMethodesProvider>
+        <ReservationProvider>
+          <PrimeReactProvider>
+            {authLoading && <IndeterminateProgressBar />}
+            <PaymentMethodeFieldsProviders>
+              <div className="bg-gradient-to-t from-gradient-start to-gradient-end h-full w-full">
+                {/* Header, navbar, or other shared components */}
+                <NavBar />
+                <div className="min-h-screen pt-14">
+                  {globalLoading && <IndeterminateProgressBar />}
+                  {/* Ajuster en fonction de la hauteur de la NavBar */}
+                  <Outlet />
                 </div>
-              </PaymentMethodeFieldsProviders>
-            </PrimeReactProvider>
-          </ReservationProvider>
-        </PaymentMethodesProvider>
-      </QueryClientProvider>
+              </div>
+            </PaymentMethodeFieldsProviders>
+          </PrimeReactProvider>
+        </ReservationProvider>
+      </PaymentMethodesProvider>
     </SalleProvider>
   );
 };
