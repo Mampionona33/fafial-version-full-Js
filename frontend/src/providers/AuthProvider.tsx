@@ -21,6 +21,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const [user, setUser] = useState<UserInterface | null>(null);
   const [loading, setLoading] = useState(false);
   const [accessToken, setAccessToken] = useState<string | null>(null);
+  const pathname = window.location.pathname;
 
   const isAccessTokenExpired = useCallback(() => {
     const accessToken = localStorage.getItem(ACCESS_TOKEN_NAME);
@@ -193,29 +194,67 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   useEffect(() => {
     const scheduleTokenRefresh = () => {
       if (accessToken) {
-        const decodedToken: { exp: number } = jwtDecode(accessToken);
-        const expirationTime = decodedToken.exp * 1000;
-        const currentTime = Date.now();
-        const anticipatedTime = expirationTime - EXPIRATION_BUFFER;
+        try {
+          const decodedToken: { exp: number } = jwtDecode(accessToken);
+          const expirationTime = decodedToken.exp * 1000;
+          const currentTime = Date.now();
+          const anticipatedTime = expirationTime - EXPIRATION_BUFFER;
 
-        // Calculate the delay before refreshing the token
-        const delay = anticipatedTime - currentTime;
+          // Calculate the delay before refreshing the token
+          const delay = anticipatedTime - currentTime;
 
-        if (delay > 0) {
-          // Schedule a one-time refresh when the anticipated time is reached
-          const timeoutId = setTimeout(async () => {
-            console.log("Refreshing token...");
-            await refreshToken();
-          }, delay);
+          // Debug logs to verify the values
+          console.log("Access Token:", accessToken);
+          console.log("Expiration Time (ms):", expirationTime);
+          console.log("Current Time (ms):", currentTime);
+          console.log("Anticipated Time (ms):", anticipatedTime);
+          console.log("Calculated Delay (ms):", delay);
+          console.log("Current Pathname:", pathname);
 
-          return () => clearTimeout(timeoutId);
-        } else {
-          // Refresh token immediately if it's already past the anticipated time
-          refreshToken();
+          // Check the condition
+          if (delay > 0 && pathname !== "/login") {
+            console.log("Current Path:", pathname);
+            let countdown = Math.floor(delay / 1000); // Convert delay to seconds
+            console.log(`Token will refresh in ${countdown} seconds`);
+
+            // Create an interval to count down every second
+            const countdownInterval = setInterval(() => {
+              countdown -= 1;
+              console.log(`Time until token refresh: ${countdown} seconds`);
+
+              // Stop the countdown when it reaches 0
+              if (countdown <= 0) {
+                clearInterval(countdownInterval);
+              }
+            }, 1000);
+
+            // Schedule a one-time refresh when the anticipated time is reached
+            const timeoutId = setTimeout(async () => {
+              console.log("Refreshing token...");
+              clearInterval(countdownInterval); // Clear the countdown interval when refreshing
+              await refreshToken();
+            }, delay);
+
+            // Cleanup function to clear timeout and interval if component unmounts
+            return () => {
+              clearTimeout(timeoutId);
+              clearInterval(countdownInterval);
+            };
+          } else {
+            // Refresh token immediately if it's already past the anticipated time
+            console.log(
+              "Immediate token refresh due to expired or login page."
+            );
+            refreshToken();
+          }
+        } catch (error) {
+          console.error("Failed to decode the access token:", error);
+          refreshToken(); // Attempt to refresh if decoding fails
         }
       }
     };
 
+    // Handle user state if user data is retrieved successfully
     if (userResponse?.status === 200) {
       const user = userResponse.data.user;
       setUser(user);
@@ -229,7 +268,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }
 
     scheduleTokenRefresh();
-  }, [accessToken, isAuthenticated, refreshToken, userResponse, userLoading]);
+  }, [
+    accessToken,
+    isAuthenticated,
+    refreshToken,
+    userResponse,
+    userLoading,
+    pathname,
+  ]);
 
   const login = async (
     email: string,
