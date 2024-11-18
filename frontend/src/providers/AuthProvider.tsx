@@ -102,10 +102,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
       console.log(anticipatedTime, currentTime);
 
-      tokenRefreshInterval = setInterval(async () => {
-        console.log("Refreshing token...");
-        await refreshToken();
-      }, Math.max(0, anticipatedTime - currentTime));
+      if (anticipatedTime < currentTime) {
+        tokenRefreshInterval = setInterval(async () => {
+          console.log("Refreshing token...");
+          await refreshToken();
+        }, Math.max(0, anticipatedTime - currentTime));
+      }
     }
 
     if (userResponse?.status === 200) {

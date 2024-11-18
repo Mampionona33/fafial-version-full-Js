@@ -7,13 +7,6 @@ import {
 import { AxiosResponse, isAxiosError } from "axios"; // Importez isAxiosError
 
 class AuthServices {
-  private static ACCESS_TOKEN_NAME: string;
-  private static REFRESH_TOKEN_NAME: string;
-
-  static {
-    AuthServices.ACCESS_TOKEN_NAME = ACCESS_TOKEN_NAME;
-  }
-
   // Fonction de connexion pour authentifier et stocker le token dans un cookie
   public static async login(
     email: string,
@@ -38,7 +31,7 @@ class AuthServices {
   }
 
   public static isAuthenticated(): boolean {
-    const token = localStorage.getItem(AuthServices.ACCESS_TOKEN_NAME);
+    const token = localStorage.getItem(ACCESS_TOKEN_NAME);
     return !!token;
   }
 
@@ -58,19 +51,19 @@ class AuthServices {
   }
 
   public static getTokenAccess(): string | null {
-    return localStorage.getItem(AuthServices.ACCESS_TOKEN_NAME);
+    return localStorage.getItem(ACCESS_TOKEN_NAME);
   }
 
   public static getRefreshToken(): string | undefined {
-    return Cookies.get(AuthServices.REFRESH_TOKEN_NAME);
+    return Cookies.get(REFRESH_TOKEN_NAME);
   }
 
   public static setTokenAccess(token: string): void {
-    localStorage.setItem(AuthServices.ACCESS_TOKEN_NAME, token);
+    localStorage.setItem(ACCESS_TOKEN_NAME, token);
   }
 
   public static removeAccessToken(): void {
-    localStorage.removeItem(AuthServices.ACCESS_TOKEN_NAME);
+    localStorage.removeItem(ACCESS_TOKEN_NAME);
   }
 
   static async refreshToken(): Promise<AxiosResponse> {
