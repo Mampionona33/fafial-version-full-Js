@@ -39,6 +39,26 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     return true;
   }, []);
 
+  // const refreshToken = useCallback(async () => {
+  //   try {
+  //     console.log("Refreshing token...");
+  //     const resp = await AuthServices.refreshToken();
+  //     if (resp.status === 200) {
+  //       const { accessToken } = resp.data;
+  //       localStorage.setItem(ACCESS_TOKEN_NAME, accessToken);
+  //       console.log("Token refreshed:", accessToken); // Log pour vérifier le token rafraîchi
+  //       return accessToken;
+  //     } else if (resp.status === 401) {
+  //       setIsAuthenticated(false);
+  //       localStorage.removeItem(ACCESS_TOKEN_NAME);
+  //       Cookies.remove(REFRESH_TOKEN_NAME);
+  //     }
+  //   } catch (error) {
+  //     console.error("Token refresh failed:", error);
+  //   }
+  //   return null;
+  // }, []);
+
   const refreshToken = useCallback(async () => {
     try {
       console.log("Refreshing token...");
@@ -46,7 +66,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       if (resp.status === 200) {
         const { accessToken } = resp.data;
         localStorage.setItem(ACCESS_TOKEN_NAME, accessToken);
-        console.log("Token refreshed:", accessToken); // Log pour vérifier le token rafraîchi
+        setAccessToken(accessToken); // Update the access token in state
+        console.log("Token refreshed:", accessToken);
         return accessToken;
       } else if (resp.status === 401) {
         setIsAuthenticated(false);
@@ -91,27 +112,109 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     enabled: !!accessToken,
   });
 
+  // useEffect(() => {
+  //   let tokenRefreshInterval: NodeJS.Timeout;
+
+  //   if (isAuthenticated && accessToken) {
+  //     const decodedToken: { exp: number } = jwtDecode(accessToken);
+  //     console.log("decodedToken", decodedToken);
+  //     const expirationTime = decodedToken.exp * 1000;
+  //     const currentTime = Date.now();
+  //     console.log("expirationTime", expirationTime);
+  //     const anticipatedTime = expirationTime - EXPIRATION_BUFFER;
+  //     console.log("EXPIRATION_BUFFER", EXPIRATION_BUFFER);
+
+  //     console.log(anticipatedTime, currentTime);
+
+  //     if (anticipatedTime < currentTime) {
+  //       tokenRefreshInterval = setInterval(async () => {
+  //         console.log("Refreshing token...");
+  //         await refreshToken();
+  //       }, Math.max(0, anticipatedTime - currentTime));
+  //     }
+  //   }
+
+  //   if (userResponse?.status === 200) {
+  //     const user = userResponse.data.user;
+  //     setUser(user);
+  //     localStorage.setItem("user", JSON.stringify(user));
+  //     setIsAuthenticated(true);
+  //     setLoading(false);
+  //   }
+
+  //   const checkAuthStatus = async () => {
+  //     const accessToken = localStorage.getItem(ACCESS_TOKEN_NAME);
+  //     const refreshTokenCookie = Cookies.get(REFRESH_TOKEN_NAME);
+
+  //     if (isAccessTokenExpired() && isAuthenticated) {
+  //       const newAccessToken = await refreshToken();
+  //       if (newAccessToken) {
+  //         const userResponse = await UserServices.getAuthenticatedUser(
+  //           newAccessToken
+  //         );
+  //         if (userResponse.status === 200) {
+  //           const user = userResponse.data.user;
+  //           setUser(user);
+  //           localStorage.setItem("user", JSON.stringify(user));
+  //           setIsAuthenticated(true);
+  //         }
+  //       } else {
+  //         setIsAuthenticated(false);
+  //         localStorage.removeItem("user");
+  //       }
+  //     } else if (accessToken && refreshTokenCookie) {
+  //       const storedUser = localStorage.getItem("user");
+  //       if (storedUser) {
+  //         setUser(JSON.parse(storedUser));
+  //         setIsAuthenticated(true);
+  //       }
+  //     } else {
+  //       setIsAuthenticated(false);
+  //       localStorage.removeItem("user");
+  //     }
+  //   };
+
+  //   checkAuthStatus();
+
+  //   if (userLoading) {
+  //     setLoading(true);
+  //   }
+
+  //   return () => clearInterval(tokenRefreshInterval);
+  // }, [
+  //   isAccessTokenExpired,
+  //   refreshToken,
+  //   isAuthenticated,
+  //   userResponse,
+  //   userLoading,
+  //   accessToken,
+  // ]);
+
   useEffect(() => {
-    let tokenRefreshInterval: NodeJS.Timeout;
+    const scheduleTokenRefresh = () => {
+      if (accessToken) {
+        const decodedToken: { exp: number } = jwtDecode(accessToken);
+        const expirationTime = decodedToken.exp * 1000;
+        const currentTime = Date.now();
+        const anticipatedTime = expirationTime - EXPIRATION_BUFFER;
 
-    if (isAuthenticated && accessToken) {
-      const decodedToken: { exp: number } = jwtDecode(accessToken);
-      console.log("decodedToken", decodedToken);
-      const expirationTime = decodedToken.exp * 1000;
-      const currentTime = Date.now();
-      console.log("expirationTime", expirationTime);
-      const anticipatedTime = expirationTime - EXPIRATION_BUFFER;
-      console.log("EXPIRATION_BUFFER", EXPIRATION_BUFFER);
+        // Calculate the delay before refreshing the token
+        const delay = anticipatedTime - currentTime;
 
-      console.log(anticipatedTime, currentTime);
+        if (delay > 0) {
+          // Schedule a one-time refresh when the anticipated time is reached
+          const timeoutId = setTimeout(async () => {
+            console.log("Refreshing token...");
+            await refreshToken();
+          }, delay);
 
-      if (anticipatedTime < currentTime) {
-        tokenRefreshInterval = setInterval(async () => {
-          console.log("Refreshing token...");
-          await refreshToken();
-        }, Math.max(0, anticipatedTime - currentTime));
+          return () => clearTimeout(timeoutId);
+        } else {
+          // Refresh token immediately if it's already past the anticipated time
+          refreshToken();
+        }
       }
-    }
+    };
 
     if (userResponse?.status === 200) {
       const user = userResponse.data.user;
@@ -121,53 +224,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       setLoading(false);
     }
 
-    const checkAuthStatus = async () => {
-      const accessToken = localStorage.getItem(ACCESS_TOKEN_NAME);
-      const refreshTokenCookie = Cookies.get(REFRESH_TOKEN_NAME);
-
-      if (isAccessTokenExpired() && isAuthenticated) {
-        const newAccessToken = await refreshToken();
-        if (newAccessToken) {
-          const userResponse = await UserServices.getAuthenticatedUser(
-            newAccessToken
-          );
-          if (userResponse.status === 200) {
-            const user = userResponse.data.user;
-            setUser(user);
-            localStorage.setItem("user", JSON.stringify(user));
-            setIsAuthenticated(true);
-          }
-        } else {
-          setIsAuthenticated(false);
-          localStorage.removeItem("user");
-        }
-      } else if (accessToken && refreshTokenCookie) {
-        const storedUser = localStorage.getItem("user");
-        if (storedUser) {
-          setUser(JSON.parse(storedUser));
-          setIsAuthenticated(true);
-        }
-      } else {
-        setIsAuthenticated(false);
-        localStorage.removeItem("user");
-      }
-    };
-
-    checkAuthStatus();
-
     if (userLoading) {
       setLoading(true);
     }
 
-    return () => clearInterval(tokenRefreshInterval);
-  }, [
-    isAccessTokenExpired,
-    refreshToken,
-    isAuthenticated,
-    userResponse,
-    userLoading,
-    accessToken,
-  ]);
+    scheduleTokenRefresh();
+  }, [accessToken, isAuthenticated, refreshToken, userResponse, userLoading]);
 
   const login = async (
     email: string,
