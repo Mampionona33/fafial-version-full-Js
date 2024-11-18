@@ -96,9 +96,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
     if (isAuthenticated && accessToken) {
       const decodedToken: { exp: number } = jwtDecode(accessToken);
+      console.log("decodedToken", decodedToken);
       const expirationTime = decodedToken.exp * 1000;
       const currentTime = Date.now();
+      console.log("expirationTime", expirationTime);
       const anticipatedTime = expirationTime - EXPIRATION_BUFFER;
+      console.log("EXPIRATION_BUFFER", EXPIRATION_BUFFER);
 
       console.log(anticipatedTime, currentTime);
 
