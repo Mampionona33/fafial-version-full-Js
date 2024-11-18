@@ -21,11 +21,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const [user, setUser] = useState<UserInterface | null>(null);
   const [loading, setLoading] = useState(false);
   const [accessToken, setAccessToken] = useState<string | null>(null);
-  const pathname = window.location.pathname;
 
   const refreshToken = useCallback(async () => {
     try {
       console.log("Refreshing token...");
+      const pathname = window.location.pathname;
+      if (pathname === "/login") return;
       const resp = await AuthServices.refreshToken();
       if (resp.status === 200) {
         const { accessToken } = resp.data;
@@ -94,11 +95,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
           console.log("Current Time (ms):", currentTime);
           console.log("Anticipated Time (ms):", anticipatedTime);
           console.log("Calculated Delay (ms):", delay);
-          console.log("Current Pathname:", pathname);
 
           // Check the condition
-          if (delay > 0 && pathname !== "/login") {
-            console.log("Current Path:", pathname);
+          if (delay > 0) {
             let countdown = Math.floor(delay / 1000); // Convert delay to seconds
             console.log(`Token will refresh in ${countdown} seconds`);
 
@@ -117,6 +116,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
             const timeoutId = setTimeout(async () => {
               console.log("Refreshing token...");
               clearInterval(countdownInterval); // Clear the countdown interval when refreshing
+              clearTimeout(timeoutId);
+
               await refreshToken();
             }, delay);
 
@@ -153,14 +154,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }
 
     scheduleTokenRefresh();
-  }, [
-    accessToken,
-    isAuthenticated,
-    refreshToken,
-    userResponse,
-    userLoading,
-    pathname,
-  ]);
+  }, [accessToken, isAuthenticated, refreshToken, userResponse, userLoading]);
 
   const login = async (
     email: string,
