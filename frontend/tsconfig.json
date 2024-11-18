@@ -1,11 +1,13 @@
 {
+  "compilerOptions": {
+    "typeRoots": [
+      "./node_modules/@types",
+      "./node_modules/@tanstack/react-table/types"
+    ]
+  },
   "files": [],
   "references": [
     { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.node.json" }
-  ],
-  "typeRoots": [
-    "./node_modules/@types",
-    "./node_modules/@tanstack/react-table/types"
   ]
 }
