@@ -1,5 +1,9 @@
 {
   "compilerOptions": {
+    "paths": {
+      "@src/*": ["./src/*"],
+      "@tests/*": ["./tests/*"]
+    },
     "typeRoots": [
       "./node_modules/@types",
       "./node_modules/@tanstack/react-table/types"
