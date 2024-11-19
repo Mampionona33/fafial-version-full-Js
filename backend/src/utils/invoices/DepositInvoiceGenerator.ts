@@ -21,9 +21,11 @@ class DepositInvoiceGenerator {
   private companyInfo: CompanyInfo | null;
   private clientInfo: ClientInfo | null;
   private bodyContent: ITable;
+  private reference: string;
 
   constructor() {
     this.myCompanyLogo = "";
+    this.reference = "";
     this.title = "Invoice";
     this.companyInfo = null;
     this.clientInfo = null;
@@ -37,6 +39,10 @@ class DepositInvoiceGenerator {
 
   setTitle(title: string) {
     this.title = title;
+  }
+
+  setReference(reference: string) {
+    this.reference = reference;
   }
 
   setLogo(logo: string) {
@@ -62,7 +68,14 @@ class DepositInvoiceGenerator {
       doc.fontSize(12).text(this.companyInfo.name, { align: "left" });
       doc.text(this.companyInfo.address, { align: "left" });
       doc.text(this.companyInfo.contact, { align: "left" });
-      doc.rect(doc.x, 0, 500, doc.y).stroke();
+      // doc.rect(doc.x, 0, 500, doc.y).stroke();
+    }
+  }
+
+  private addReference(doc: InstanceType<typeof PDFDocument>) {
+    if (this.reference.length > 0) {
+      doc.fontSize(12).text(this.reference, { align: "left" });
+      doc.moveDown(1);
     }
   }
 
@@ -74,18 +87,17 @@ class DepositInvoiceGenerator {
 
       // Information aligned to the right
       doc.text(`Client: ${this.clientInfo.name}`, {
-        align: "left",
+        align: "right",
       });
       doc.text(`Contact: ${this.clientInfo.contact}`, {
-        align: "left",
+        align: "right",
       });
       doc.text(`Contact Name: ${this.clientInfo.contactName}`, {
-        align: "left",
+        align: "right",
       });
 
       doc.moveDown(2);
-
-      doc.rect(doc.x, 0, 500, doc.y).stroke();
+      // doc.rect(doc.x, 0, 500, doc.y).stroke();
     }
   }
 
@@ -98,7 +110,6 @@ class DepositInvoiceGenerator {
     doc.fontSize(16).text(this.title, {
       align: "center",
     });
-    doc.rect(doc.x, 0, 500, doc.y).stroke();
   }
 
   private async addBody(doc: InstanceType<typeof PDFDocument>) {
@@ -133,6 +144,7 @@ class DepositInvoiceGenerator {
 
     this.setHeaders(doc);
     this.setClientDetails(doc);
+    this.addReference(doc);
     this.addTitle(doc);
     this.addBody(doc);
     this.setFooter(doc);

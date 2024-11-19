@@ -30,7 +30,7 @@ export const createAcompteInvoice = async (req: Request, res: Response) => {
       return;
     }
 
-    const invoiceRef = ReferenceGenerator.generateReference("INV");
+    const invoiceRef = ReferenceGenerator.generateReference("FAC");
 
     // Création de la facture d'acompte
     const invoice = await prisma.invoice.create({
@@ -186,6 +186,8 @@ export const getAcompteInvoice = async (req: Request, res: Response) => {
     });
 
     console.log("reservation", reservation);
+    console.log("invoice", invoice);
+
     const tableHeader: IHeader[] = [
       { label: "Détails", property: "details", width: 275 },
       { label: "Quantité", property: "quantity", width: 75 },
@@ -194,6 +196,7 @@ export const getAcompteInvoice = async (req: Request, res: Response) => {
     ];
 
     const depositeInvoice = new DepositInvoiceGenerator();
+    depositeInvoice.setReference(`Réference: ${invoice!.reference}`);
     depositeInvoice.setTitle(`Reservation : ${reservation!.reference}`);
     depositeInvoice.setBody({ headers: tableHeader });
     depositeInvoice.setCompanyInfo({
