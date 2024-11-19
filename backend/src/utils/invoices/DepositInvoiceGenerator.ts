@@ -1,6 +1,7 @@
 import fs from "fs";
+import { ITable } from "interfaces/pdfTableTypes";
 import path from "path";
-const PDFDocument = require("pdfkit");
+const PDFDocument = require("pdfkit-table");
 
 interface ClientInfo {
   name: string;
@@ -19,14 +20,19 @@ class DepositInvoiceGenerator {
   private title: string;
   private companyInfo: CompanyInfo | null;
   private clientInfo: ClientInfo | null;
-  private bodyContent: string;
+  private bodyContent: ITable;
 
   constructor() {
     this.myCompanyLogo = "";
     this.title = "Invoice";
     this.companyInfo = null;
     this.clientInfo = null;
-    this.bodyContent = "";
+    this.bodyContent = {
+      headers: [],
+      rows: [],
+      subtitle: "",
+      title: "",
+    };
   }
 
   setTitle(title: string) {
@@ -45,7 +51,7 @@ class DepositInvoiceGenerator {
     this.clientInfo = clientInfo;
   }
 
-  setBody(bodyContent: string) {
+  setBody(bodyContent: ITable) {
     this.bodyContent = bodyContent;
   }
 
@@ -64,23 +70,18 @@ class DepositInvoiceGenerator {
     if (this.clientInfo) {
       doc.moveDown(2);
 
-      const rightAlignX = 400; // Adjust this X position to place the text to the right side
+      //const rightAlignX = 350; // Adjust this X position to place the text to the right side
 
       // Information aligned to the right
-      doc.text(`Client: ${this.clientInfo.name}`, rightAlignX, doc.y, {
+      doc.text(`Client: ${this.clientInfo.name}`, {
         align: "left",
       });
-      doc.text(`Contact: ${this.clientInfo.contact}`, rightAlignX, doc.y, {
+      doc.text(`Contact: ${this.clientInfo.contact}`, {
         align: "left",
       });
-      doc.text(
-        `Contact Name: ${this.clientInfo.contactName}`,
-        rightAlignX,
-        doc.y,
-        {
-          align: "left",
-        }
-      );
+      doc.text(`Contact Name: ${this.clientInfo.contactName}`, {
+        align: "left",
+      });
 
       doc.moveDown(2);
 
@@ -89,10 +90,27 @@ class DepositInvoiceGenerator {
   }
 
   private addTitle(doc: InstanceType<typeof PDFDocument>) {
-    doc.fontSize(16).text(this.title, -(doc.x - 400), doc.y, {
+    // doc.fontSize(16).text(this.title, -(doc.x - 400), doc.y, {
+    //   align: "center",
+    // });
+    // doc.rect(doc.x, 0, 500, doc.y).stroke();
+
+    doc.fontSize(16).text(this.title, {
       align: "center",
     });
     doc.rect(doc.x, 0, 500, doc.y).stroke();
+  }
+
+  private async addBody(doc: InstanceType<typeof PDFDocument>) {
+    try {
+      if (this.bodyContent.headers.length > 0) {
+        doc.moveDown(1);
+        await doc.table(this.bodyContent);
+      }
+    } catch (error) {
+      console.error("Error adding body content:", error);
+      throw error;
+    }
   }
 
   private setFooter(doc: InstanceType<typeof PDFDocument>) {
@@ -116,7 +134,7 @@ class DepositInvoiceGenerator {
     this.setHeaders(doc);
     this.setClientDetails(doc);
     this.addTitle(doc);
-    doc.text(this.bodyContent);
+    this.addBody(doc);
     this.setFooter(doc);
 
     doc.end();

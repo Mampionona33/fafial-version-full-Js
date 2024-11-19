@@ -56,6 +56,9 @@ importers:
       pdfkit:
         specifier: ^0.15.1
         version: 0.15.1
+      pdfkit-table:
+        specifier: ^0.1.99
+        version: 0.1.99
     devDependencies:
       '@types/bcryptjs':
         specifier: ^2.4.6
@@ -837,6 +840,9 @@ packages:
 
   path-to-regexp@0.1.10:
     resolution: {integrity: sha512-7lf7qcQidTku0Gu3YDPc8DJ1q7OOucfa/BSsIwjuh56VU7katFvuM8hULfkwB3Fns/rsVF7PwPKVw1sl5KQS9w==}
+
+  pdfkit-table@0.1.99:
+    resolution: {integrity: sha512-BaunFJ7cvKqIPONzX9FXUpeC/3iJeLo0v2nVNjCccAxdMXKvDMBjxyF4wZhKOYlmP+nYZcikf9ByVJeCzjNK6g==}
 
   pdfkit@0.15.1:
     resolution: {integrity: sha512-sleaMQXbQ/Dk+38HlxdiMT6Lmw5+HoNc4vkJR1Tb9XGALuB1xrfdWYbDFta70F3jCrVkhA2DiQ52D7jbysGZrw==}
@@ -1887,6 +1893,10 @@ snapshots:
   parseurl@1.3.3: {}
 
   path-to-regexp@0.1.10: {}
+
+  pdfkit-table@0.1.99:
+    dependencies:
+      pdfkit: 0.15.1
 
   pdfkit@0.15.1:
     dependencies:

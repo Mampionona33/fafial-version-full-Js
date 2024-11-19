@@ -32,8 +32,7 @@ const PageStaffFactureAcompte = () => {
   if (!pdfUrl) return <p>Aucune facture trouvée.</p>;
 
   return (
-    <div>
-      <h1>Facture Acompte</h1>
+    <div className="flex items-center justify-center py-10">
       <iframe
         src={pdfUrl}
         width="100%"

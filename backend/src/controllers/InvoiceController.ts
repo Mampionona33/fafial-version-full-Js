@@ -4,6 +4,7 @@ import { ReferenceGenerator } from "../utils/ReferenceGenerator";
 import { StandardInvoiceGenerator } from "../utils/invoices/StandardInvoiceGenerator";
 import getLogoFile from "../utils/getLogoFile";
 import DepositInvoiceGenerator from "../utils/invoices/DepositInvoiceGenerator";
+import { IHeader } from "interfaces/pdfTableTypes";
 const PDFDocument = require("pdfkit");
 
 export const createAcompteInvoice = async (req: Request, res: Response) => {
@@ -185,9 +186,16 @@ export const getAcompteInvoice = async (req: Request, res: Response) => {
     });
 
     console.log("reservation", reservation);
+    const tableHeader: IHeader[] = [
+      { label: "Détails", property: "details", width: 275 },
+      { label: "Quantité", property: "quantity", width: 75 },
+      { label: "Prix", property: "price", width: 75 },
+      { label: "Total", property: "total", width: 75 },
+    ];
 
     const depositeInvoice = new DepositInvoiceGenerator();
     depositeInvoice.setTitle(`Reservation : ${reservation!.reference}`);
+    depositeInvoice.setBody({ headers: tableHeader });
     depositeInvoice.setCompanyInfo({
       address: myCompanies[0].address,
       name: myCompanies[0].name,
