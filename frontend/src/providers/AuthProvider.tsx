@@ -156,6 +156,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     scheduleTokenRefresh();
   }, [accessToken, isAuthenticated, refreshToken, userResponse, userLoading]);
 
+  useEffect(() => {
+    refreshToken();
+  }, []);
+
   const login = async (
     email: string,
     password: string
