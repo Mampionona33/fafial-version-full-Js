@@ -1,5 +1,5 @@
 import fs from "fs";
-import { ITable } from "interfaces/pdfTableTypes";
+import { IData, ITable } from "interfaces/pdfTableTypes";
 import path from "path";
 const PDFDocument = require("pdfkit-table");
 
@@ -22,9 +22,11 @@ class DepositInvoiceGenerator {
   private clientInfo: ClientInfo | null;
   private bodyContent: ITable;
   private reference: string;
+  private payementDate: string;
 
   constructor() {
     this.myCompanyLogo = "";
+    this.payementDate = "";
     this.reference = "";
     this.title = "Invoice";
     this.companyInfo = null;
@@ -32,8 +34,6 @@ class DepositInvoiceGenerator {
     this.bodyContent = {
       headers: [],
       rows: [],
-      subtitle: "",
-      title: "",
     };
   }
 
@@ -43,6 +43,10 @@ class DepositInvoiceGenerator {
 
   setReference(reference: string) {
     this.reference = reference;
+  }
+
+  setPaymentDate(payementDate: string) {
+    this.payementDate = payementDate;
   }
 
   setLogo(logo: string) {
@@ -75,7 +79,6 @@ class DepositInvoiceGenerator {
   private addReference(doc: InstanceType<typeof PDFDocument>) {
     if (this.reference.length > 0) {
       doc.fontSize(12).text(this.reference, { align: "left" });
-      doc.moveDown(1);
     }
   }
 
@@ -86,13 +89,13 @@ class DepositInvoiceGenerator {
       //const rightAlignX = 350; // Adjust this X position to place the text to the right side
 
       // Information aligned to the right
-      doc.text(`Client: ${this.clientInfo.name}`, {
+      doc.text(`${this.clientInfo.name}`, {
         align: "right",
       });
-      doc.text(`Contact: ${this.clientInfo.contact}`, {
+      doc.text(`${this.clientInfo.contact}`, {
         align: "right",
       });
-      doc.text(`Contact Name: ${this.clientInfo.contactName}`, {
+      doc.text(`${this.clientInfo.contactName}`, {
         align: "right",
       });
 
@@ -110,6 +113,15 @@ class DepositInvoiceGenerator {
     doc.fontSize(16).text(this.title, {
       align: "center",
     });
+  }
+
+  private addPaymentDate(doc: InstanceType<typeof PDFDocument>) {
+    if (this.payementDate.length > 0) {
+      doc.fontSize(12).text(`Date de payement: ${this.payementDate}`, {
+        align: "left",
+      });
+      doc.moveDown(1);
+    }
   }
 
   private async addBody(doc: InstanceType<typeof PDFDocument>) {
@@ -145,6 +157,7 @@ class DepositInvoiceGenerator {
     this.setHeaders(doc);
     this.setClientDetails(doc);
     this.addReference(doc);
+    this.addPaymentDate(doc);
     this.addTitle(doc);
     this.addBody(doc);
     this.setFooter(doc);

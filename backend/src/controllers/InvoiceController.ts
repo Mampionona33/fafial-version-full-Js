@@ -1,11 +1,9 @@
 import { Request, Response } from "express";
 import prisma from "../../prisma/prisma";
 import { ReferenceGenerator } from "../utils/ReferenceGenerator";
-import { StandardInvoiceGenerator } from "../utils/invoices/StandardInvoiceGenerator";
 import getLogoFile from "../utils/getLogoFile";
 import DepositInvoiceGenerator from "../utils/invoices/DepositInvoiceGenerator";
-import { IHeader } from "interfaces/pdfTableTypes";
-const PDFDocument = require("pdfkit");
+import { IData, IHeader } from "interfaces/pdfTableTypes";
 
 export const createAcompteInvoice = async (req: Request, res: Response) => {
   try {
@@ -195,10 +193,22 @@ export const getAcompteInvoice = async (req: Request, res: Response) => {
       { label: "Total", property: "total", width: 75 },
     ];
 
+    const tableRows: IData[] = [
+      {
+        details: "Acompte du réservation " + recette!.reference,
+        quantity: 1,
+        price: invoice!.totalAmount,
+        total: invoice!.totalAmount,
+      },
+    ];
+
     const depositeInvoice = new DepositInvoiceGenerator();
     depositeInvoice.setReference(`Réference: ${invoice!.reference}`);
+    depositeInvoice.setPaymentDate(
+      invoice!.paymentDate!.toISOString().slice(0, 10)
+    );
     depositeInvoice.setTitle(`Reservation : ${reservation!.reference}`);
-    depositeInvoice.setBody({ headers: tableHeader });
+    depositeInvoice.setBody({ headers: tableHeader, datas: tableRows });
     depositeInvoice.setCompanyInfo({
       address: myCompanies[0].address,
       name: myCompanies[0].name,
@@ -206,9 +216,9 @@ export const getAcompteInvoice = async (req: Request, res: Response) => {
     });
     depositeInvoice.setLogo(myCompanyLogo!);
     depositeInvoice.setClientInfo({
-      contactName: "test",
-      contact: "test",
-      name: "test",
+      contactName: recette!.personnePayeur,
+      contact: recette!.contactPayeur,
+      name: reservation!.nomOrganisation,
     });
 
     const pdfFilePath = await depositeInvoice.generatePdf();
